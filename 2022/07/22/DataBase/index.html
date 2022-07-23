@@ -1,0 +1,1598 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Hexo | Hexo</title><meta name="author" content="John Doe"><meta name="copyright" content="John Doe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="title：DataBse关系模型 2.1基本概念 域的定义：域($domain$)是一组值的集合，同一个域中的所有值均应具有相同的数据类型，域中元素一般无排列次序  笛卡尔积的定义：域$D_1，D_2，…，D_n$上的笛卡儿积$(Cartesian product)$是一个集合：$D_1×D_2×…×D_n＝\lbrace {(d_1,d_2,…d_n) | d_i∈D_i，1≤i≤n}\rb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2022/07/22/DataBase/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="title：DataBse关系模型 2.1基本概念 域的定义：域($domain$)是一组值的集合，同一个域中的所有值均应具有相同的数据类型，域中元素一般无排列次序  笛卡尔积的定义：域$D_1，D_2，…，D_n$上的笛卡儿积$(Cartesian product)$是一个集合：$D_1×D_2×…×D_n＝\lbrace {(d_1,d_2,…d_n) | d_i∈D_i，1≤i≤n}\rb">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+<meta property="article:published_time" content="2022-07-22T14:59:36.897Z">
+<meta property="article:modified_time" content="2022-07-22T15:12:12.247Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2022/07/22/DataBase/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: {"defaultEncoding":1,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"Author: John Doe","link":"Link: ","source":"Source: Hexo","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Hexo',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-07-22 23:12:12'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://avatars.githubusercontent.com/u/92515552?s=400&amp;u=1e1aa62c4d1cd15f520cf2d40e2a4388e05c11bb&amp;v=4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影Movie</span></a></li><li><a class="site-page child" href="/Photo/"><i class="fa-fw fas fa-photo"></i><span> 照片Photo</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Hexo</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影Movie</span></a></li><li><a class="site-page child" href="/Photo/"><i class="fa-fw fas fa-photo"></i><span> 照片Photo</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">No title</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-07-22T14:59:36.897Z" title="Created 2022-07-22 22:59:36">2022-07-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-07-22T15:12:12.247Z" title="Updated 2022-07-22 23:12:12">2022-07-22</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><hr>
+<h2 id="title：DataBse"><a href="#title：DataBse" class="headerlink" title="title：DataBse"></a>title：DataBse</h2><h3 id="关系模型"><a href="#关系模型" class="headerlink" title="关系模型"></a>关系模型</h3><hr>
+<h4 id="2-1基本概念"><a href="#2-1基本概念" class="headerlink" title="2.1基本概念"></a>2.1基本概念</h4><ol>
+<li><p><strong>域的定义：</strong>域($domain$)是一组值的集合，同一个域中的所有值均应具有相同的数据类型，域中元素一般无排列次序</p>
+</li>
+<li><p><strong>笛卡尔积的定义：</strong>域$D_1，D_2，…，D_n$上的笛卡儿积$(Cartesian product)$是一个集合：$D_1×D_2×…×D_n＝\lbrace {(d_1,d_2,…d_n) | d_i∈D_i，1≤i≤n}\rbrace$,其中允许$D_i＝D_j$且$i≠j$，将该集合中的每一个元素$(d_1,d_2,…d_n)$称为一个元组$(tuple)$，元组中的每一个值$d_i$称为一个分量$(component)$，有$n$个分量的元组称为$n$元组 .<u>一个元组也被称为一条记录</u></p>
+</li>
+<li><p><strong>关系的定义：</strong>$D_1×D_2×…×D_n$上的任意一个子集均是定义在域$D_1，D_2，…D_n$上的一个关系$(relation)$，记为$R$ 。由$n$个域构成的关系通常称为$n$元关系，关系中的每个元素即是这个关系的元组</p>
+</li>
+<li><p><strong>键的相关概念：</strong>如果一个关系中的某个属性或属性集能够唯一的确定一个元组，则称该属性（集）是这个关系上的超键$（super key，SK）$；如果将超键中的任一属性去掉后剩余的属性集不能唯一标识一个元组，则称该属性集是关系上的候选键$（candidate key，CK）$；通常从候选键中选择一个使用，这个候选键称为关系的主键$（primary key，PK）$;如果关系$R_1$中的某个属性集是另外一个关系$R_2$的候选键，那么该属性集对于关系$R_1$而言是它的外键$（foreign key，FK）$</p>
+</li>
+<li><p><strong>关系模式的定义：</strong>关系模式$（relation schema）$是对关系的型的描述，可以表示为：$R(U，D，DOM，I，F)$,其中，$U$是$R$的属性集合$\lbrace{A_1，A_2，…，A_n}\rbrace$，$D$是属性的取值范围，即域的集合$\lbrace {D_1，D_2，…，D_n}\rbrace$，$DOM$是$U$到$D$的映射集合$\lbrace{A_1→D_1，A_2→D_2，…，A_n→D_n}\rbrace$，$I$是完整性约束规则集，$F$是函数依赖集合,并且习惯上将关系模式简记为$R(A_1／D_1，A_2／D_2，…，A_n／D_n)$或者$R(A_1，A_2，…，A_n)$</p>
+<p><u>关系可以看作是关系模式在某一时刻的状态或内容，即：关系模式是型，关系是值，关系模式是静态的、稳定的，而关系是动态的，随时间不断变化的，因为关系操作在不断地更新着数据库中的数据</u></p>
+</li>
+<li><p><strong>关系的特征：</strong></p>
+<ul>
+<li>关系中不允许出现相同的元组（元组不重复）</li>
+<li>关系中各个属性必须有不同的名字，不同的属性可来自同一个域，即他们的分量可以取自同一个域（属性不重复）</li>
+<li>关系中元组的顺序(即行序)是无关紧要的，在一个关系中可以任意交换两行的次序（元组间无序）</li>
+<li>关系中属性的顺序是无关紧要的，即属性的顺序可以任意交换（属性间无序）</li>
+<li>同一属性名下的各个属性值必须来自同一个域，是同一类型的数据</li>
+<li>关系中每个分量必须是不可分的数据项，或者说所有属性值都是原子的，是一个确定的值，而不是值的集合，即不可“表中有表” 。属性值可以为空值，表示“未知”或“不可使用”。</li>
+</ul>
+</li>
+<li><p><strong>关系的类型：</strong></p>
+<ul>
+<li>（1）<strong>基本表</strong>：实际存在的表，对应实际存储数据的逻辑表示</li>
+<li>（2）<strong>查询表</strong>：对基表查询得到的结果表 </li>
+<li>（3）<strong>视图</strong>：从基本表或其他视图中导出的表 </li>
+</ul>
+</li>
+<li><p><strong>关系的完整性：</strong></p>
+<ul>
+<li>域完整性约束：元组分量在某个属性上的取值应在其值域之内；元组是否能在某个属性上取空值$null$，由该属性的语义决定</li>
+<li>实体完整性约束：$n$元组在<u>键上的取值</u>不可重复，且不能为$null$，按照键的定义，如果不同的元组在键上取相同值或空值，则将无法区分两个不同的元组</li>
+<li>参照完整性约束：属性集$FK$是关系$R$上的外键，属性集$CK$是关系$S$上的候选键，$FK$引用$CK$，$R$和$S$可以是不同的关系，也可以是相同的关系。参照完整性约束要求$R$上的元组$t$在$FK$属性上的取值$t[FK]$必须是如下两种情况之一：<ul>
+<li>等于关系$S$中某个元组在候选键$CK$上的值</li>
+<li>取空值$null$</li>
+</ul>
+</li>
+<li>用户定义的完整性约束：</li>
+</ul>
+</li>
+<li><p><strong>关系模型示意图：</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429173015423.png" alt="image-20220429173015423" style="zoom:50%;" />
+
+<p>​        <u>关系操作集合</u>是指关系模型提供的一组完备的高级关系运算，这些关系运算支持对数据库的各种操作。关系运算通常分成关系代数和关系演算</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429173122301.png" alt="image-20220429173122301" style="zoom:50%;" /></li>
+<li><p><strong>关系模型的优点：</strong></p>
+<ul>
+<li>关系模型提供单一的数据结构形式，具有高度的简明性和精确性</li>
+<li>关系模型的逻辑结构和相应的操作完全独立于数据存储方式，具有高度的数据独立性</li>
+<li>关系模型使数据库的研究建立在比较坚实的数学基础上</li>
+<li>关系数据库语言与一阶谓词逻辑具有固有内在联系，为以关系数据库为基础的推理系统和知识库系统的研究提供了方便</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="2-2关系代数"><a href="#2-2关系代数" class="headerlink" title="2.2关系代数"></a>2.2关系代数</h4><ol>
+<li><p><strong>关系运算：</strong></p>
+<ul>
+<li><p>(1)==选择：$σ_F(R)＝\lbrace{t| t∈R∧F(t)=true}\rbrace$==</p>
+<p>其中$σ$是选择算符，表示进行选择运算，$F$是选择条件，最简单的选择条件形如$XθY$或者$Xθc$，$X$，$Y$是属性名，$c$是常量，$θ$是算术比较运算符，包括$＞，≥，＜，≤，＝，≠$等。可以由简单的选择条件通过逻辑运算符构成更为复杂的条件，逻辑运算符包括$∧$，$∨$和$﹁$</p>
+</li>
+<li><p>(2)==投影：$\prod_X(R)＝\lbrace {t[X]| t∈R}\rbrace$==</p>
+<p>$X$是关系$R$的一个属性子集，$t[X]$表示关系$R$上的元组$t$在属性子集$X$上的分量</p>
+<p><u>需要注意的是因为关系中不允许有重复元组，因此在投影后需要将可能出现的重复元组进行合并</u></p>
+</li>
+<li><p>(3)<strong>连接：</strong></p>
+<ul>
+<li><p>==$θ$连接：$R⋈_{AθB}S＝\lbrace{rs| r∈R∧s∈S∧r[A]θs[B]}\rbrace＝σ_{AθB}(R×S)$==</p>
+<p>$⋈$是连接运算符，$AθB$是连接条件，$θ$是算术比较运算符。$R⋈_{AθB}S$表示将关系$R$和$S$在各自的属性$A$，$B$上满足$θ$条件的元组连接起来</p>
+</li>
+<li><p>==自然连接：$R⋈S＝π_{Attr(R)∪(Attr(S)－A)}(σ_{R.A=S.A}(R×S))$==</p>
+<p>消除了重复属性的等值连接,其中$Attr(R)$是关系R的属性全集。对此的具体可看如下例子：</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429180921166.png" alt="image-20220429180921166" style="zoom: 50%;" /></li>
+<li><p><strong>外连接：</strong>外连接将不满足连接条件的元组仍然保留在结果关系中，并在缺失属性上取$null$。根据保留元组的不同，外连接又分为左外连接，右外连接，全外连接。（按照自己的理解来说，左外连接就是左边关系的所有元组都会在结果集中出现，右边关系能够进行自然连接的就进行，不能连接上的就要赋$null$，右外连接同理可得）</p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429185740440.png" alt="image-20220429185740440"></p>
+</li>
+<li><p><strong>半连接：</strong>R和S的半连接是将其自然连接的结果在R的属性集上投影，可以表示为：</p>
+ <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429191052996.png" alt="image-20220429191052996" style="zoom:50%;" />
+
+<p>半连接不具有交换率，如下例子可以理解半连接的实现过程：</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429191230569.png" alt="image-20220429191230569" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li><p>==除： $T(X)＝R(X,Y)÷S(Y)＝\lbrace{t[X]| t∈R∧ s∈S，t[X]s∈R}\rbrace＝\prod_X(R)－        \prod_X((\prod_X(R)×S)－R)$==</p>
+<p>式中$t[X]s$表示由元组$t$在属性子集$X$上的分量同关系$S$的元组$s$构成的新元组(对于除运算的理解，我认为是寻找象集属性都在关系R中出现的元组在结果属性上的投影)</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429192410523.png" alt="image-20220429192410523" style="zoom:50%;" />
+
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429193451796.png" alt="image-20220429193451796" style="zoom:50%;" /></li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="2-3关系演算"><a href="#2-3关系演算" class="headerlink" title="2.3关系演算"></a>2.3关系演算</h4><ul>
+<li>关系演算：以数理逻辑中的<u>谓词演算</u>为基础</li>
+<li>按谓词变元不同进行分类：<ul>
+<li>1.<strong>元组关系演算</strong>：以元组变量作为谓词变元的基本对象</li>
+<li>2.<strong>域关系演算</strong>：  以域变量作为谓词变元的基本对象</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li><p>元组关系演算：元组关系演算表达式的一般形式是$\lbrace{t| P(t)}\rbrace$，其中$t$是元组变量，$P(t)$是元组关系演算公式，一般由原子公式构成</p>
+<ul>
+<li><p><u>原子公式有以下的三种形式：</u></p>
+<ul>
+<li>$R(t)$，$t$是元组变量，$R$是关系，$R(t)$表示$t∈R$，即$t$是$R$的一个元组</li>
+<li>$s[i]θt[j]$，$s$和$t$都是元组变量，$s[i]$表示元组$s$的第$i$个分量，$t[j]$表示$t$的第$j$个分量，$θ$是算术比较运算符。$s[i]θt[j]$表示$s$的第$i$个分量和$t$的第$j$个分量满足$θ$比较关系</li>
+<li>$s[i]θc$或$cθs[i]$，$c$是常量，$s[i]θc$表示元组$s$的第$i$个分量和常量$c$满足$θ$这样的比较关系</li>
+</ul>
+</li>
+<li><p>在原子公式的基础上可以通过以下递归定义构成元组关系演算公式:</p>
+<ul>
+<li><p>(1)原子公式也是公式</p>
+</li>
+<li><p>(2)如果$P1$，$P2$是公式，则$P1∧P2$，$P1∨P2$， $P1$也是公式，分别表示：</p>
+<p>​     如果$P1$，$P2$同时为真，则$P1∧P2$为真，否则$P1∧P2$为假；</p>
+<p>​     如果$P1$，$P2$中至少有一个为真，则$P1∨P2$为真，否则$P1∨P2$为假；</p>
+<p>​     如果$P1$为真，则 $P1$为假，如果$P1$为假，则 $P1$为真</p>
+</li>
+<li><p>(3)如果$P$是公式，则$∃t(P)$也是公式。 $∃$是存在量词符号，$∃t(P)$表示当至少存在一个$t$使得$P$为真，则 $∃t(P)$为真，否则为假</p>
+</li>
+<li><p>(4)如果$P$是公式，则 $∀t(P)$也是公式。$∀$是全称量词符号，$∀t(P)$表示如果所有的$t$都使$P$为真，则 $∀t(P)$为真，否则为假</p>
+</li>
+<li><p>(5)在元组关系演算公式中，各类算符优先级为：</p>
+<p>$①$算术比较运算符优先级最高；</p>
+<p>$②$量词$∃$和$∀$优先级其次，且$∃$的优先级高于$∀$；</p>
+<p>$③$逻辑运算符优先级最低，且$\neg$的优先级高于$∧$，$∧$的优先级高于$∨$；</p>
+<p>$④$括号可以改变算符的优先级，加括号时，括号内算符优先，同一括号内算符优先级遵循上述各项</p>
+</li>
+<li><p>(6)有限次使用上述规则得到的即是<u>元组关系演算公式</u>，除此之外的构成形式不是元组关系演算公式</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429200332669.png" alt="image-20220429200332669" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li><p><strong>基本关系代数运算的元组关系演算等价表示:</strong></p>
+<ul>
+<li><p>$R∪S＝\lbrace{t| R(t)∨S(t)}\rbrace$</p>
+</li>
+<li><p>$R－S＝\lbrace{t| R(t)∧┑S(t)}\rbrace$</p>
+</li>
+<li><p>$R×S＝\lbrace{t^{(m+n)}|(∃u^{(m)})(∃v^{(n)})(R(u)∧S(v)∧t[1]＝  u[1]∧…∧t[m]＝u[m]∧t[m+1]＝}$</p>
+<p>​               ${v[1]∧…∧t[m+n]＝u[n])}\rbrace$，其中$t^{(m+n)}$表示$t$是$m＋n$元关系的元组</p>
+</li>
+<li><p>$σ_F(R)＝\lbrace{t| R(t)∧F’}\rbrace$，其中$F’$是选择条件$F$在元组关系演算中的等价表示</p>
+</li>
+<li><p>$π_{i_1，i_2，···，i_k}(R)＝\lbrace{t^{(k)}|(∃u)(R(u)∧t[1]＝u[i_1] ∧…∧t[k]＝u[i_k])}\rbrace$</p>
+</li>
+</ul>
+</li>
+<li><p>如果$\lbrace{t| P(t)}\rbrace $满足下面的三个条件，则$\lbrace{t| P(t)}\rbrace $是安全的：</p>
+<ul>
+<li>1)如果$P(t)$为真，则$t$的每个分量在$Dom(P)$中($DOM$为域的范围)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>2)对于$P$中每个形如$(∃u)(Q(u))$的子表达式，如果$u$使$Q(u)$为真，则$u$的每个分量在$Dom(P)$中；<ul>
+<li>3)对于$P$中每个形如$(∀u)(Q(u))$的子表达式，如果$u$使$Q(u)$为假，则$u$的每个分量在$Dom(P)$中</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li><p><strong>域关系运算：</strong>域关系演算表达式的一般形式是$\lbrace{x_1…x_k | P(x_1，…，x_k)}\rbrace$，其中$x_1，···，x_k$都是域变量，$P(x_1，…，x_k)$是域关系演算公式，一般由原子公式构成</p>
+<p>域关系运算的定义与元组关系运算定义类似，此处不在赘述</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220429202557528.png" alt="image-20220429202557528" style="zoom:50%;" /></li>
+</ol>
+<hr>
+<h5 id="经典例题"><a href="#经典例题" class="headerlink" title="经典例题"></a>经典例题</h5><p> $Student(Sno，Class，Sname，Sex，Age)$</p>
+<p> $Course（Cno，Cname，Teacher）$</p>
+<p> $SC（Sno，Cno，Grade）$</p>
+<ul>
+<li><p><strong>例1：</strong>王老师开设课程的编号及课程名：</p>
+<p>$\prod_{Cno，Cname}(σ_{Teacher=王}(Course))$</p>
+</li>
+<li><p><strong>例2：</strong>至少选修了一门王老师所开设课程的学生学号：</p>
+<p>$\prod_{Sno}((σ_{Teacher=王}(SC ⋈ Course))$</p>
+<p>$\prod_{Sno}(SC ⋈\prod_{Cno}(σ_{Teacher=王}(Course)))$   (两种方法都可以 实现，但是在效率上有所差别)</p>
+</li>
+<li><p><strong>例3：</strong>李同学未选课程的编号：</p>
+<p>$\prod_{Cno}(Course)－\prod_{Cno}(σ_{Sname=李}(Student ⋈ SC))$ $\prod_{Cno}(Course)－\prod_{Cno}(σ_{Sname=李}(Student)⋈ SC)$</p>
+</li>
+<li><p><strong>例4：</strong>至少选修了两门课程的学生学号：</p>
+<p>$\prod_1(σ_{1=4∧2≠5}(SC×SC))$</p>
+</li>
+<li><p><strong>例5：</strong>全部学生均选修了的课程编号及名称：</p>
+<p>$\prod_{Cno，Cname}(Course ⋈(\prod_{Sno，Cno}(SC)÷\prod_{Sno}(Student)))$</p>
+</li>
+<li><p><strong>例6：</strong>检索选修课程名为$Maths$的学生学号与姓名：</p>
+<p>$\prod_{Sno, Sname}(σ_{Cname=Maths}(S⋈SC⋈C))$    ==主要是因为学生关系和课程关系没有任何联系，则需要用选课关系充当桥梁==</p>
+</li>
+<li><p><strong>例7：</strong>检索选修课程号为$C_2$或$C_4$的学生学号：</p>
+<p>$\prod_{Sno}(σ_{Cno=C_2 ∨ Cno=C_4} (SC))$</p>
+<p>$R=\lbrace{t| (∃u)(SC(u)∧(u[2]=C_2∨u[2] = C_4)∧t[1]=u[1])}\rbrace$</p>
+</li>
+<li><p><strong>例8：</strong>检索至少选修课程号为$C_2$和$C_4$的学生学号：</p>
+<p>$\prod_{Sno}(σ_{1=4∧2=C_2 ∧ 5=C_4}(SC×SC))$   ==用几重笛卡尔积来判断就是来看选了几门课的学生数==</p>
+<p>$R={t| (∃u) (∃v)(SC(u) ∧SC(v)∧u[2] = C_2 ∧v[2] = C_4∧u[1] = v[1] ∧ t[1] = u[1])}$</p>
+</li>
+<li><p><strong>例9：</strong>查询“离散数学”课程的编号及任课教师：</p>
+<p>$R＝\lbrace{t|(∃u)(Course(u)∧u[2]＝’离散数学’∧t[1]＝  u[1]∧t[2]＝u[3])}\rbrace$</p>
+</li>
+<li><p><strong>例10：</strong>选修了’数据结构’的学生学号及姓名：$R＝\lbrace{t| (∃u)(∃v)(∃w) (Student(u)∧SC(v)∧Course(w)∧u[1]＝v[1]∧v[2]＝w[1]∧w[2]＝’数据结构’}$</p>
+<p>${∧t[1]＝u[1]∧t[2]＝u[3])}\rbrace$</p>
+</li>
+<li><p><strong>例11：</strong>检索学习课程号为$C_2$的学生学号与成绩:</p>
+<p>$R=\lbrace{t_1t_2| (∃u_1u_2u_3)(SC(u_1u_2u_3)∧u_2= C_2 ∧ t_1 = u_1 ∧t_2 = u_3 )}$</p>
+</li>
+<li><p><strong>例12：</strong>检索学习课程号为$C_2$的学生学号与姓名:</p>
+<p>$R=\lbrace{t_1t_2 | (∃u_1u_2u_3u_4) (∃v_1v_2v_3)(S(u_1u_2u_3u_4) ∧SC (v_1v_2v_3)∧v_2= C_2 ∧u_1= v_1∧ t_1= u_1∧t_2 = u_2)}\rbrace$</p>
+</li>
+</ul>
+<hr>
+<h3 id="第三章-关系数据库语言-SQL"><a href="#第三章-关系数据库语言-SQL" class="headerlink" title="第三章 关系数据库语言$SQL$"></a>第三章 关系数据库语言$SQL$</h3><hr>
+<h4 id="3-1-SQL-语言概述"><a href="#3-1-SQL-语言概述" class="headerlink" title="3.1 $SQL$语言概述"></a>3.1 $SQL$语言概述</h4><ul>
+<li><p>结构化查询语言$SQL（Structured Query Language）$是一种介于<u>关系代数</u>与<u>关系演算</u>之间的语言，其功能包括<u>查询</u>、<u>操纵</u>、<u>定义</u>和<u>控制</u>四个方面，是一个通用的的关系数据库语言</p>
+</li>
+<li><p><strong>$SQL$的特点：</strong></p>
+<ul>
+<li><p><strong>1.综合统一</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513151812983.png" alt="image-20220513151812983" style="zoom:50%;" /></li>
+<li><p><strong>2.高度非过程化</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513151919378.png" alt="image-20220513151919378" style="zoom:50%;" /></li>
+<li><p><strong>3.面向集合的操作方式</strong> </p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513152014889.png" alt="image-20220513152014889" style="zoom:50%;" /></li>
+<li><p><strong>4.以同一种语法结构提供多种使用方式</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513152136107.png" alt="image-20220513152136107" style="zoom:50%;" /></li>
+<li><p><strong>5.语言简洁，易学易用</strong></p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513152235959.png" alt="image-20220513152235959" style="zoom:50%;" /><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513152309788.png" alt="image-20220513152309788" style="zoom:50%;" />          </p>
+</li>
+</ul>
+</li>
+<li><p><strong>$SQL$的组成：</strong></p>
+<ul>
+<li><ol>
+<li>==数据定义语言==，即$SQL$ $DDL$，用于定义$SQL$模式、基本表、视图、索引等结构</li>
+<li>==数据操纵语言==，即$SQL$ $DML$，数据操纵分成数据查询和数据更新两类。其中数据更新又分成插入、删除和修改三种操作</li>
+<li>==数据控制语言==，即$SQL$ $DCL$，这一部分包括对基本表和视图的授权、完整性规则的描述、事务控制等内容。</li>
+<li>==嵌入式$SQL$语言==的使用规定，这一部分内容涉及到$SQL$语句嵌入在宿主语言程序中的规则</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="3-2-SQL-数据定义功能"><a href="#3-2-SQL-数据定义功能" class="headerlink" title="3.2 $SQL$数据定义功能"></a>3.2 $SQL$数据定义功能</h4><ul>
+<li><p>$SQL$的数据定义功能：模式定义、表定义、视图和索引的定义</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513153508389.png" alt="image-20220513153508389" style="zoom:50%;" /></li>
+<li><p>创建基本表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span><span class="operator">&lt;</span>表名<span class="operator">&gt;</span></span><br><span class="line">(<span class="operator">&lt;</span>列名<span class="operator">&gt;</span> <span class="operator">&lt;</span>数据类型<span class="operator">&gt;</span>[完整性约束条件][,<span class="operator">&lt;</span>列名<span class="operator">&gt;</span> <span class="operator">&lt;</span>数据类型<span class="operator">&gt;</span>[完整性约束条件]]·····[表级完整性约束条件])</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>==列的完整性约束条件：==</p>
+<ul>
+<li>用$SQL$保留字$NULL$或$NOT$ $NULL$指定当前列是否可以去空值或不允许去空值</li>
+<li>用$UNIQUE$指定当前列取值不可重复</li>
+<li>用$DEFAULT$ &lt;表达式&gt;指定该列的缺省值或特别地用$DEFAULT$ $NULL$指定当前列缺省取空值</li>
+</ul>
+</li>
+<li><p>==表级完整性约束语法格式：==</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PRIMARY</span> KEY(<span class="operator">&lt;</span>列名<span class="operator">&gt;</span>)， <span class="keyword">FOREIGN</span> KEY(<span class="operator">&lt;</span>列名<span class="operator">&gt;</span>) <span class="keyword">REFERENCES</span><span class="operator">&lt;</span>表名<span class="operator">&gt;</span> <span class="keyword">ON</span> <span class="keyword">DELETE</span> &#123;RESTRICT<span class="operator">|</span>CASCADE<span class="operator">|</span><span class="keyword">SET</span> <span class="keyword">NULL</span>&#125;,<span class="keyword">CHECK</span> <span class="operator">&lt;</span>逻辑表达式<span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，$RESTRICT$含义为当被引用关系中要删除的元组在引用关系中出现时，禁止删除被引用关系中的相应元组，$CASCADE$表示当删除被引用关系的元组时，引用关系中的相应元组会自动删除，$SET$ $NULL$表示当删除被引用关系中元组时，引用关系中的相应元组的对应属性自动置为$NULL$</p>
+</li>
+<li><p><strong>创建基本表举例：</strong></p>
+   <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span>  STUDENT</span><br><span class="line">      (SNO <span class="type">CHAR</span>(<span class="number">7</span>)  <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">      SNAME <span class="type">VARCHAR</span>(<span class="number">10</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">      SEX  <span class="type">CHAR</span>(<span class="number">1</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">      BDATE  <span class="type">DATE</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">      HEIGHT  <span class="type">DEC</span>(<span class="number">3</span>,<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="number">0.0</span>,<span class="operator">/</span><span class="operator">/</span><span class="number">3</span>表示是三位数，包括整数和小数部分，<span class="number">2</span>表示小数位数有两位</span><br><span class="line">      <span class="keyword">PRIMARY</span> KEY(SNO));    <span class="operator">/</span><span class="operator">/</span>定义主键</span><br></pre></td></tr></table></figure></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> COURSE</span><br><span class="line">       (CNO  <span class="type">CHAR</span>(<span class="number">6</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">        CNAME  <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">        LHOUR  <span class="type">SMALLINT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">        CREDIT <span class="type">DEC</span>(<span class="number">1</span>,<span class="number">0</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">        SEMESTER  <span class="type">CHAR</span>(<span class="number">2</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">        <span class="keyword">PRIMARY</span> KEY(CNO)); <span class="operator">/</span><span class="operator">/</span>定义主键</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span>  SC</span><br><span class="line">        (SNO <span class="type">CHAR</span>(<span class="number">7</span>)  <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">         CNO  <span class="type">CHAR</span>(<span class="number">6</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>, </span><br><span class="line">         GRADE  <span class="type">DEC</span>(<span class="number">4</span>,<span class="number">1</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">         <span class="keyword">PRIMARY</span> KEY(SNO,CNO),    <span class="operator">/</span><span class="operator">/</span>定义主键</span><br><span class="line">         <span class="keyword">FOREIGN</span> KEY(SNO)              <span class="operator">/</span><span class="operator">/</span>定义外键</span><br><span class="line">              <span class="keyword">REFERENCES</span> STUDENT</span><br><span class="line">              <span class="keyword">ON</span> <span class="keyword">DELETE</span> CASCADE,</span><br><span class="line">         <span class="keyword">FOREIGN</span> KEY(CNO) <span class="operator">/</span><span class="operator">/</span>定义外键</span><br><span class="line">              <span class="keyword">REFERENCES</span> COURSE</span><br><span class="line">              <span class="keyword">ON</span> <span class="keyword">DELETE</span> RESTRICT,</span><br><span class="line">        <span class="keyword">CHECK</span> (GRADE <span class="keyword">IS</span> <span class="keyword">NULL</span>) <span class="keyword">OR</span> (GRADE <span class="keyword">BETWEEN</span> <span class="number">0</span> <span class="keyword">AND</span> <span class="number">100</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>==修改基本表：==</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="operator">&lt;</span>表名<span class="operator">&gt;</span></span><br><span class="line">          <span class="keyword">ADD</span>  <span class="operator">&lt;</span>新列名<span class="operator">&gt;</span> <span class="operator">&lt;</span>数据类型<span class="operator">&gt;</span> [完整性约束]        <span class="operator">/</span><span class="operator">/</span><span class="keyword">ADD</span>子句用于增加新列和新的完整性约束条件</span><br><span class="line">          <span class="keyword">DROP</span> <span class="operator">&lt;</span>完整性约束名<span class="operator">&gt;</span>                        <span class="operator">/</span><span class="operator">/</span><span class="keyword">DROP</span>子句用于删除指定的完整性约束或列</span><br><span class="line">          <span class="keyword">DROP</span> [<span class="keyword">COLUMN</span>] <span class="operator">&lt;</span>列名<span class="operator">&gt;</span> [RESTRICT <span class="operator">|</span> CASCADE]</span><br><span class="line">          MODIFY<span class="operator">&lt;</span>列名<span class="operator">&gt;</span> <span class="operator">&lt;</span>数据类型<span class="operator">&gt;</span>                    <span class="operator">/</span><span class="operator">/</span>MODIFY子句用于修改原有的列定义　</span><br></pre></td></tr></table></figure>
+
+<p><strong>举例：</strong></p>
+<ol>
+<li><p>向$STUDENT$表增加“入学时间” $(SCOME)$列，其数据类型为日期型</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> STUDENT <span class="keyword">ADD</span> SCOME <span class="type">DATE</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>将学生姓名$SNAME$的长度增加到$30$</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> STUDENT MODIFY SNAME <span class="type">VARCHAR</span>(<span class="number">30</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>删除关于学号为主键的约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> STUDENT <span class="keyword">DROP</span> <span class="keyword">PRIMARY</span> KEY;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>==删除基本表：==</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="operator">&lt;</span>表名<span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>基本表定义一旦删除，表中的数据以及在此表上建立的索引都将自动删除掉，而建立在此表上的视图虽仍然保留，但已无法引用，因此执行删除操作时一定要格外小心</p>
+</li>
+<li><p> <strong>索引的基本知识：</strong></p>
+</li>
+<li><p>$RDBMS$中索引一般采用$B+$树、$HASH$来实现</p>
+<ul>
+<li>$B+$树索引具有动态平衡的优点</li>
+<li>$HASH$索引具有查找速度快的特点</li>
+</ul>
+</li>
+<li><p>索引是关系数据库的内部实现技术，属于内模式的范畴</p>
+</li>
+<li><p>$CREATE$  $INDEX$语句定义索引时，可以定义索引是唯一索引、非唯一索引或聚簇索引</p>
+</li>
+<li><p>建立索引的目的：加快查询速度</p>
+</li>
+<li><p>索引的使用通常都是隐式的，就是说索引建立之后，不需要用户显式地调用，$DBMS$根据当前的情况自动选择采用哪些索引来作为存取路径或对索引进行一定的维护工作</p>
+</li>
+<li><p><strong>索引的建立于删除：</strong></p>
+<ul>
+<li><p><strong>创建索引：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">UNIQUE</span>][CLUSTER] INDEX <span class="operator">&lt;</span>索引名<span class="operator">&gt;</span> </span><br><span class="line">       <span class="keyword">ON</span> <span class="operator">&lt;</span>表名<span class="operator">&gt;</span> (<span class="operator">&lt;</span>列名<span class="operator">&gt;</span>[<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>][,<span class="operator">&lt;</span>列名<span class="operator">&gt;</span>[<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>]]····)</span><br></pre></td></tr></table></figure>
+
+<p>参数$UNIQUE$表示建立的是唯一索引，$CLUSTER$表示建立的是聚簇索引，$ASC$表示升序，$DESC$表示降序</p>
+</li>
+<li><p><strong>删除索引：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> INDEX <span class="operator">&lt;</span>索引名<span class="operator">&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>模式的创建与删除：</strong></p>
+<ul>
+<li><p>创建模式实际上定义了一个命名空间，在这个空间中可以定义该模式包含的数据库对象，例如基本表、视图、索引等</p>
+</li>
+<li><p>$SQL$模式有模式名标识，一般包括授权$ID$（通常是系统中的一个用户名）和模式所含对象（如基本表、视图、域、约束和断言、触发器等）两方面的描述</p>
+</li>
+<li><p>创建模式：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> SCHEMA <span class="operator">&lt;</span>模式名<span class="operator">&gt;</span> <span class="keyword">AUTHORIZATION</span> <span class="operator">&lt;</span>所有者ID<span class="operator">&gt;</span></span><br><span class="line">[创建基本表语句]</span><br><span class="line">[创建视图语句]</span><br><span class="line">[创建授权语句]</span><br><span class="line">······</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> SCHEMA Dept <span class="keyword">AUTHORIZATION</span> Zhang </span><br><span class="line">       <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> Department(id <span class="type">CHAR</span>(<span class="number">6</span>),name <span class="type">VARCHAR</span>(<span class="number">10</span>))</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>删除模式：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> SCHEMA <span class="operator">&lt;</span>模式名<span class="operator">&gt;</span> [RESTRICT<span class="operator">|</span>CASCADE]</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>模式与表：</strong></p>
+<ul>
+<li><p>每一个基本表都属于某一个模式</p>
+</li>
+<li><p>一个模式包含多个基本表</p>
+</li>
+<li><p>定义基本表所属模式：</p>
+<ul>
+<li><ol>
+<li><p>在表名中明显地给出模式名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Create</span> <span class="keyword">table</span> “S<span class="operator">-</span>T”.Student（......）;   <span class="comment">/*模式名为 S-T*/</span></span><br></pre></td></tr></table></figure></li>
+<li><p>在创建模式语句中同时创建表</p>
+</li>
+<li><p>设置所属的模式</p>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>创建基本表时，若没有指定模式，系统根据搜索路径来确定对象所属的模式，$RDBMS$会使用模式列表中第一个存在的模式作为数据库对象的模式名，若搜索路径中的模式名都不存在，系统将给出错误</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="3-3-SQL-数据查询功能"><a href="#3-3-SQL-数据查询功能" class="headerlink" title="3.3 $SQL$数据查询功能"></a>3.3 $SQL$数据查询功能</h4><p>关系代数查询的一般表现形式为：$\prod_{A,B,C,D…}(σ_F(R_1×···×R_n))$,与下述$SQL$语句等价</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> A,B,C,D...</span><br><span class="line">FORM   R1,...,Rn</span><br><span class="line"><span class="keyword">WHERE</span>  F</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-3-1基本查询语句"><a href="#3-3-1基本查询语句" class="headerlink" title="3.3.1基本查询语句"></a>3.3.1<strong>基本查询语句</strong></h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> [<span class="keyword">ALL</span><span class="operator">|</span><span class="keyword">DISTINCT</span>]<span class="operator">&lt;</span>目标列表达式<span class="operator">&gt;</span>[,<span class="operator">&lt;</span>目标列表达式<span class="operator">&gt;</span>] ...</span><br><span class="line"><span class="keyword">FROM</span> <span class="operator">&lt;</span>表名或视图名<span class="operator">&gt;</span>[,<span class="operator">&lt;</span>表名或视图名<span class="operator">&gt;</span>] ...</span><br><span class="line">[<span class="keyword">WHERE</span> <span class="operator">&lt;</span>条件表达式<span class="operator">&gt;</span>]</span><br><span class="line">[<span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="operator">&lt;</span>列名<span class="number">1</span><span class="operator">&gt;</span> [<span class="keyword">HAVING</span> <span class="operator">&lt;</span>条件表达式<span class="operator">&gt;</span>]]</span><br><span class="line">[<span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="operator">&lt;</span>列名<span class="number">2</span><span class="operator">&gt;</span> [<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>]]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>整个$SELECT$语句的含义是，根据$WHERE$子句的条件表达式，从$FROM$子句指定的基本表或视图中找出满足条件的元组，再按$SELECT$子句中的目标列表达式，选出元组中的属性值形成结果表</p>
+</li>
+<li><p>如果有$GROUP$子句，则将结果按&lt;列名1&gt;的值进行分组，该属性列值相等的元组为一个组，每个组产生结果表中的一条记录,通常会在每组中作用集函数</p>
+</li>
+<li><p>如果$GROUP$子句带$HAVING$短语，则只有满足指定条件的组才予输出</p>
+</li>
+<li><p>如果有$ORDER$子句，则结果表还要按&lt;列名2&gt;的值的升序或降序进行排序</p>
+</li>
+</ul>
+<h5 id="3-3-2单表查询"><a href="#3-3-2单表查询" class="headerlink" title="3.3.2单表查询"></a>3.3.2单表查询</h5><ul>
+<li><p><strong>查询指定列</strong></p>
+<ul>
+<li><p>例：查询全体学生的学号与姓名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno,Sname <span class="keyword">FROM</span> Student;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询全体学生的姓名、学号、所在系</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,Sno,Sdept <span class="keyword">FROM</span> Student;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>查询全部列</strong></p>
+<ol>
+<li>在$SELECT$关键字后面列出所有列名</li>
+<li>将&lt;目标列表达式&gt;指定为*</li>
+</ol>
+<ul>
+<li><p>例：查询全体学生的详细记录</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno,Sname,Ssex,Sage,Sdept FORM Student;</span><br><span class="line">   <span class="comment">/*或*/</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>查询经过计算的值</strong></p>
+<p>$SELECT$子句的&lt;目列表达式&gt;可以为：算术表达式、字符串常量、函数、列名</p>
+<ul>
+<li><p>例：查询全体学生的姓名及其出生年份</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,<span class="number">2022</span><span class="operator">-</span>Sage <span class="keyword">FROM</span> Student; <span class="comment">/*假定当年的年份为2022年*/</span></span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询全体学生的姓名、出生年份和所在系，要求用小写字母表示所在系名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname，‘<span class="keyword">Year</span> <span class="keyword">of</span> Brith:’,<span class="number">2022</span><span class="operator">-</span>Sage,<span class="built_in">LOWER</span>(Sdept) <span class="keyword">FROM</span> Student;</span><br></pre></td></tr></table></figure>
+
+<p>使用别名改变查询结果的列标题：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname NAME， ’<span class="keyword">Year</span> <span class="keyword">of</span> Birth: ’  BIRTH，<span class="number">2021</span><span class="operator">-</span>Sage  BIRTHDAY，<span class="built_in">LOWER</span>(Sdept)  DEPARTMENT  <span class="keyword">FROM</span>   Student；</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>选择表中的若干元组</strong></p>
+<ul>
+<li><p><strong>消除取值重复的行</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span> SC;<span class="comment">/*没有取消重复行*/</span></span><br><span class="line">等价于：(缺省)</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">ALL</span> Sno <span class="keyword">FROM</span> SC;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> Sno <span class="keyword">FROM</span> SC;<span class="comment">/*取消重复行*/</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>查询满足条件的元组</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220513190703590.png" alt="image-20220513190703590" style="zoom:50%;" />
+
+<ul>
+<li><p>比较大小</p>
+<ol>
+<li><p>例：查询计算机系($CS$)全体学生的名单</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sdept<span class="operator">=</span><span class="string">&#x27;CS&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询所有年龄在20岁以下的学生姓名及其年龄</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,Sage <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sage<span class="operator">&lt;</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询考试成绩有不及格的学生的学号</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> Sno <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Grade<span class="operator">&lt;</span><span class="number">60</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>确定范围——谓词：$（NOT）BETWEEN…AND…$</p>
+<ol>
+<li>例：查询年龄在20~23岁之间的学生的姓名、系别和年龄</li>
+</ol>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,Sdept,Sage <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sage <span class="keyword">BETWEEN</span> <span class="number">20</span> <span class="keyword">AND</span> <span class="number">23</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>确定集合——谓词：（NOT）IN&lt;值表&gt;</p>
+<ol>
+<li><p>例：查询信息系（$IS$）、数学系（$MA$）和计算机科学系（$CS$）学生的姓名和性别</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,Ssex <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sdept <span class="keyword">IN</span>(<span class="string">&#x27;IS&#x27;</span>,<span class="string">&#x27;MA&#x27;</span>,<span class="string">&#x27;CS&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>字符匹配——谓词：$LIKE$</p>
+<ul>
+<li><strong>匹配串为固定字符串</strong></li>
+</ul>
+<ol>
+<li><p>例：查询学号为201215121的学生的详细情况</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span>  <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span>  Sno <span class="keyword">LIKE</span> <span class="string">&#x27;201215121&#x27;</span>;</span><br><span class="line">等价于： </span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span>  Student <span class="keyword">WHERE</span> Sno <span class="operator">=</span> <span class="string">&#x27;201215121&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li><strong>使用换码字符将通配符转义为普通字符</strong></li>
+</ul>
+<ol>
+<li><p>例：查询$DB_Design$课程的课程号和学分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Cno，Ccredit <span class="keyword">FROM</span> Course <span class="keyword">WHERE</span>  Cname <span class="keyword">LIKE</span> <span class="string">&#x27;DB\_Design&#x27;</span> <span class="keyword">ESCAPE</span> <span class="string">&#x27;\&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询以”$DB_$”开头，且倒数第3个字符为 $i$的课程的详细情况</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span>   Course <span class="keyword">WHERE</span>  Cname <span class="keyword">LIKE</span>  <span class="string">&#x27;DB\_%i_ _&#x27;</span> <span class="keyword">ESCAPE</span> <span class="string">&#x27;\&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p> ==$ESCAPE$ ‘＼’ 表示“ ＼” 为换码字符== </p>
+</li>
+</ol>
+<ul>
+<li><strong>匹配串为含通配符的字符串</strong></li>
+</ul>
+<ol>
+<li>例：查询所有姓刘学生的姓名、学号和性别</li>
+</ol>
+   <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname，Sno，Ssex <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sname <span class="keyword">LIKE</span> ‘刘<span class="operator">%</span>’；</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>查询姓”欧阳”且全名为三个字的学生的姓名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname <span class="keyword">FROM</span>   Student <span class="keyword">WHERE</span>  Sname <span class="keyword">LIKE</span> <span class="string">&#x27;欧阳_&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>查询名字中第2个字为”阳”字的学生的姓名和学号</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,Sno <span class="keyword">FROM</span>   Student <span class="keyword">WHERE</span>  Sname <span class="keyword">LIKE</span> ‘_阳<span class="operator">%</span>’；</span><br></pre></td></tr></table></figure></li>
+<li><p>查询所有不姓刘的学生姓名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">      <span class="keyword">SELECT</span> Sname,Sno,Ssex <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span>  Sname <span class="keyword">NOT</span> <span class="keyword">LIKE</span> <span class="string">&#x27;刘%&#x27;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="operator">-</span> <span class="operator">*</span><span class="operator">*</span>涉及空值的查询<span class="operator">*</span><span class="operator">*</span> ——谓词：$<span class="keyword">IS</span>$ ($<span class="keyword">NOT</span>$)$<span class="keyword">NULL</span>$</span><br><span class="line"></span><br><span class="line">  <span class="number">1.</span> 例：某些学生选修课程后没有参加考试，所以有选课记录，但没有考试成绩。查询缺少成绩的学生的学号和相应的课程号</span><br><span class="line"></span><br><span class="line">   ```<span class="keyword">SQL</span></span><br><span class="line">     <span class="keyword">SELECT</span> Sno,Cno <span class="keyword">FROM</span>  SC <span class="keyword">WHERE</span>  Grade <span class="keyword">IS</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查所有有成绩的学生学号和课程号</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">     <span class="keyword">SELECT</span> Sno,Cno <span class="keyword">FROM</span>  SC <span class="keyword">WHERE</span>  Grade <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>;</span><br><span class="line">  </span><br><span class="line"><span class="operator">-</span> 多重条件查询</span><br><span class="line"></span><br><span class="line">  逻辑运算符中$<span class="keyword">AND</span>$的优先级高于$<span class="keyword">OR</span>$,可以用括号改变优先级</span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> 例：查询计算机系年龄在<span class="number">20</span>岁以下的学生姓名</span><br><span class="line"></span><br><span class="line">   ```<span class="keyword">SQL</span></span><br><span class="line">     <span class="keyword">SELECT</span> Sname <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span>  Sdept<span class="operator">=</span> <span class="string">&#x27;CS&#x27;</span> <span class="keyword">AND</span> Sage<span class="operator">&lt;</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>$ORDER$ $BY$子句</p>
+<p>当排序列含空值时：</p>
+<p>$ASC$：（升序）排序列为空值的元组最先显示</p>
+<p>$DESC$：（降序）排序列为空值的元组最后显示 </p>
+<ol>
+<li><p>例：查询选修了$CS-03$课程的学生的学号及其成绩，查询结果按分数降序排列</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno,Grade <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span>  Cno<span class="operator">=</span> <span class="string">&#x27;CS-03&#x27;</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> Grade <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询全体学生情况，查询结果按所在系的系号升序排列，同一系中的学生按年龄降序排列</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">     <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">ORDER</span> <span class="keyword">BY</span> Sdept <span class="keyword">ASC</span>,Sage <span class="keyword">DESC</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="operator">-</span> <span class="operator">*</span><span class="operator">*</span>$<span class="keyword">SQL</span>$函数<span class="operator">*</span><span class="operator">*</span></span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> $<span class="keyword">SQL</span>$函数主要包括<span class="operator">&lt;</span>u<span class="operator">&gt;</span>标量函数<span class="operator">&lt;</span><span class="operator">/</span>u<span class="operator">&gt;</span>和<span class="operator">&lt;</span>u<span class="operator">&gt;</span>聚集函数<span class="operator">&lt;</span><span class="operator">/</span>u<span class="operator">&gt;</span>两类</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> <span class="operator">=</span><span class="operator">=</span>标量函数<span class="operator">=</span><span class="operator">=</span>的运算对象是一个记录行在某个属性上的具体取值，大致可以分为字符、数学、时间、类型转换等几种形式。例如，函数$LENGTH()$可以计算一个字符串类型数值的长度，$<span class="built_in">ABS</span>()$可以计算一个数值类型的绝对值</span><br><span class="line"></span><br><span class="line"><span class="number">3.</span> <span class="operator">=</span><span class="operator">=</span>聚集函数<span class="operator">=</span><span class="operator">=</span>是$<span class="keyword">SQL</span>$中具有统计性质的一类函数，其运算对象通常是记录的集合或一组记录在某个列上的全部取值，聚集函数的返回结果一般将会是惟一的一个确定值</span><br><span class="line"></span><br><span class="line">   <span class="operator">-</span> 计数</span><br><span class="line"></span><br><span class="line">     ```<span class="keyword">SQL</span></span><br><span class="line">     COUNT（[<span class="keyword">DISTINCT</span><span class="operator">|</span><span class="keyword">ALL</span>] <span class="operator">&lt;</span>列名<span class="operator">&gt;</span>）</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li><p>计算总和</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SUM（[<span class="keyword">DISTINCT</span><span class="operator">|</span><span class="keyword">ALL</span>] <span class="operator">&lt;</span>列名<span class="operator">&gt;</span>）</span><br></pre></td></tr></table></figure></li>
+<li><p>计算平均值</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AVG（[<span class="keyword">DISTINCT</span><span class="operator">|</span><span class="keyword">ALL</span>] <span class="operator">&lt;</span>列名<span class="operator">&gt;</span>）</span><br></pre></td></tr></table></figure></li>
+<li><p>最大最小值</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MAX（[<span class="keyword">DISTINCT</span><span class="operator">|</span><span class="keyword">ALL</span>] <span class="operator">&lt;</span>列名<span class="operator">&gt;</span>）</span><br><span class="line">	 MIN（[<span class="keyword">DISTINCT</span><span class="operator">|</span><span class="keyword">ALL</span>] <span class="operator">&lt;</span>列名<span class="operator">&gt;</span>）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>例：查询学生总人数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> Sudent;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询选修了课程的学生人数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="keyword">DISTINCT</span> Sno) <span class="keyword">FROM</span> SC;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：计算’CS-01’课程的学生平均成绩</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">AVG</span>(Grade) <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Cno<span class="operator">=</span><span class="string">&#x27;CS-01&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询选修’CS-01’课程的学生最高分数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">MAX</span>(Grade) <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Cno<span class="operator">=</span> ‘CS<span class="number">-01</span>’;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>$GROUP$ $BY$子句</p>
+<p>细化聚集函数的作用对象，对查询结果分组后，聚集函数将分别作用于每个组，作用对象是查询的中间结果表，按指定的一列或多列值分组，值相等的为一组</p>
+<ol>
+<li><p>例:求各个课程号及相应的选课人数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Cno,<span class="built_in">COUNT</span>(Sno) <span class="keyword">FROM</span> SC <span class="keyword">GROUP</span> <span class="keyword">BY</span> Cno;</span><br></pre></td></tr></table></figure></li>
+<li><p>平均成绩最高的学生学号及成绩</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">       <span class="keyword">SELECT</span> Sno,<span class="built_in">MAX</span>(<span class="built_in">AVG</span>(Grade)) <span class="keyword">FROM</span> SC <span class="keyword">GROUP</span> <span class="keyword">BY</span> Sno;</span><br><span class="line">       </span><br><span class="line">     <span class="operator">-</span> $<span class="keyword">HAVING</span>$短语</span><br><span class="line">     </span><br><span class="line">       <span class="operator">-</span> $<span class="keyword">HAVING</span>$短语与$<span class="keyword">WHERE</span>$子句的区别：</span><br><span class="line">         <span class="number">1.</span> 作用对象不同</span><br><span class="line">       <span class="number">2.</span> $<span class="keyword">WHERE</span>$子句作用于基表或视图，从中选择满足条件的元组</span><br><span class="line">         <span class="number">3.</span> $<span class="keyword">HAVING</span>$短语作用于组，从中选择满足条件的组</span><br><span class="line">     </span><br><span class="line">       <span class="operator">-</span> 例：查询选修了<span class="number">3</span>门以上课程的学生学号</span><br><span class="line">     </span><br><span class="line">         ```<span class="keyword">SQL</span></span><br><span class="line">      <span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span> SC <span class="keyword">GROUP</span> <span class="keyword">BY</span> Sno <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">3</span>;</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">##### <span class="number">3.3</span><span class="number">.3</span><span class="operator">*</span><span class="operator">*</span>连接查询：<span class="operator">*</span><span class="operator">*</span>同时涉及多个表的查询</span><br><span class="line"></span><br><span class="line">一般格式：</span><br><span class="line"></span><br><span class="line">```<span class="keyword">SQL</span></span><br><span class="line">[<span class="operator">&lt;</span>表名<span class="number">1</span><span class="operator">&gt;</span>.]<span class="operator">&lt;</span>列名<span class="number">1</span><span class="operator">&gt;</span>  <span class="operator">&lt;</span>比较运算符<span class="operator">&gt;</span>  [<span class="operator">&lt;</span>表名<span class="number">2</span><span class="operator">&gt;</span>.]<span class="operator">&lt;</span>列名<span class="number">2</span><span class="operator">&gt;</span></span><br><span class="line">[<span class="operator">&lt;</span>表名<span class="number">1</span><span class="operator">&gt;</span>.]<span class="operator">&lt;</span>列名<span class="number">1</span><span class="operator">&gt;</span> <span class="keyword">BETWEEN</span> [<span class="operator">&lt;</span>表名<span class="number">2</span><span class="operator">&gt;</span>.]<span class="operator">&lt;</span>列名<span class="number">2</span><span class="operator">&gt;</span> <span class="keyword">AND</span> [<span class="operator">&lt;</span>表名<span class="number">2</span><span class="operator">&gt;</span>.]<span class="operator">&lt;</span>列名<span class="number">3</span><span class="operator">&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>等值与非等值连接查询</p>
+<ul>
+<li><p>等值连接：连接运算符为=</p>
+<p>例：查询每一个学生及其选修课程的情况</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Student.<span class="operator">*</span>,SC.<span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> Student,SC</span><br><span class="line"><span class="keyword">WHERE</span> Student.Sno<span class="operator">=</span>SC.Sno;</span><br></pre></td></tr></table></figure>
+
+<p>例：查询选修了编号为’$CS-01$’的课程且成绩高于80分的学生姓名及成绩</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,Grade</span><br><span class="line"><span class="keyword">FROM</span> Student,SC</span><br><span class="line"><span class="keyword">WHERE</span> Student.Sno<span class="operator">=</span>SC.Sno <span class="keyword">AND</span> Cno<span class="operator">=</span><span class="string">&#x27;CS-01&#x27;</span> <span class="keyword">AND</span> Grade<span class="operator">&gt;</span><span class="number">80</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>自连接:一个表与其自己进行连接</p>
+<p>需要给表起别名以示区别，由于所有属性名都是同名属性，因此必须使用别名前缀</p>
+<ul>
+<li><p>例：查询每一门课的间接先修课</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> FIRST.Cno，SECOND.Cpno</span><br><span class="line"><span class="keyword">FROM</span> Course <span class="keyword">FIRST</span>,Course <span class="keyword">SECOND</span></span><br><span class="line"><span class="keyword">WHERE</span> FIRST.Cpno<span class="operator">=</span>SEOND.Cno；</span><br></pre></td></tr></table></figure>
+
+<p>​     <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220514111725063.png" alt="image-20220514111725063" style="zoom:50%;" />        </p>
+</li>
+</ul>
+</li>
+<li><p>外连接</p>
+<ul>
+<li><p>外连接与普通连接的区别：</p>
+<ol>
+<li>普通连接操作只输出满足连接条件的元组</li>
+<li>外连接操作以指定表为连接主体，将主体表中不满足连接条件的元组一并输出</li>
+</ol>
+</li>
+<li><p>例：查询每个学生及其选修课程的情况</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Student.Sno,Sname,Ssex,Sage,Sdept,Cno,Grade</span><br><span class="line">    <span class="keyword">FROM</span>  Student  <span class="keyword">LEFT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> SC <span class="keyword">ON</span> (Student.Sno<span class="operator">=</span>SC.Sno);</span><br></pre></td></tr></table></figure></li>
+<li><p>左外连接：列出左边关系中所有的元组</p>
+</li>
+<li><p>右外连接：列出右边关系中所有的元组</p>
+</li>
+</ul>
+</li>
+<li><p>复合条件连接:$WHERE$子句中含多个连接条件</p>
+<ol>
+<li><p>例：查询选修2号课程且成绩在90分以上的所有学生</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Student.Sno, Sname <span class="keyword">FROM</span>   Student, SC</span><br><span class="line">		<span class="keyword">WHERE</span>  Student.Sno <span class="operator">=</span> SC.Sno <span class="keyword">AND</span> <span class="comment">/* 连接谓词*/</span></span><br><span class="line">             SC.Cno<span class="operator">=</span> <span class="string">&#x27;2&#x27;</span> <span class="keyword">AND</span> SC.Grade <span class="operator">&gt;</span> <span class="number">90</span>;      <span class="comment">/* 其他限定条件 */</span> </span><br></pre></td></tr></table></figure></li>
+<li><p>查询每个学生的学号、姓名、选修的课程名及成绩</p>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Student.Sno，Sname，Cname，Grade <span class="keyword">FROM</span>   Student，SC，Course    <span class="comment">/*多表连接*/</span></span><br><span class="line">  <span class="keyword">WHERE</span>  Student.Sno <span class="operator">=</span> SC.Sno <span class="keyword">AND</span> SC.Cno <span class="operator">=</span> Course.Cno；</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+<h5 id="3-3-4嵌套查询"><a href="#3-3-4嵌套查询" class="headerlink" title="3.3.4嵌套查询"></a>3.3.4<strong>嵌套查询</strong></h5><ul>
+<li><p><strong>嵌套查询概述</strong></p>
+<ul>
+<li><p>一个$SELECT-FROM-WHERE$语句称为一个查询块</p>
+</li>
+<li><p>将一个查询块嵌套在另一个查询块的$WHERE$子句或$HAVING$短语的条件中的查询称为嵌套查询</p>
+</li>
+<li><p><strong>子查询的限制：</strong>不能使用$ORDER$ $BY$子句</p>
+</li>
+<li><p>例：选修了2号课程的学生姓名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname <span class="keyword">FROM</span> Student	   <span class="comment">/*外层查询/父查询*/</span></span><br><span class="line"><span class="keyword">WHERE</span> <span class="string">&#x27;2&#x27;</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span> Cno <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Student.Sno<span class="operator">=</span>SC.Sno);  <span class="comment">/*内层查询/子查询*/</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>不相关子查询：</strong></p>
+<p>子查询的条件不依赖于父查询，由里向外，逐层处理，即每个子查询在上一级查询处理之前求解，子查询的结果用于建立其父查询的查找条件</p>
+</li>
+<li><p><strong>相关子查询：</strong></p>
+<p>子查询的查询条件依赖于父查询。首先取外层查询中表的第一个元组，根据它与内层查询相关的属性值处理内层查询，若$WHERE$子句返回值为真，则取此元组放入结果表，然后再取外层表的下一个元组，重复这一过程，直至外层表全部检查完为止</p>
+</li>
+<li><p><strong>带有$IN$谓词的子查询</strong></p>
+<ol>
+<li><p>例：查询与’刘晨’在同一个系学习的学生</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno，Sname，Sdept <span class="comment">/*查找与刘晨在同一系的学生*/</span></span><br><span class="line">    <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sdept  <span class="keyword">IN</span></span><br><span class="line">   (<span class="keyword">SELECT</span> Sdept <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sname<span class="operator">=</span> <span class="string">&#x27;刘晨&#x27;</span>);<span class="comment">/*确定刘晨所在的系名*/</span></span><br></pre></td></tr></table></figure></li>
+<li><p>例：查询选修了课程名为“信号系统”的学生学号和姓名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno,Sname     ③ 最后在Student关系中取出Sno和Sname</span><br><span class="line">  	<span class="keyword">FROM</span>   Student</span><br><span class="line"> 	<span class="keyword">WHERE</span>  Sno <span class="keyword">IN</span></span><br><span class="line">             (<span class="keyword">SELECT</span> Sno    ② 然后在SC关系中找出选修了<span class="number">3</span>号课程的</span><br><span class="line">              <span class="keyword">FROM</span>    SC      学生学号</span><br><span class="line">              <span class="keyword">WHERE</span>  Cno <span class="keyword">IN</span></span><br><span class="line">                     ( <span class="keyword">SELECT</span> Cno   ① 首先在Course关系中找出</span><br><span class="line">                       <span class="keyword">FROM</span> Course   “信息系统”的课程号，为<span class="number">3</span>号</span><br><span class="line">                       <span class="keyword">WHERE</span> Cname<span class="operator">=</span> ‘信息系统’</span><br><span class="line">                     ));</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p><strong>带有比较运算符的子查询</strong></p>
+<p>当能确切知道内层查询返回单值时，可以用比较运算符$&gt;,&lt;，=,&gt;=,&lt;=,!=或&lt; &gt;$，并且与$SOME$、$ANY$或$ALL$谓词配合使用 </p>
+<ol>
+<li><p>例：找出每个学生超过他已选修课程平均成绩的课程号</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno,Cno <span class="keyword">FROM</span>  SC  X</span><br><span class="line">    <span class="keyword">WHERE</span> Grade <span class="operator">&gt;=</span>(<span class="keyword">SELECT</span> <span class="built_in">AVG</span>(Grade) <span class="keyword">FROM</span>  SC Y <span class="keyword">WHERE</span> Y.Sno<span class="operator">=</span>X.Sno);</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p><strong>带有$SOME$（$ANY$）或$ALL$谓词的子查询</strong></p>
+<p>$SOME$（$ANY$）表示是任意一个值，$ALL$表示是所有值</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220514215208401.png" alt="image-20220514215208401" style="zoom: 67%;" />
+
+
+
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220514215750258.png" alt="image-20220514215750258" style="zoom:67%;" />
+
+<ol>
+<li><p>例：查询其他系中比计算机科学系某一学生年龄小的学生姓名和年龄</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname,Sage <span class="keyword">FROM</span>   Student</span><br><span class="line">    <span class="keyword">WHERE</span> Sage<span class="operator">&lt;</span><span class="keyword">SOME</span> (<span class="keyword">SELECT</span> Sage <span class="keyword">FROM</span> Student</span><br><span class="line">                      <span class="keyword">WHERE</span> Sdept<span class="operator">=</span> <span class="string">&#x27;CS&#x27;</span>) <span class="keyword">AND</span> Sdept <span class="operator">&lt;&gt;</span> <span class="string">&#x27;CS&#x27;</span> ; <span class="comment">/*父查询块中的条件 */</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p><strong>带有$EXISTS$谓词的子查询</strong></p>
+<p>带有$EXISTS$谓词的子查询不返回任何数据，只产生逻辑真值$true$或逻辑假值$false$</p>
+<p>若内层查询结果非空，则外层的$WHERE$子句返回真值</p>
+<p>若内层查询结果为空，则外层的$WHERE$子句返回假值</p>
+<p>由$EXISTS$引出的子查询，其目标列表达式通常都用$*$ ，因为带$EXISTS$的子查询只返回真值或假值，给出列名无实际意义</p>
+<p>==一些带$EXISTS$或$NOT$ $EXISTS$谓词的子查询不能被其他形式的子查询等价替换==</p>
+<p>==所有带$IN$谓词、比较运算符、$SOME$和$ALL$谓词的子查询都能用带$EXISTS$谓词的子查询等价替换==   </p>
+<p>用$EXISTS/NOT$ $EXISTS$实现全称量词:$(\forall x)P ≡\neg (\exists x(\neg P))$</p>
+<p>•用$EXISTS/NOT$ $EXISTS$实现逻辑蕴函(难点):$p\rightarrow q ≡ \neg p∨q$ </p>
+<ol>
+<li><p>例：查询所有选修了$1$号课程的学生姓名</p>
+<p>思路分析：本查询涉及$Student$和$SC$关系，在$Student$中依次取每个元组的$Sno$值，用此值去检查$SC$关系，若$SC$中存在这样的元组，其$Sno$值等于此$Student.Sno$值，并且其$Cno= ‘1’$，则取此$Student.Sname$送入结果关系</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname <span class="keyword">FROM</span> Student<span class="comment">/*用嵌套查询*/</span></span><br><span class="line">     <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> (<span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> SC.Sno<span class="operator">=</span>Student.Sno <span class="keyword">AND</span> Cno<span class="operator">=</span> <span class="string">&#x27; 1 &#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+<ol start="2">
+<li>例：查询与“刘晨”在同一个系学习的学生<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno,Sname,Sdept <span class="keyword">FROM</span> Student S1</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> (<span class="keyword">SELECT</span><span class="operator">*</span> <span class="keyword">FROM</span> Student S2</span><br><span class="line">              <span class="keyword">WHERE</span> S2.Sdept <span class="operator">=</span> S1.Sdept <span class="keyword">AND</span> S2.Sname <span class="operator">=</span> <span class="string">&#x27;刘晨&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+<li>例：查询至少选修了学生’$S03$’选修的全部课程的学生学号</li>
+</ol>
+<p>   解题思路：用逻辑蕴函表达：查询学号为$x$的学生，对所有的课程$y$，只要‘$S03$’学生选修了课程$y$，则$x$也选修了$y$   ;形式化表示：用$p$表示谓词 “学生‘$S03$’选修了课程$y$”,用$q$表示谓词 “学生$x$选修了课程$y$”</p>
+<p>   则上述查询为: $(\forall y) p \rightarrow q$</p>
+<p>   等价变换：   $(\forall y)p\rightarrow q ≡ \neg (\exists y (\neg(p \rightarrow q ))≡ \neg(\exists y (\neg(\neg p∨ q) )≡ \neg (\exists y)(p∧\neg q)$</p>
+<p>   变换后语义：不存在这样的课程$y$，学生‘$S03$’选修了$y$，而学生$x$没有选</p>
+   <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span>  Student S <span class="keyword">WHERE</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span></span><br><span class="line">(<span class="keyword">SELECT</span><span class="operator">*</span> <span class="keyword">FROM</span> SC SCY <span class="keyword">WHERE</span> SCY.Sno <span class="operator">=</span> <span class="string">&#x27;S03&#x27;</span>  </span><br><span class="line">　<span class="keyword">AND</span>  <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>( <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> SC SCZ  <span class="keyword">WHERE</span>　SCZ.Sno<span class="operator">=</span>S.Sno <span class="keyword">AND</span> SCZ.Cno<span class="operator">=</span>SCY.Cno))</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>例：查询选修了全部课程的学生姓名<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sname <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> (<span class="keyword">SELECT</span><span class="operator">*</span> <span class="keyword">FROM</span> Course <span class="keyword">WHERE</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>(<span class="keyword">SELECT</span><span class="operator">*</span> <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> SC.Sno<span class="operator">=</span>Student.Sno <span class="keyword">AND</span> SC.Cno<span class="operator">=</span> Course.Cno));</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h5 id="3-3-5集合查询"><a href="#3-3-5集合查询" class="headerlink" title="3.3.5集合查询"></a>3.3.5<strong>集合查询</strong></h5><p>集合操作的种类：并操作$UNION$，交操作$INTERSECT$,差操作$EXCEPT$。==参加集合操作的各项查询结果的列数必须相同，对应项的数据类型也必须相同==</p>
+<p>例1：查询计算机科学系的学生及年龄不大于19岁的学生</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span>  <span class="keyword">FROM</span> Student  <span class="keyword">WHERE</span> Sdept<span class="operator">=</span> <span class="string">&#x27;CS&#x27;</span></span><br><span class="line">        <span class="keyword">UNION</span></span><br><span class="line">        <span class="keyword">SELECT</span> <span class="operator">*</span>  <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sage<span class="operator">&lt;=</span><span class="number">19</span>;</span><br><span class="line">        或</span><br><span class="line">        <span class="keyword">SELECT</span>  <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sdept<span class="operator">=</span> <span class="string">&#x27;CS&#x27;</span>  <span class="keyword">OR</span>  Sage<span class="operator">&lt;=</span><span class="number">19</span>;</span><br></pre></td></tr></table></figure>
+
+<p>$UNION：$将多个查询结果合并起来时，系统自动去掉重复元组。</p>
+<p>$UNION ALL$：将多个查询结果合并起来时，保留重复元组</p>
+<p>例2：查询选修课程1的学生集合与选修课程2的学生集合的交集</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Cno<span class="operator">=</span><span class="string">&#x27;1&#x27;</span> </span><br><span class="line">    <span class="keyword">INTERSECT</span></span><br><span class="line">    <span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Cno<span class="operator">=</span><span class="string">&#x27;2&#x27;</span>;</span><br><span class="line">    或</span><br><span class="line">    <span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Cno<span class="operator">=</span><span class="string">&#x27;1&#x27;</span> </span><br><span class="line">   <span class="keyword">AND</span> Sno <span class="keyword">IN</span> (<span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Cno<span class="operator">=</span><span class="string">&#x27; 2 &#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>例3：查询计算机系($CS$)的学生与年龄不大于19岁的学生的差集</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sdept<span class="operator">=</span><span class="string">&#x27;CS&#x27;</span></span><br><span class="line">    <span class="keyword">EXCEPT</span></span><br><span class="line">    <span class="keyword">SELECT</span>  <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sage <span class="operator">&lt;=</span><span class="number">19</span>;</span><br><span class="line">     或</span><br><span class="line">   <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sdept<span class="operator">=</span> <span class="string">&#x27;CS&#x27;</span> <span class="keyword">AND</span>  Sage<span class="operator">&gt;</span><span class="number">19</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="3-4-SQL-数据操纵功能"><a href="#3-4-SQL-数据操纵功能" class="headerlink" title="3.4 $SQL$数据操纵功能"></a>3.4 $SQL$数据操纵功能</h4><h5 id="3-4-1数据插入"><a href="#3-4-1数据插入" class="headerlink" title="3.4.1数据插入"></a>3.4.1数据插入</h5><p>常见形式包括：<u>单记录查询</u>和<u>子查询结果</u>两种</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="operator">&lt;</span>表名<span class="operator">&gt;</span> [(列名，…列名)] <span class="keyword">VALUES</span>  (列值，…列值)    <span class="comment">/*单记录查询*/</span></span><br></pre></td></tr></table></figure>
+
+<p>例1：将数据库课程加入到$Course$表中</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span>  <span class="keyword">INTO</span>  Course (Cno，Cname,Teacher) <span class="keyword">VALUES</span>  (<span class="string">&#x27;CS－06&#x27;</span>,<span class="string">&#x27;数据库系统原理&#x27;</span>,<span class="string">&#x27;李华&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>例2：在$SC$表中增加记录(‘$01055123$’,‘$CS－06$’)，成绩暂缺：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span>  <span class="keyword">INTO</span>  SC(Sno，Cno) <span class="keyword">VALUES</span>  (<span class="string">&#x27;01055123&#x27;</span>,<span class="string">&#x27;CS－06&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span>  <span class="keyword">INTO</span>  <span class="operator">&lt;</span>表名<span class="operator">&gt;</span> [(列名，…列名)] <span class="operator">&lt;</span>子查询<span class="operator">&gt;</span> <span class="comment">/*子查询结果：即将某个表中的若干个记录按照一定的查询条件作为一个查询的结果集插入到另一个表中*/</span></span><br></pre></td></tr></table></figure>
+
+<p>例3：将平均成绩高于80分的男生学号及平均成绩存入表$S_Grade(Sno，Avg_Grade)$中，其中$Sno$表示学号，$Avg_Grade$表示平均成绩</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span>  <span class="keyword">INTO</span>  S_Grade(Sno,Avg_Grade)</span><br><span class="line">    <span class="keyword">SELECT</span>  Sno,<span class="built_in">AVG</span>(Grade) <span class="keyword">FROM</span> SC</span><br><span class="line">    <span class="keyword">WHERE</span>  Sno  <span class="keyword">IN</span> (<span class="keyword">SELECT</span> Sno <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> SEX<span class="operator">=</span><span class="string">&#x27;男&#x27;</span>)</span><br><span class="line">    <span class="keyword">GROUP</span>  <span class="keyword">BY</span> Sno <span class="keyword">HAVING</span> <span class="built_in">AVG</span>(Grade)<span class="operator">&gt;</span><span class="number">80</span>;</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-4-2数据删除"><a href="#3-4-2数据删除" class="headerlink" title="3.4.2数据删除"></a>3.4.2数据删除</h5><p>$SQL$数据删除语句可以将表中的部分或全部记录清除，语法格式为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> <span class="operator">&lt;</span>表名<span class="operator">&gt;</span> [<span class="keyword">WHERE</span> 条件表达式]</span><br></pre></td></tr></table></figure>
+
+<p>如果该语句指定$WHERE$条件，则只有满足条件的那些记录才会被删除，条件可以是简单的算术比较表达式，也可以是带有子查询的复杂形式</p>
+<p>例：将“$C$语言”课程成绩不存在的记录删除</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> SC</span><br><span class="line">    <span class="keyword">WHERE</span> (Grade <span class="keyword">IS</span> <span class="keyword">NULL</span>) <span class="keyword">AND</span> Cno <span class="keyword">IN</span></span><br><span class="line">             (<span class="keyword">SELECT</span> Cno <span class="keyword">FROM</span> Course <span class="keyword">WHERE</span> Cname＝<span class="string">&#x27;C语言&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-4-3数据修改"><a href="#3-4-3数据修改" class="headerlink" title="3.4.3数据修改"></a>3.4.3数据修改</h5><p>$SQL$的数据修改语句用于更新表中已有记录在不同列上的取值，语法格式为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> <span class="operator">&lt;</span>表名<span class="operator">&gt;</span> <span class="keyword">SET</span> <span class="operator">&lt;</span>列名<span class="operator">&gt;</span>＝<span class="operator">&lt;</span>列值表达式<span class="operator">&gt;</span>[，<span class="operator">&lt;</span>列名<span class="operator">&gt;</span>＝<span class="operator">&lt;</span>列值表达式<span class="operator">&gt;</span>…] [<span class="keyword">WHERE</span> 条件表达式]</span><br></pre></td></tr></table></figure>
+
+<p>例1：将雇员表$EMP$中每名员工的工资增加100元</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> EMP <span class="keyword">SET</span>  Salary＝Salary＋<span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p>例2：将“$01055071$”同学选修的“$CS－03$”课程成绩置为$NULL$</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> SC <span class="keyword">SET</span> Grade＝<span class="keyword">NULL</span> <span class="keyword">WHERE</span> Sno＝<span class="string">&#x27;01055071&#x27;</span> <span class="keyword">AND</span> Cno＝<span class="string">&#x27;CS－03&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="3-5-视图"><a href="#3-5-视图" class="headerlink" title="3.5 视图"></a>3.5 视图</h4><p>$SQL$视图是不存储具体数据，而仅在数据目录中存放其定义的“虚表”，它提供了一种间接访问基本表中数据的便捷方式，使用户可以更有效，更安全的访问系统中存储的相关数据视图可以通过基本表或其它视图导出，因而有着许多和基本表类似的性质</p>
+<h5 id="3-5-1视图的定义"><a href="#3-5-1视图的定义" class="headerlink" title="3.5.1视图的定义"></a>3.5.1视图的定义</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">VIEW</span> <span class="operator">&lt;</span>视图名<span class="operator">&gt;</span>[(<span class="operator">&lt;</span>列名<span class="operator">&gt;</span>，…，<span class="operator">&lt;</span>列名<span class="operator">&gt;</span>)] <span class="keyword">AS</span> <span class="operator">&lt;</span>子查询<span class="operator">&gt;</span> [<span class="keyword">WITH</span> <span class="keyword">CHECK</span> OPTION]  <span class="comment">/*建立视图*/</span></span><br></pre></td></tr></table></figure>
+
+<p>==如果在子查询的$SELECT$语句中使用了函数或运算表达式，那么必须在视图名后给出全部的列名表，因为函数和运算表达式是不能用来表示一个列的名称的==</p>
+<p>例1：建立全部男同学的视图</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span>  <span class="keyword">VIEW</span>  S_MALE</span><br><span class="line">	<span class="keyword">AS</span> <span class="keyword">SELECT</span> Sno,Class,Sname <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> SEX＝<span class="string">&#x27;男&#x27;</span> <span class="keyword">WITH</span> <span class="keyword">CHECK</span> OPTION;</span><br></pre></td></tr></table></figure>
+
+<p>例2：建立一个计算机系学生学号、选修课程数及其平均成绩的视图</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span>  <span class="keyword">VIEW</span>  S_AG (Sno，CNT_C，AVG_G)</span><br><span class="line">	<span class="keyword">AS</span> <span class="keyword">SELECT</span>  Sno，<span class="built_in">COUNT</span>(Cno)，<span class="built_in">AVG</span>(Grade) <span class="keyword">FROM</span> SC <span class="keyword">WHERE</span> Cno <span class="keyword">LIKE</span> <span class="string">&#x27;CS%&#x27;</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span> Sno;</span><br></pre></td></tr></table></figure>
+
+<p>例3：建立选修了“操作系统”课程的学生学号、姓名、及成绩的视图</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span>  <span class="keyword">VIEW</span>  S_C </span><br><span class="line">	<span class="keyword">AS</span> SEELCT S.Sno,Sname,Grade <span class="keyword">FROM</span>  Student,Course,SC</span><br><span class="line">	     <span class="keyword">WHERE</span>  Student.Sno＝SC.Sno  <span class="keyword">AND</span>  Course.Cno＝SC.Cno <span class="keyword">AND</span>  Cname＝<span class="string">&#x27;操作系统&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-5-2视图的删除"><a href="#3-5-2视图的删除" class="headerlink" title="3.5.2视图的删除"></a>3.5.2视图的删除</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">VIEW</span> S_MALE</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-5-3视图的查询"><a href="#3-5-3视图的查询" class="headerlink" title="3.5.3视图的查询"></a>3.5.3视图的查询</h5><p>由于视图中并不存储数据记录，因此处理视图查询时系统会首先将视图查询语句中的$WHERE$条件与视图定义中的$WHERE$条件进行有效合并，然后再转变为对基本表的查询</p>
+<p>例：在视图$S_MALE$上查询“李华”同学的学号及所在班级</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Sno,Class <span class="keyword">FROM</span> S_MALE <span class="keyword">WHERE</span> Sname<span class="operator">=</span><span class="string">&#x27;李华&#x27;</span>;</span><br><span class="line"><span class="comment">/*等价于*/</span></span><br><span class="line"><span class="keyword">SELECT</span>  Sno,Class <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> Sname＝<span class="string">&#x27;李华&#x27;</span> <span class="keyword">AND</span> SEX＝<span class="string">&#x27;男&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-5-4视图的更新"><a href="#3-5-4视图的更新" class="headerlink" title="3.5.4视图的更新"></a>3.5.4视图的更新</h5><p>视图的更新最终还是会落实为对基本表的更新，但并不是所有的视图记录都能够惟一的对应到基本表中的一条记录，因此视图的更新通常会具有较大的限制</p>
+<p>例1：在视图$S_MALE$中将学号为‘$01055029$’的学生所在班级更新为‘计算机$12$’</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> S_MALE <span class="keyword">SET</span> Class＝<span class="string">&#x27;计算机12&#x27;</span> <span class="keyword">WHERE</span> Sno＝<span class="string">&#x27;01055029&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>例2：将视图$S_AG$中学号为‘$01055016$’的同学的选课数更新为12，并将其平均成绩更新为81.7分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> S_AG <span class="keyword">SET</span> CNT_C＝<span class="number">12</span>，AVG_G＝<span class="number">81.7</span> <span class="keyword">WHERE</span> Sno＝<span class="string">&#x27;01055016&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>例3：在视图$S_C$中插入新记录(‘01055097’，’张明’，92)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span>  <span class="keyword">INTO</span>  S_C <span class="keyword">VALUES</span>  (<span class="string">&#x27;01055097&#x27;</span>,<span class="string">&#x27;张明&#x27;</span>，<span class="number">92</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>==视图更新的特点及限制如下==：</strong></p>
+<p>（1）<strong>行列子集视图是可以更新的。</strong>一个例外情况是，如果基本表并没有为视图定义中不包含的那些属性列指定缺省值，同时这些列又不允许取值为$NULL$，那么这样的行列子集视图是不能执行$INSERT$操作的</p>
+<p>（2）如果视图定义中使用了$DISTINCT$、$GROUP$ $BY$分组或者是聚集函数，那么这样的视图是不能更新的</p>
+<p>（3）如果视图定义中使用了多表联接或者含有嵌套查询，那么通常情况下这样的视图是不能更新的</p>
+<h5 id="3-5-5视图的应用"><a href="#3-5-5视图的应用" class="headerlink" title="3.5.5视图的应用"></a>3.5.5视图的应用</h5><p>视图对应于数据库三层模式结构的外模式，视图这个概念的提出极大的方便了关系数据库系统的使用，具体的说，视图应用具有以下的几个优点：</p>
+<p>（1）提供了数据的逻辑独立性</p>
+<p>（2）简化了用户应用</p>
+<p>（3）提供了一定的数据安全保护功能</p>
+<hr>
+<h4 id="3-6-SQL-数据控制功能"><a href="#3-6-SQL-数据控制功能" class="headerlink" title="3.6 $SQL$数据控制功能"></a>3.6 $SQL$数据控制功能</h4><p>由$DBMS$提供统一的数据控制功能是数据库系统的特点之一。数据控制亦称为数据保护，包括数据的安全性控制、完整性控制、并发控制和恢复</p>
+<h5 id="3-6-1权限与角色"><a href="#3-6-1权限与角色" class="headerlink" title="3.6.1权限与角色"></a>3.6.1权限与角色</h5><p>数据库上的权限主要包括两种，一种是==用户级的权限==，另一种是==表级的权限==</p>
+<p>用户级权限是指$DBA$可以单独授予某个用户在数据库上可进行何种操作的权限</p>
+<p>$SQL$标准支持的是表级权限，这是指$DBA$可以单独控制每个基本表和视图的存取，可能会经常用到的表级权限包括：表（包括基本表和视图）的查询($SEELCT$)、更新($INSERT$、$UPDATE$、$DELETE$)和引用($REFERENCE$)等</p>
+<p>角色并不对应于某个具体的用户，而是对于一类具有共同特征的用户的总称，这样做的目的是为了便于管理，定义角色的语法是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span>  ROLE <span class="operator">&lt;</span>角色名<span class="operator">&gt;</span>  [<span class="keyword">WITH</span>  ADMIN  &#123;<span class="operator">&lt;</span>当前用户名<span class="operator">&gt;</span><span class="operator">|</span><span class="operator">&lt;</span>当前角色名<span class="operator">&gt;</span>&#125;]</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-6-2权限的授予和收回"><a href="#3-6-2权限的授予和收回" class="headerlink" title="3.6.2权限的授予和收回"></a>3.6.2权限的授予和收回</h5><p>==将表级权限授予某个授权$ID$的语法格式如下：==</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span>  <span class="operator">&lt;</span>权限<span class="operator">&gt;</span>  <span class="keyword">ON</span>  <span class="keyword">TABLE</span>  <span class="operator">&lt;</span>表名<span class="operator">&gt;</span> </span><br><span class="line">	  <span class="keyword">TO</span>  <span class="operator">&lt;</span>授权ID<span class="operator">&gt;</span>，…，<span class="operator">&lt;</span>授权ID<span class="operator">&gt;</span>  [<span class="keyword">WITH</span>  <span class="keyword">GRANT</span> OPTION]</span><br></pre></td></tr></table></figure>
+
+<p>其中权限包括$SELECT$、$UPDATE$、$INSERT$、$DELETE$、$REFERENCE$、$ALL$ $PRIVILEGES$等，$ALL$ $PRIVILEGES$表示授予所有的权限，此外对于$SELECT$和$UPDATE$还可以将权限指定到具体的某些属性列上，如果使用了$WITH$ $GRANT$ $OPTION$，则表明该权限是可以转授的</p>
+<p>==收回用户某种特权的$SQL$语句如下：==</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">REVOKE</span>  <span class="operator">&lt;</span>权限<span class="operator">&gt;</span>  <span class="keyword">ON</span>  <span class="keyword">TABLE</span>  <span class="operator">&lt;</span>表名<span class="operator">&gt;</span> <span class="keyword">FROM</span>  <span class="operator">&lt;</span>授权ID<span class="operator">&gt;</span>，…，<span class="operator">&lt;</span>授权ID<span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>例1：将表$SC$上的$SELECT$和$UPDATE(Grade)$特权授予用户$Wang$，同时允许该用户将权限授予其它用户</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span>，<span class="keyword">UPDATE</span>(Grade) <span class="keyword">ON</span> <span class="keyword">TABLE</span> SC <span class="keyword">TO</span> Wang <span class="keyword">WITH</span> <span class="keyword">GRANT</span> OPTION</span><br></pre></td></tr></table></figure>
+
+<p>例2：将用户$Wang$在$SC$表上的$UPDATE$权限收回</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">REVOKE</span>  <span class="keyword">UPDATE</span>(Grade)  <span class="keyword">ON</span>  <span class="keyword">TABLE</span>  SC   <span class="keyword">FROM</span>  Wang</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="第四章-数据依赖于关系模式规范化"><a href="#第四章-数据依赖于关系模式规范化" class="headerlink" title="第四章 数据依赖于关系模式规范化"></a>第四章 数据依赖于关系模式规范化</h3><hr>
+<h4 id="4-1关系模式设计中的问题"><a href="#4-1关系模式设计中的问题" class="headerlink" title="4.1关系模式设计中的问题"></a>4.1关系模式设计中的问题</h4><ul>
+<li>1.数据冗余</li>
+<li>2.更新异常</li>
+<li>3.插入异常</li>
+<li>4.删除异常</li>
+</ul>
+<p><strong>解决方法：</strong>通过分解关系模式来消除其中不合适的数据依赖 </p>
+<hr>
+<h4 id="4-2数据依赖"><a href="#4-2数据依赖" class="headerlink" title="4.2数据依赖"></a>4.2数据依赖</h4><ul>
+<li>**数据依赖(Data Dependency)**是通过一个关系中各属性值相等与否体现出来的一种数据间的相互制约关系，是现实世界中事物属性间相互联系的抽象，是数据内在的性质，是<u>语义的体现</u></li>
+<li>最重要的是<strong>函数依赖</strong>和<strong>多值依赖</strong></li>
+</ul>
+<p><u>关系的模式称为关系的内涵，而将关系的实例$r$称为关系的外延，由于用户经常对关系进行插入、删除和修改操作，因此外延是与时间有关的，随着时间的推移在不断变化</u></p>
+<h5 id="4-2-1函数依赖"><a href="#4-2-1函数依赖" class="headerlink" title="4.2.1函数依赖"></a>4.2.1函数依赖</h5><ol>
+<li><p><strong>函数依赖定义：</strong>设$R$为关系模式，$r$是$R$上的<strong>任意</strong>一个关系实例,<strong>$X,Y\subseteq U$<strong>是$R$的两个属性子集，若对于$r$上的</strong>任意</strong>两个元组$t1，t2∈r$都有：如果 $t1[X]＝t2[X]$，则必有$t1[Y]=t2[Y]$，则称在$R$上$X$函数决定$Y$或者$Y$函数依赖于$X$，记为$X→Y$，$X$称为决定子(Determinant)</p>
+</li>
+<li><p>函数依赖是指关系$R$模式的所有关系元组均应满足的约束条件而不是关系模式中的某个或某些元组满足的约束条件</p>
+</li>
+<li><p><strong>完全函数依赖定义：</strong>设$R$为关系模式,$X,Y$是$R$的不同属性集，如果$X\rightarrow Y$成立，且不存在$X^‘ \subset X $使得$X^‘→Y^‘$也成立,则称$Y$完全函数依赖于$X$，记为$X\overset{f}{\rightarrow}Y$,否则称$Y$部分依赖于$X$,记为$X\overset{p}{\rightarrow}Y$.其中 完全函数依赖中的决定子不包含冗余属性，即只要将决定子中的任何一个属性去掉，这个函数依赖就不在成立</p>
+</li>
+<li><p><strong>平凡函数依赖定义：</strong>如果$Y\subseteq X$，则称$X→Y$为平凡的函数依赖</p>
+</li>
+<li><p><strong>传递函数依赖定义：</strong>设$X,Y,Z$是$R$上的不同属性集合，如果有$X→Y$，$Y→Z$成立且$Y{\not→}X$,则称$Z$传递函数依赖于$X$.条件$Y{\not→}X$非常重要，如果没有这个条件，那么$X$与$Y$就是一一对应关系，从而$Y→Z$就是直接函数依赖</p>
+</li>
+<li><p><strong>函数依赖的逻辑蕴涵定义：</strong>设$F$是在关系模式$R$上成立的函数依赖的集合，$X→Y$是一个函数依赖，如果对于$R$的每个满足$F$的关系$r$也满足$X→Y$，那么称$F$逻辑蕴涵$X→Y$，记为$F⊨X→Y$.例如：$\lbrace{X→Y，Y→Z}\rbrace ⊨ X→Z$</p>
+</li>
+<li><p><strong>函数依赖集合的闭包定义：</strong>由函数依赖集合$F$所逻辑蕴涵的全部函数依赖所构成的集合称之为$F$的闭包(closure)，记作$F^+$，即 $F^+＝\lbrace{ X→Y|F ⊨ X→Y}\rbrace$ </p>
+<p>​     <strong>函数依赖集的闭包$F^+$的特点：</strong></p>
+<ul>
+<li>$F⊆F^+$，这是因为根据闭包的定义$F$中的每个函数依赖必定也在$F^+$中</li>
+<li>$(F^+)^+＝F^+$，该性质说明闭包运算是幂等的，即$F$经过任意多次的闭包运算后其结果仍然等于$F^+$</li>
+<li>如果$F＝F^+$，则称$F$是完备的</li>
+<li>$F^+$的计算是一个$NP$完全问题</li>
+</ul>
+</li>
+<li><p><strong>函数依赖的推理规则（Armstrong公理）：</strong></p>
+<ul>
+<li><p>$A1$（<strong>自反率</strong>）：如果$Y ⊆ X ⊆ U$，则$X→Y$成立</p>
+</li>
+<li><p>$A2$（<strong>增广率</strong>）：如果$X→Y$成立，且$Z ⊆ U$，则$XZ→YZ$成立</p>
+</li>
+<li><p>$A3$（<strong>传递率</strong>）：如果$X→Y，Y→Z$成立，则$X→Z$成立</p>
+<p><strong>由上面三条规则可以推出以下规则：</strong></p>
+<ul>
+<li><strong>合并规则</strong>：若$X→Y，X→Z$成立，则$X→YZ$成立</li>
+<li><strong>伪传递规则</strong>：若$X→Y，WY→Z$成立，则$WX→Z$成立</li>
+<li><strong>分解规则</strong>：若$X→Y$，且$Z⊆Y$，则有$X→Z$</li>
+</ul>
+<p><strong>$FD$的逻辑导出定义：</strong>给定关系模式$R&lt;U,F&gt;$，如果能由$F$根据Armstrong公理导出$X→Y$，则称$X→Y$是$F$的逻辑导出，记为$F=&gt; X→Y$</p>
+</li>
+</ul>
+</li>
+<li><p><strong>属性集闭包的定义：</strong>属性集$X$关于$R(U，F)$上的函数依赖集合$F$的闭包$X_F^+$ 定义为$X_F^+＝\lbrace{A|A∈U，F=&gt; X→A}\rbrace$，并且$X⊆X_F^+$是一定成立的.（在计算时就看所要求的属性集在函数依赖集中的能依照上述的推理规则能推出的函数依赖右部的集合）</p>
+<p><strong>引理：</strong>$X→Y$可由<em>Armstrong</em>公理退出的充分必要条件是$Y⊆X_F^+$<strong>（十分重要，一定要记住！！！）</strong></p>
+<ul>
+<li>==<strong>求属性集$X(X⊂U)$关于$U$上的函数依赖集F的闭包$X_F^+$的算法：</strong>==<ul>
+<li>输入：$X,F$</li>
+<li>输出：$X_F^+$</li>
+<li>步骤：<ol>
+<li><strong>令$X(0)=X，i=0$</strong> </li>
+<li><strong>求$B$，这里$B=\lbrace{A|(存在V→W)(V→W∈F∧V⊆X(i) ∧ A∈W)}\rbrace$</strong></li>
+<li><strong>$X(i+1)=X(i)∪B$</strong></li>
+<li><strong>判断$X(i+1)=X(i)$吗?</strong></li>
+<li><strong>若相等或$X(i)=U$ 则X(i)就是$X_F^+$,算法终止</strong></li>
+<li><strong>若否，则$i=i+1$，返回第 $2$步</strong></li>
+</ol>
+</li>
+<li>该算法最多$|U|-|X|$次循环就会终止</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Armstrong公理的正确性和完备性:</strong></p>
+<ul>
+<li><strong>Armstrong公理的正确性</strong>是指使用推理规则从函数依赖（$FD$）集和$F$推出的$FD$必定在$F^+$中”，即：如果$F=&gt;X→Y 则 F|= X→Y$</li>
+<li><strong>Armstrong公理的完备性</strong>是指$F^+$中的函数依赖$FD$都能从$F$集使用推理规则集导出，即：如果$F|= X→Y 则 F =&gt; X→Y$</li>
+<li><strong>定理：</strong><u>Armstrong公理是完备的</u>（证明过程看课件即可）</li>
+<li>Armstrong公理的正确性和完备性说明“<strong>逻辑导出</strong>”与“<strong>逻辑蕴含</strong>”是两个<strong>等价</strong>的概念</li>
+</ul>
+</li>
+<li><p><strong>函数依赖集的等价覆盖定义：</strong>设F，G是两个函数依赖集合，如果$F^+＝G^+$ ，则称$F$等价于G，或者$F$与$G$互相覆盖</p>
+<p><strong>引理：</strong>$F$与$G$等价的充分必要条件是$F⊆G^+ 并且G⊆F^+$</p>
+<ul>
+<li>若$F⊆G^+$ ,则$X^+_F⊆X^+_G+$</li>
+<li>任取$X→Y∈F^+$ 则有 $Y⊆X^+_F⊆X^+_G$。 所以$X→Y∈(G^+)^+ = G^+$ ，即$F^+⊆G^+$ </li>
+<li>同理可证$G^+⊆F^+$ ，所以$F^+=G^+$</li>
+</ul>
+</li>
+<li><p><strong>最小函数依赖集合的定义：</strong>若F满足下列条件：</p>
+<ul>
+<li>$F$中所有函数依赖的右部均为单属性</li>
+<li>$F$中不存在这样的函数依赖$X→A$及$Z⊂X$，使得 $F^+ ＝(F-\lbrace{X→A}\rbrace∪\lbrace{Z→A}\rbrace)^+$    (去除所有依赖左边的冗余属性.)</li>
+<li>F中不存在这样的函数依赖$X→A$：使得$F^+ ＝(F-{X→A})^+$   （去除所有冗余依赖关系）</li>
+</ul>
+<p>则称$F$为最小函数依赖集或最小覆盖</p>
+<p><strong>定理：</strong><u>每一个函数依赖集$F$均等价于一个最小函数依赖集$F_{min}$</u></p>
+<p>==<strong>例题：</strong>$R(A,B,C,D,E,H,I)，F = \lbrace{A→BE, AH→D, B→C, BD→E, C→D, H→I,I→H, H→BE}\rbrace$,试求$F$的最小依赖集$F_{min}$==</p>
+<ul>
+<li><strong>右部拆成单属性:</strong>$F=\lbrace{A→B, A→E ,AH→D, B→C, BD→E, C→D, H→I,I→H,H→B, H→E}\rbrace$</li>
+<li><strong>考察左部不是单属性的函数依赖，消除多余属性:</strong><ul>
+<li>$AH→D: \quad\quad∵((AH)-H)_F^+＝ABECD,D∈((AH)-H)_F^+    \quad\quad\quad∴以A→D取代AH→D$</li>
+<li>$BD→E:\quad\quad ∵((BD)-D)_F^+＝BCDE,E∈((BD)-D)_F^+\quad\quad\quad\quad∴以B→E取代BD→E$</li>
+<li>$F=\lbrace{A→B, A→E ,A→D, B→C, B→E, C→D, H→I,I→H, H→B, H→E}\rbrace$</li>
+</ul>
+</li>
+<li><strong>消除多余的函数依赖：</strong><ul>
+<li>$A→B \quad\quad∵A_G^+＝AED,B∉ A_G^+(G=F-{A→B}) \quad\quad∴保留该函数依赖$</li>
+<li>$A→E \quad\quad∵A_G^+＝ABCDE,E∈A_G^+(G=F-{A→E}) \quad\quad∴不保留该函数依赖$</li>
+<li>$A→D \quad\quad∵A_G^+＝ABCDE,D∈ A_G^+(G=F-{A→D})  \quad\quad∴不保留该函数依赖$</li>
+<li>$B→C  \quad\quad∵B_G^+＝B,C ∉ B_G^+(G=F-{B→C})  \quad\quad∴保留该函数依赖$</li>
+<li>$B→E \quad\quad∵B_G^+＝BCD,E ∉ B_G^+(G=F-{B→E})  \quad\quad∴保留该函数依赖$</li>
+<li>$C→D\quad\quad∵C_G^+＝C,D∉C_G^+(G=F-{C→D})\quad\quad∴保留该函数依赖$</li>
+<li>$H→I \quad\quad∵H_G^+＝HBECD,I ∉H_G^+(G=F-{H→I}) \quad\quad∴保留该函数依赖$</li>
+<li>$I→H \quad\quad∵I_G^+＝I,H ∉ I_G^+(G=F-{I→H})   \quad\quad∴保留该函数依赖$</li>
+<li>$H→B \quad\quad∵H_G^+＝HIE,B∉ H_G^+(G=F-{H→B})\quad\quad∴保留该函数依赖$</li>
+<li>$H→E \quad\quad∵H_G^+＝HBCDE,E∈H_G^+(G=F-{H→E}) \quad\quad∴不保留该函数依赖$</li>
+</ul>
+</li>
+<li><strong>最小函数依赖集为</strong>$F_{min}=\lbrace{A→B, B→C, B→E,C→D, H→I, I→H, H→B\rbrace}$</li>
+</ul>
+<p><strong><u>$F$的最小依赖集$F_{min}$不一定是唯一的，它和我们对各函数依赖$FDi$及$X→A$中$X$各属性的处置顺序有关</u></strong></p>
+</li>
+</ol>
+<h5 id="4-2-2多值依赖"><a href="#4-2-2多值依赖" class="headerlink" title="4.2.2多值依赖"></a>4.2.2多值依赖</h5><ul>
+<li><p>引入相关问题</p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220427213212656.png" alt="image-20220427213212656"></p>
+</li>
+<li><p>仔细考察这类关系模式TEACHING，发现它具有一种称为多值依赖($MVD$)的数据依赖</p>
+</li>
+<li><p><strong>解决思路</strong>：通过建立两个关系，让每个关系只存储一个多值属性的数据。</p>
+</li>
+</ul>
+<ol>
+<li><p><strong>多值依赖定义：</strong>设$R(U)$是属性集$U$上的一个关系模式。$X，Y，Z$是的$U$的子集,并且$Z=U-X-Y$。关系模式$R(U)$中多值依赖$X→→Y$成立，当且仅当对$R(U)$的任一关系$r$,给定的一对$(x，z)$值有一组$Y$的值，这组值仅仅决定于$x$值而与$z$值无关</p>
+<p><strong>例如：</strong>在关系模式TEACHING中，对于(物理，光学原理)有一组$T$值{李勇，王军}，这组值仅仅决定于课程$C$上的值(物理)，也就是说对于另一个(物理,普通物理学)它对应的一组$T$值仍是{李勇,王军}，尽管这时参考书$B$的值已经改变了。因此，$T$多值依赖于$C$，即$C→→T$</p>
+</li>
+<li><p><strong>多值依赖形式化描述定义：</strong>设$R(U)$是属性集U上的一个关系模式。$X，Y，Z$是的U的子集,并且$Z=U-X-Y$，如果对$R(U)$的任一关系$r$，都有如下性质：</p>
+<ul>
+<li>如果r中存在2个元组$s、t$，使得： $s[X]=t[X]$则$r$中必存在元组$u、v$,使得：<ul>
+<li>(1) $u[X]=v[X]=s[X]=t[X]$</li>
+<li>(2) $u[Y]=t[Y] 且 u[Z]=s[Z]$</li>
+<li>(3) $v[Y]=s[Y] 且 v[Z]=t[Z]$</li>
+</ul>
+</li>
+<li>(即交换s、t在Y上的值得到的2个元组必在r中)</li>
+</ul>
+<p> 则称关系模式$R$满足多值依赖$X→→Y$</p>
+<p>==（口诀：$X$相同的话，$Y$和$Z$的笛卡尔积都在$r$里面，那就是多值依赖）==</p>
+</li>
+<li><p><strong>多值依赖的推导规则：</strong></p>
+<ul>
+<li>$A4$（互补律）：如果$X→→Y$，则$X→→(U-X-Y)$</li>
+<li>$A5$（扩展律）：如果$X→→Y$且$V⊆W⊆U$，则$WX→→VY$</li>
+<li>$A6$（传递律）：如果$X→→Y$且$Y→→Z$，则$X→→(Z-Y)$</li>
+<li>$A7$ : 如果$X→Y$，则X→→Y，即$FD$是$MVD$的特例</li>
+<li>$A8$ : 如果$X→→Y、Z⊆Y$且对某一个与$Y$不相交的$W$有：如果 $W→Z$，则$X→Z$</li>
+</ul>
+<p>由上述规则可以推出以下规则：</p>
+<ul>
+<li>$MVD$合并规则：如果$X→→Y、X→→Z$，则$X→→YZ$</li>
+<li>$MVD$伪传递规则：如果$X→→Y、WY→→Z$，则$WX→→(Z-WY）$</li>
+<li>混合伪传递规则：如果$X→→Y、XY→Z$，则$X→(Z-Y）$</li>
+<li>$MVD$分解规则：如果$X→→Y、X→→Z$，则$X→→(Y∩Z）$、$X→→(Y-Z) $、$X→→(Z-Y）$均成立</li>
+</ul>
+</li>
+<li><p><strong>平凡的多值依赖定义：</strong>若$X→→Y$，而$Z=U-XY$为空，则称$X→→Y$ 为平凡的多值依赖</p>
+</li>
+<li><p><strong>多值依赖的性质：</strong></p>
+<ul>
+<li>多值依赖具有对称性。即若$X→→Y$，则$X→→Z$，其中$Z＝U－XY$</li>
+<li>多值依赖的传递性。即若$X→→Y，Y→→Z$， 则$X→→Z－Y$</li>
+<li>函数依赖可以看作是多值依赖的特殊情况。即若$X→Y$，则$X→→Y$。这是因为当$X→Y$时，对$X$的每一个值$x$，$Y$有一个确定的值$y$与之对应，所以$X→→Y$</li>
+<li>若$X→→Y，X→→Z$，则$X→→YZ$ </li>
+<li>若$X→→Y，X→→Z$，则$X→→Y∩Z$ </li>
+<li>若$X→→Y，X→→Z$，则$X→→Y－Z，X→→Z－Y$</li>
+</ul>
+</li>
+<li><p><strong>多值依赖与函数依赖：</strong></p>
+<ul>
+<li><strong>区别：</strong><ul>
+<li><u>函数依赖规定某些元组不能出现在关系中，也称为相等产生依赖</u></li>
+<li><u>多值依赖要求某种形式的其它元组必须在关系中，称为元组产生依赖</u></li>
+</ul>
+</li>
+<li><strong>有效性范围：</strong><ul>
+<li>$A→B$的有效性仅决定于$X、Y$属性集上的值，它在任何属性集$W（XY ⊆W ⊆U）$上都成立</li>
+<li>若$A→B$在$R(U)$上成立，则对于任何$Y^′⊆Y$，均有$X→Y^′$成立</li>
+<li>$X→→Y$的有效性与属性集范围有关</li>
+<li>$X→→Y$在属性集$W（XY ⊆W ⊆U）$上成立，但在$U$上不一定成立</li>
+<li>$X→→Y$在$U$上成立$\Rightarrow$$X→→Y$在属性集W（XY ⊆W ⊆U）上成立</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="4-3关系模式分解"><a href="#4-3关系模式分解" class="headerlink" title="4.3关系模式分解"></a>4.3关系模式分解</h4><ul>
+<li>我们可以通过把一个”大的”关系模式分解成多个”小的”关系模式，以解决插入异常、删除异常和更新异常等问题</li>
+<li>关系模式的分解，不仅仅是属性集合的分解，也是对关系模式上的函数依赖集，以及对关系模式的当前值的分解的具体表现</li>
+<li>关系模式的分解并不是随意的，必须保证原来的关系模式的语义性质和信息不被丢失，即要求分解应当既“<strong>无损联接</strong>”又“<strong>保持函数依赖</strong>”</li>
+</ul>
+<ol>
+<li><p><strong>关系模式分解的定义：</strong>设$R(U)$为关系模式，则称:$ρ={R_1(U_1),R_2(U_2),…,R_k(U_k)}$ (其中$U= \sum_{i=1}^kU_i$  ,且对于任意的$1≤i,j≤k\quad$没有$U_i⊆U_j)$为$R$的一个分解</p>
+</li>
+<li><p><strong>函数依赖集$F$在属性集$U_i(⊆U)$上的==投影定义==：</strong>$\prod_{U_i}(F)=\lbrace X→Y|X→Y∈F^+\wedge XY⊆U_i \rbrace$</p>
+<p><strong>模式分解示意图如下所示：</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220428094709167.png" alt="模式分解示意图" style="zoom:50%;" /></li>
+<li><p><strong>无损连接分解定义：</strong>设$R$是一个关系模式，$F$是$R$上的一个$FD$集,$ρ=\lbrace R_1，···，R_k \rbrace$ 为$R$的一个分解,如果对$R$中满足$F$的每一个关系$r$，都有$r =π_{R_1}（r）⋈π_{R_2}（r）⋈ ···⋈π_{R_k}（r）$，（$π$为投影符号）则称分解$ρ$相对于$R$是无损连接分解</p>
+<p><strong>投影连接运算定义：</strong>设$ρ=\lbrace R_1，···，R_k \rbrace$为$R$的一个分解，$r$是$R$上的任意一个具体关系，则$r$对于$ρ$的投影连接运算定义为：$m_ρ(r)=⋈_{i=1}^k\prod_{u_i}(r)$.若有$r_i=π_{R_1}（r）(1\leq i \leq k)$,则有以下性质：</p>
+<ul>
+<li>$r⊆m_ρ(r)$</li>
+<li>若$s= m_ρ(r)$，则$π_{R_i}(s)=r_i$</li>
+<li>$m_ρ(m_ρ(r))= m_ρ(r)$,这个性质称为幂等性</li>
+</ul>
+<p>如果$r= m_ρ(r)$，则$ρ$是无损连接</p>
+</li>
+<li><p>==<strong>无损分解的判别算法：</strong>==</p>
+<ul>
+<li><p><strong>输入</strong>：关系模式$R(A_1，···，A_n)$;$R$上的函数依赖集$F$；$R$的一个分解，$ρ=\lbrace R_1，···，R_k \rbrace$</p>
+</li>
+<li><p><strong>输出：</strong>$ρ$是否为无损连接分解</p>
+</li>
+<li><p><strong>方法：</strong>（课件上有一个例题）</p>
+<ul>
+<li><p>(1)建立一个$n$列、$k$行的符号表$M$：其中$M[i,j]=\begin{cases}    a_j, \text{若$A_j\in U_i$ } &amp; \b_{ij}, \text{若$A_j\notin U_i$} \\end{cases} $</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220428191823842.png" alt="image-20220428191823842" style="zoom: 50%;" /></li>
+<li><p>(2)用$F$中的每一函数依赖$X→Y$对$M$反复进行下列检查和处理：检查$X$中的属性所对应的列，找出在$X$上取值相等的行，如果找到两个(或多个)行在$X$上取值相等，就将对应行中$Y$中属性所对应的符号改为一致，即如果其中之一为$a_j$，则将其他符号也改为$a_j$；如果全部符号都是“$b$”符号，则将它们改为同样的“$b$”符号</p>
+</li>
+<li><p>(3)如此进行下去，直到发现$M$中某一行变为：$a_1,a_2,···,a_n$，则说明$ρ$是无损连接分解；否则，一直进行到$M$不再改变为止，则说明$ρ$不是无损连接分解</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>无损分解的判别定理1：</strong>设$ρ=\lbrace R_1，R_2\rbrace$是关系模式$R$的一个分解，$F$是$R$上成立的$FD$集，那么分解$ρ$相对于$F$是无损分解的充分必要条件是$(R_1∩R_2)→(R_1－R_2)$或$(R_1∩R_2)→(R_2－R_1)$</p>
+<p><strong>无损分解的判别定理2：</strong>如果$FD：$$X→Y$在模式$R$上成立，且$X∩Y=\emptyset$，则$ρ=\lbrace{U－Y，XY }\rbrace$是$R$的无损分解</p>
+</li>
+<li><p><strong>保持函数依赖的分解定义：</strong>设$ρ=\lbrace R_1，···，R_k \rbrace$是$R$的一个分解，$F$是$R$上的$FD$集，如果有：$\cup_{i=1}^kπ_{R_i}(F)⊨F$,则称分解$ρ$保持函数依赖集$F$ </p>
+</li>
+<li><p><strong>==检验分解是否保持函数依赖的算法：==</strong></p>
+<ul>
+<li><p><strong>输入：</strong>$R$上的函数依赖集$F$；$R$的一个分解$ρ=\lbrace R_1，···，R_k \rbrace$</p>
+</li>
+<li><p><strong>输出：</strong>$ρ$是否保持函数依赖集合$F$</p>
+</li>
+<li><p><strong>方法：</strong>令$G=\cup_{i=1}^kπ_{R_i}(F)$，为检验$G$是否覆盖$F$,可对$F$中的每一个函数依赖$X→Y$进行检验：</p>
+<ul>
+<li><p>首先计算$X_G^+$,然后检查$Y$是否被包含在$X_G^+$中</p>
+</li>
+<li><p>==不必求出$G$而计算$X_G^+$的算法：==</p>
+<p>==$Z:=X;$<br>$repeat  $==</p>
+<pre><code>==$for \quad i=1\quad to \quad k\quad do$==
+    ==$Z:=Z\cup((Z\cap U_i)_F^+\cap U_i) $==
+</code></pre>
+<p>​    ==$until \quad Z$不在变化==<br>​        </p>
+</li>
+<li><p>如果$Y$被包含在$X_G^+$中，则$X→Y\in X_G^+ $</p>
+</li>
+<li><p>如果$F$中的所有函数依赖经检验都属于$X_G^+$，则$ρ$保持函数依赖，否则不保持函数依赖</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>模式分解与模式等价问题：</strong></p>
+<ul>
+<li><strong>数据等价</strong>是指两个数据库实例应表示同样的信息内容，用“无损分解”衡量，如果是无损分解，那么对泛关系反复的投影和联接都不会丢失信息</li>
+<li><strong>依赖等价</strong>是指两个数据库模式应有相同的依赖集闭包，在依赖集闭包相等情况下，数据的语义是不会出差错的。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="4-4关系模式的规范化"><a href="#4-4关系模式的规范化" class="headerlink" title="4.4关系模式的规范化"></a>4.4关系模式的规范化</h4><ol>
+<li><p>**第一范式($1NF$):**如果关系模式$R$的每个关系$r$的属性值都是不可分的原子值，则称$R$是第一范式（$1NF$）的模式。(分量是否需要再分与具体应用有关如果用到值的一部分，则需要进一步分割)     <u>满足$1NF$的关系称为规范化的关系，否则称为非规范化的关系</u></p>
+</li>
+<li><p><strong>键的相关概念：</strong></p>
+<ul>
+<li><p>设$K$为$R&lt;U，F&gt;$中的属性或属性组合，若$K→U∈F^+$，则称$K$为$R$的一个<strong>超键</strong></p>
+</li>
+<li><p>如果一个超键$K$的任何真子集都不再是超键，则称$K$为$R$的一个<strong>候选键</strong>,候选键有时也称为键</p>
+</li>
+<li><p>若关系模式中有多个候选键，则选定其中的一个为<strong>主键</strong></p>
+</li>
+<li><p>包含在任何一个<u>候选键</u>中的属性，称为<strong>主属性</strong>$(Prime attribute)$或键属性$(Key attribute)$ 。不包含在任何候选键中的属性，则称为<strong>非主属性</strong>$(Nonprime attribute)$或非键属性$(Non-key attribute)$</p>
+</li>
+</ul>
+</li>
+<li><p>==<strong>求关系模式上全部候选键的算法：</strong>==</p>
+<ul>
+<li><strong>输入</strong>：关系模式$R(U,F)$，其中$F$是最小覆盖</li>
+<li><strong>输出</strong>：$R$上的所有候选键</li>
+<li><strong>步骤</strong>：<ul>
+<li>将$R$的全部属性分为四类，分别是$C_1$：不在任何函数依赖中出现的属性；$C_2$：仅在函数依赖决定子中出现的属性；$C_3$：仅在函数依赖右部出现的属性；$C_4$：在函数依赖左部右部均有出现的属性。注意，<u>任何候选键中必然会包括$C_1、C_2$中的属性</u></li>
+<li>若$(C_1∪C_2)^+＝U$ 或者 $C_4＝Φ$，则$C_1∪C_2$即为惟一的候选键；否则，逐一将$C_4$中的属性加入$C_1∪C_2$并计算其闭包，若其闭包为$U$，则$C_1∪C_2$与该属性构成关系上的一个候选键，重复该过程直至找出所有的候选键</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>**第二范式（$2NF$）:**如果关系模式$R$中的所有非主属性都<u>完全函数依赖</u>于所有$CK$，则称$R$满足$2NF$，表示为$R∈2NF$</p>
+<p><u>$2NF$是在$1NF$的基础上==消除非主属性对于所有候选键的部分函数依赖==</u></p>
+</li>
+<li><p>**第三范式（$3NF$）:**如果关系模式$R$中的非主属性既不部分函数依赖也不传递函数依赖于$R$上的所有候选键，则称$R$满足$3NF$，表示为$R∈3NF$</p>
+<p><u>$3NF$是在$2NF$的基础上==消除非主属性对于键的传递依赖==</u></p>
+</li>
+<li><p><strong>重要推论：</strong></p>
+<ul>
+<li><p><strong>推论1：</strong>如果$R$是$3NF$模式，那么$R$也是$2NF$模式</p>
+</li>
+<li><p><strong>推论2：</strong>如果$R$是$BCNF$模式，那么$R$也是$3NF$模式</p>
+</li>
+<li><p><strong>推论3：</strong>设关系模式$R$，当$R$上<u>每一个</u>$FD$  $X→A$满足下列三个条件之一：</p>
+<ul>
+<li> $A∈X$（即$X→A$是一个平凡的$FD$）；</li>
+<li>$X$是$R$的超键；</li>
+<li>$A$是主属性。</li>
+</ul>
+<p> 则关系模式$R$就是$3NF$模式。</p>
+</li>
+</ul>
+</li>
+<li><p>**$BCNF$范式:**若对于$R$上的任何<u>非平凡函数依赖</u>$X→Y$都有$X$必包含$R$的某个候选键，则称$R$满足$BCNF$，表示为$R∈BCNF$</p>
+<p><u>如果关系模式$R$中的每个属性都不传递依赖于$R$的候选键，那么称$R$是$BCNF$的模式</u></p>
+<p>$BCNF$是在$3NF$的基础上==消除<u>主属性</u>对于键的部分依赖和传递依赖==</p>
+</li>
+<li><p>**第四范式($4NF$​):**设$D$是关系模式$R$上成立的$FD$和$MVD$集合。如果$D$中每个非平凡的$MVD$  $X→→Y$的左部$X$都是$R$的超键，那么称$R$是$4NF$的模式</p>
+<p><u>$4NF$就是限制关系模式的属性之间不允许有非平凡且非函数依赖的多值依赖</u></p>
+</li>
+<li><p>==<strong>分解成$3NF$模式集的算法：</strong>==</p>
+<ul>
+<li><p><strong>输入：</strong>关系模式$R_R(U_R，F_R)$ </p>
+</li>
+<li><p><strong>输出：</strong>$ρ＝\lbrace{ R_0，R_1，…，R_k，R_{ck}}\rbrace$</p>
+</li>
+<li><p><strong>步骤：</strong></p>
+<ul>
+<li>(1)首先将$F_R$转换为等价的最小覆盖，记为$F$</li>
+<li>(2)将不在$F$中出现的属性单独构成关系模式$R_0(U_0)$，其余属性记为$U＝U_R－U_0$，于是得到第一个分解 $＝{R_0，R}$，其中$R(U，F)$；</li>
+<li>(3)如果$R$中有某一个<u>函数依赖</u>包含$U$中的全部属性，则算法终止，输出即为$ρ$</li>
+<li>(4)否则，将$F$中的函数依赖按照左部相同原则进行分组，假设共分为$k$组，得到$k$个关系模式$R_i(U_i，F_i)$，$U_i$表示每组函数依赖所涉及的全部属性，$F_i$是相应的函数依赖集，将这$k$个关系模式加入$ρ$中得到：$ρ＝\lbrace{ R_0，R_1，…，R_k}\rbrace$</li>
+<li>(5)经过上述步骤得到的每个$R_i$均是$3NF$，且因为分组是按照函数依赖进行的，不会丢失任何一个函数依赖，所以该过程是保持函数依赖的。为了保证该分解同时是无损连接的，需要再加入一个由任一候选键构成的关系模式$R_{ck}$，如果该关系模式已在前面的某个$R_i$中出现，则可以省略；</li>
+<li>(6)输出$ρ＝\lbrace{ R_0，R_1，…，R_k}\rbrace$，算法结束</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>==<strong>分解成$BCNF$模式集的算法：</strong>==</p>
+<ul>
+<li><p><strong>输入：</strong>关系模式$R(U，F)$ </p>
+</li>
+<li><p><strong>输出：</strong>$ρ＝\lbrace{ R_1，…，R_k}\rbrace$</p>
+</li>
+<li><p><strong>步骤：</strong></p>
+<ul>
+<li>(1)令$ρ＝{R(U，F)}$</li>
+<li>(2)如果$ρ$中的每个子关系模式均是$BCNF$，则算法终止，输出即为 $ρ$</li>
+<li>(3)否则，$ρ$中必有某个子关系模式$R_i(U_i，F_i)$不满足$BCNF$，根据$BCNF$的定义，至少有一个$X→A∈F^＋<em>i$，且$X$不包含$R_i$的任一候选键，将$R_i$分解为两个关系模式$R</em>{i1}、R_{i2}$，且$R_{i1}＝\lbrace XA，F_{i1}\rbrace，R_{i2}＝\lbrace U_i－A，F_{i2}\rbrace$，用$R_{i1}、R_{i2}$取代$R_i$，返回(2)继续执行</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>规范化过程总结：</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220428220738050.png" alt="image-20220428220738050" style="zoom:50%;" />
+
+<hr>
+</li>
+</ol>
+<h3 id="第五章-数据库设计"><a href="#第五章-数据库设计" class="headerlink" title="第五章 数据库设计"></a>第五章 数据库设计</h3><h4 id="5-1数据库设计概述"><a href="#5-1数据库设计概述" class="headerlink" title="5.1数据库设计概述"></a>5.1数据库设计概述</h4><ul>
+<li><p><u>数据库设计</u>是指在一个特定应用环境下，根据用户的<strong>信息需求</strong>、<strong>处理需求</strong>和<strong>数据库支撑环境</strong>(包括$DBMS$、$OS$和硬件)， 构造最合理的<u>数据库模式</u>，<u>创建数据库</u>及其相关<u>应用系统</u>的过程</p>
+</li>
+<li><p><strong>数据库系统生命周期</strong>：数据库应用系统从开始规划、分析、设计、实现投入运行后的维护到最后被新的系统所取代而停止使用的整个期间</p>
+</li>
+<li><p><strong>数据库系统的生存期</strong>：</p>
+<p>（1）系统规划:   </p>
+<p>（2）数据库设计:需求分析,概念设计,逻辑设计,物理设计</p>
+<p>（3）系统实现：应用程序编码、调试</p>
+<p>（4）运行和维护:</p>
+</li>
+</ul>
+<h5 id="5-1-1数据库设计的特点"><a href="#5-1-1数据库设计的特点" class="headerlink" title="5.1.1数据库设计的特点"></a>5.1.1数据库设计的特点</h5><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529150528765.png" alt="image-20220529150528765" style="zoom: 33%;" />
+
+<h5 id="5-1-2数据库设计方法"><a href="#5-1-2数据库设计方法" class="headerlink" title="5.1.2数据库设计方法"></a>5.1.2数据库设计方法</h5><ol>
+<li><strong>面向数据的设计方法</strong>：以信息需求为主，兼顾处理需求（由于数据 相对比较稳定，处理相对容易变动，因此采用面向数据的设计方法来设计相对稳定的数据库）</li>
+<li><strong>面向过程的设计方法</strong>：以处理需求为主，兼顾信息需求</li>
+<li><strong>手工与经验相结合方法</strong>：设计质量与设计人员的经验和水平有直接关系 ，并且数据库运行一段时间后常常不同程度地发现各种问题，增加了维护代价</li>
+<li><strong>规范设计法</strong>：过程迭代和逐步求精</li>
+<li><strong>新奥尔良方法</strong>：将数据库设计分为若干阶段和步骤</li>
+<li><strong>基于$E-R$模型的数据库设计方法</strong>：概念设计阶段广泛采用</li>
+<li><strong>$3NF$的设计方法</strong>：逻辑阶段可采用的有效方法</li>
+<li><strong>$ODL$方法</strong>：面向对象的数据库设计方法</li>
+</ol>
+<h5 id="5-1-3数据库设计的基本步骤"><a href="#5-1-3数据库设计的基本步骤" class="headerlink" title="5.1.3数据库设计的基本步骤"></a>5.1.3数据库设计的基本步骤</h5><ul>
+<li><p>数据库设计分为6个阶段：<u>系统规划</u>、<u>需求分析</u>、<u>概念结构设计</u>、<u>逻辑结构设计</u>、<u>物理结构设计</u>、<u>数据库实施</u>、<u>数据库运行和维护</u>。（==需求分析和概念设计独立于任何数据库管理系统，逻辑设计和物理设计与选用的$DBMS$密切相关==）</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529152344157.png" alt="image-20220529152344157" style="zoom: 50%;" /></li>
+<li><p>数据库设计过程中的各级模式：</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529152507943.png" alt="image-20220529152507943" style="zoom:50%;" />
+
+<hr>
+</li>
+</ul>
+<h4 id="5-2需求分析"><a href="#5-2需求分析" class="headerlink" title="5.2需求分析"></a>5.2需求分析</h4><p><strong>需求分析阶段</strong>主要负责收集用户的信息需求及处理需求，并加以分析、整理、统一，最终形成用户需求分析说明书</p>
+<ul>
+<li><p><strong>需求分析的任务：</strong></p>
+<p>（1）详细调查现实世界要处理的对象（2）充分了解原系统（手工系统或计算机系统）（3）明确用户的各种需求（4）确定新系统的功能（5）充分考虑今后可能的扩充和改变（6）编写需求分析说明书</p>
+</li>
+<li><p><strong>需求分析的重点：</strong>信息要求、处理要求、安全性与完整性要求</p>
+</li>
+<li><p><strong>需求分析的步骤：</strong></p>
+<ol>
+<li><strong>需求信息的收集（了解用户需求）</strong></li>
+</ol>
+<p>(1) 信息需求,用户要从数据库获得的信息内容      (2) 处理需求,完成什么处理功能及处理方式</p>
+<p>(3) 安全性和完整性要求</p>
+<ol start="2">
+<li><strong>需求信息的分析整理</strong></li>
+</ol>
+<ul>
+<li><p>对收集到的数据进行抽象,即对实际事物或事件的人为处理,抽取共同的本质特性,并用各种概念精确地加以描述</p>
+</li>
+<li><p>要想把收集到的信息（如文件、图表、票据等）转换为下一阶段工作可用的形式信息，必须对需求信息作分析整理的工作</p>
+</li>
+</ul>
+<ol start="3">
+<li><strong>编写需求分析说明</strong></li>
+</ol>
+</li>
+<li><p><strong>需求分析的结果：</strong></p>
+<ul>
+<li><p>确定系统范围，产生系统范围图</p>
+</li>
+<li><p>分析用户活动，产生业务流程图</p>
+</li>
+<li><p>分析用户活动涉及的数据，产生数据流图</p>
+</li>
+<li><p>分析系统数据，产生数据字典</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="5-3概念设计"><a href="#5-3概念设计" class="headerlink" title="5.3概念设计"></a>5.3概念设计</h4><p>将需求分析阶段得到的用户需求抽象为信息结构即概念模型的过程就是数据库的概念设计</p>
+<p><strong>概念模型</strong>是对现实世界的一种抽象，即对实际的人、物、事和概念进行人为处理，抽取人们关心的共同特性，忽略非本质的细节，并把这些特性用各种概念精确地加以描述</p>
+<p>==概念设计所得到的数据模式与$DBMS$无关，且独立于软硬件应用环境==</p>
+<h5 id="5-3-1采用-ER-模型的概念设计"><a href="#5-3-1采用-ER-模型的概念设计" class="headerlink" title="5.3.1采用$ER$模型的概念设计"></a>5.3.1采用$ER$模型的概念设计</h5><ul>
+<li><p>$ER$模型的基本元素：实体、联系、属性</p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529154937912.png" alt="image-20220529154937912" style="zoom:50%;" />              <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529155004239.png" alt="image-20220529155004239" style="zoom:50%;" />                   <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529155017257.png" alt="image-20220529155017257" style="zoom:50%;" />     </p>
+</li>
+<li><p>基于$ER$模型的设计过程：==设计实体类型==（此时不要涉及到“联系”）==设计联系类型==（此时考虑实体间的联系）</p>
+</li>
+<li><p><strong>实体和属性的设计：</strong>基本属性和复合属性（可否再分）、单值属性和多值属性（对一个实体对象是否只能取一个值）、==多值属性的处理：==将原来的多值属性用几个新的单值属性来表示或将原来的多值属性用一个新的实体类型表示</p>
+</li>
+<li><p><strong>联系的设计：</strong></p>
+<ul>
+<li><strong>联系集：</strong>  联系集是$n（n≥2）$个实体集上的数学关系，这些实体集不必互异。如果$E_1，E_2，…，E_n$为$n$个实体集，那么联系集$R$是${(e_1，e_2，…，e_n)|e_1∈E_1,e_2∈E_2，…，e_n∈E_n}$的一个子集，而$(e_1，e_2，…，e_n)$是一个联系</li>
+<li><strong>联系的元数：</strong>一个联系涉及到的实体集个数</li>
+<li><strong>联系的连通词（基数比约束）：</strong>联系涉及到的实体集之间实体对应的方式</li>
+<li><strong>实体的基数（参与约束）：</strong>有两个实体集$E_1$和$E_2$，$E_1$中每个实体与$E_2$中有联系实体的数目的最小值$min$和最大值$max$，称为$E_1$的（基数）参与度，用$(min，max)$形式表示 </li>
+</ul>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529162146946.png" alt="image-20220529162146946" style="zoom: 50%;" />   <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529162300775.png" alt="image-20220529162300775" style="zoom: 50%;" />           <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529162348403.png" alt="image-20220529162348403" style="zoom:50%;" />   <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529163031742.png" alt="image-20220529163031742" style="zoom:50%;" /></p>
+</li>
+<li><p><strong>$ER$模型的操作：</strong>包括实体类型、联系类型和属性的分裂、合并、增删等</p>
+</li>
+<li><p><strong>扩充的$ER$模型：</strong>包括弱实体、普遍化/特殊化、聚集、范畴等概念（弱实体不能独立存在）</p>
+<p>如：</p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529165909805.png" alt="image-20220529165909805" style="zoom:50%;" /><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529170540199.png" alt="image-20220529170540199" style="zoom: 33%;" /> </p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529170329780.png" alt="image-20220529170329780" style="zoom:50%;" /><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529170947986.png" alt="image-20220529170947986" style="zoom: 33%;" />        <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529171017566.png" alt="image-20220529171017566" style="zoom: 33%;" />             </p>
+</li>
+</ul>
+<h5 id="5-3-2概念设计的策略"><a href="#5-3-2概念设计的策略" class="headerlink" title="5.3.2概念设计的策略"></a>5.3.2概念设计的策略</h5><p>（1） <strong>自顶向下：</strong>首先建立较高抽象层次的模式（视图），然后再逐步细化，求精，直至得到更为具体的模式（视图）</p>
+<p>（2）<strong>自底向上：</strong>首先从具体的基本对象开始，建立一个包含有基本抽象的模式，然后再在基础上进行组合、修改、抽象</p>
+<p>（3）<strong>由内向外：</strong>首先从最基本的概念出发，建立一个仅包含那些具有明显特征的实体类型的初步模型，然后再逐步引入其他相关对象，整个建模过程是一个由内向外的扩张过程，是自底向上策略的一个特例</p>
+<p>（4）<strong>混合策略：</strong>首先按照自顶向下思想建立系统的全局结构框架，然后对于框架内的每一部分需求再按照自底向上方式进行详细设计，是自定向下方式和自底向上方式的一种有效结合</p>
+<h5 id="5-3-3概念设计的方法"><a href="#5-3-3概念设计的方法" class="headerlink" title="5.3.3概念设计的方法"></a>5.3.3概念设计的方法</h5><ol>
+<li><p><strong>集中式模式设计法：</strong>首先对需求分析阶段得到的应用需求进行合并，形成一个统一的整体需求说明。系统的概念结构设计将以合并后的总体需求为蓝本，设计出全局的概念模式，然后再按照不同的特定应用和用户设计出各自的外模式。该方法适合于小规模的应用</p>
+</li>
+<li><p><strong>视图集成法：</strong>包括局部视图设计和视图集成两个步骤</p>
+<ul>
+<li><p><strong>局部视图设计：</strong><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529173424202.png" alt="image-20220529173424202" style="zoom:50%;" /></p>
+</li>
+<li><p><strong>视图集成：</strong></p>
+<ul>
+<li><p>解决冲突，生成初步全局的$ER$图</p>
+<ol>
+<li><strong>命名冲突：</strong>主要指实体、属性、联系等对象在名字方面的冲突，一般表现为<u>同名异义</u>和<u>同义异名</u> 两种情况</li>
+<li><strong>属性冲突：</strong>包括<u>属性域冲突</u>和<u>属性取值单位冲突</u>两种情况</li>
+<li><strong>类型冲突：</strong>同一个概念在不同视图中被抽象成了不同的类型的对象，实际应用中的类型冲突主要是<u>实体和属性间</u>的冲突</li>
+<li><strong>约束冲突：</strong>约束冲突主要指<u>语义约束</u>方面的不一致</li>
+</ol>
+</li>
+<li><p>消除冗余，完成全局$ER$图</p>
+<ul>
+<li><p>冗余主要包括<u>数据冗余</u>和<u>联系冗余</u>两种情况，冗余的数据是指可以由其它基本数据导出的数据，冗余的联系是指可以由其它联系导出的联系</p>
+</li>
+<li><p>数据和联系的冗余将会给数据库完整性的维护带来困难，容易引起数据的不一致，消除冗余的工作可以通过分析数据字典和数据流图中的数据说明及数据间的关系完成</p>
+</li>
+</ul>
+</li>
+<li></li>
+</ul>
+</li>
+<li><p>==$ER$模型设计举例==</p>
+<ul>
+<li><p><strong>问题要求：</strong>某学校的管理信息系统，其中 有4个部门要求实现计算机管理：（人事处：教职工管理），（学生处：学生学籍管理），（教务处：教学管理），（后勤处：住宅】宿舍管理）</p>
+</li>
+<li><p><strong>设计局部$E-R$模型：</strong></p>
+<ol>
+<li><p><strong>确定局部应用范围</strong></p>
+<ul>
+<li>按照系统的使用部门划分：人事管理——人事处 、学生管理——学生处 、教学管理——教务处 、住房管理——后勤处</li>
+<li>通常校长需要了解整个学校的运行情况，应有校长查询模块，提供决策指导信息</li>
+</ul>
+</li>
+<li><p><strong>确定实体集</strong>：（以人事管理为例），通过调研 和需求分析，人事部门需要管理教职工、部门、职称和职务，所以实体集有：教职工、部门、职称和职务</p>
+</li>
+<li><p><strong>确定联系集</strong></p>
+<p>•<strong>部门－教职工：</strong>$1:N$           •<strong>部门－职称：没有联系</strong>            •<strong>部门－职务：没有联系</strong></p>
+<p>•<strong>教职工－职称：</strong>$N:1$           •<strong>教职工－职务：</strong>$N:1$              •<strong>职称－职务：没有联系</strong></p>
+<p>得到初步$E-R$图：<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529180539676.png" alt="image-20220529180539676" style="zoom:50%;" /></p>
+</li>
+<li><p><strong>确定实体集的属性</strong></p>
+<p><u>教职工</u>：教职工号，姓名，性别，出生日期，学历</p>
+<p><u>部门(包括管理部门和教学院系)</u>：部门号，类型，名称，办公电话</p>
+<p><u>职务</u>：代号，名称</p>
+<p><u>职称</u>：代号，名称</p>
+</li>
+<li><p><strong>确定联系集的属性</strong></p>
+<p><u>部门－教职工</u>：无</p>
+<p><u>教职工－职称</u>：聘任日期</p>
+<p><u>教职工－职务</u>：任职日期</p>
+</li>
+<li><p>画出局部$E-R$模型</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529191709383.png" alt="image-20220529191709383" style="zoom:50%;" /></li>
+<li><p>其他三个子模块的局部$E-R$模型</p>
+<ul>
+<li><p>学生管理的局部$E-R$模型</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529191900400.png" alt="image-20220529191900400" style="zoom:50%;" /></li>
+<li><p>教学管理的局部$E-R$模型</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529192026413.png" alt="image-20220529192026413" style="zoom:50%;" /></li>
+<li><p>住房管理的局部$E-R$模型</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529192048586.png" alt="image-20220529192048586" style="zoom:50%;" /></li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4 id="5-4逻辑设计"><a href="#5-4逻辑设计" class="headerlink" title="5.4逻辑设计"></a>5.4逻辑设计</h4><p><strong>逻辑设计的任务</strong>是在概念设计的基础上给出与$DBMS$相关的数据库逻辑模式</p>
+<p><strong>基于$ER$模型的逻辑设计步骤：</strong></p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529192838110.png" alt="image-20220529192838110" style="zoom:50%;" />
+
+<p>==$E-R$模型独立于$DBMS$，可用于任何一种数据库。把$E-R$模型转换为某个具体的$DBMS$所能接受的关系数据模型，称为<u>数据库的逻辑设计</u>，或称为数据库逻辑模式==</p>
+<p>==$E-R$模型转换为关系模型主要解决如何用<u>关系</u>来表达实体和实体间的联系==</p>
+<ul>
+<li><p><strong>$E－R$模型向关系模型的转换可以参照以下原则进行：</strong></p>
+<p>(1)实体转换为关系模式，关系模式的属性集由实体原有的属性集构成，实体的键是关系模式的键</p>
+<p>(2)如果属性是非原子属性，可以按照纵向展开或横向展开的方式将其转化为原子属性。对于多值类型的非原子属性，可以纵向展开，而复合类型的属性则可以横向展开</p>
+<p>(3)实体间的联系可以转换为关系模式，也可以与参与联系的实体所对应的关系模式合并，对于常见的二元联系和三元联系，有以下的具体转换方式：</p>
+<ul>
+<li><p><strong>$1$：$1$联系</strong>                  <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529194221816.png" alt="image-20220529194221816" style="zoom:50%;" /></p>
+<ul>
+<li><p>当$E_1$和$E_2$都是部分参与时：</p>
+<p>$R_1(\underline{K_1},A_1),R_2(\underline{K_2},A_2),R_3(K_1,\underline{K_1,K_2},A_R)$,其中$K_1$,$K_2$都可成为$R_3$的键</p>
+</li>
+<li><p>当$E_1$是全参与时：</p>
+<p>$R_1(\underline {K_1},A_1,K_2,A_R),R_2(\underline{K_2},A_2)$,其中$K_2$是$R_1$的外键</p>
+</li>
+<li><p>例如：</p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529195056598.png" alt="image-20220529195056598" style="zoom:50%;" /><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529195313569.png" alt="image-20220529195313569" style="zoom: 33%;" /></p>
+</li>
+</ul>
+</li>
+<li><p> <strong>$1$：$N$联系</strong>                                 <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529195851211.png" alt="image-20220529195851211" style="zoom:50%;" /></p>
+</li>
+<li><p>当$E_2$是部分参与时：</p>
+<p>  $R_1(\underline{K_1},A_1),R_2(\underline{K_2}，A_2),R_3(\underline{K_2},\underset{\sim}{K_1},A_R)$,其中$K_1$是$R_3$的外键</p>
+</li>
+<li><p>当$E_2$是全参与时：</p>
+<p>  $R_1(\underline{K_1},A_1),R_2(\underline{K_2},A_2,\underset{\sim}{K_1},A_R)$,其中$K_1$是$R_2$的外键</p>
+</li>
+<li><p>例如：</p>
+<p><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529201810249.png" alt="image-20220529201810249" style="zoom:50%;" /><img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529201854988.png" alt="image-20220529201854988" style="zoom:33%;" /></p>
+</li>
+<li><p> <strong>$M$：$N$联系</strong>                                <img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529202032471.png" alt="image-20220529202032471" style="zoom: 67%;" /></p>
+</li>
+<li><p>$R_1(\underline{K_1},A_1),R_2(\underline{K_2},A_2),R_3(\underline{K_1,K_2},A_R)$,其中$K_1$,$K_2$联合构成$R_3$的键，且$K_1$,$K_2$又同时都是外键</p>
+</li>
+<li><p>例如：<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529202612491.png" alt="image-20220529202612491" style="zoom:50%;" /></p>
+</li>
+<li><p><strong>三元联系</strong></p>
+<p>$1:1:1$、$1:1:N$、$1:M:N$、$M:N:P$</p>
+<p>$1:1:1$和$1:1:N$可转化为三个或四个关系模式</p>
+<p>$1:M:N$和$M:N:P$应转化为四个关系模式</p>
+<p>如果存在键完全相同的若干关系模式，则可以考虑将其合并为一个新的关系模式</p>
+<ul>
+<li><p>例如库存销售信息管理系统的$ER$模型及转换</p>
+<img src="C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20220529203756963.png" alt="image-20220529203756963" style="zoom:50%;" /></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>优化与调整</strong></p>
+<p>对于关系模式进行的优化与调整主要集中在<u>数据结构</u>与<u>性能</u>两个方面：</p>
+<ul>
+<li><strong>结构方面的调整</strong>主要是指通过关系规范化理论对关系模式进行优化，以减少数据冗余和更新异常问题的出现</li>
+<li><strong>性能的调整</strong>主要是指通过减少查询时连接运算次数和改变关系大小等方式提高数据处理速度</li>
+</ul>
+<p>==关系模式的规范化过程主要包括以下几个步骤：==</p>
+<p> (1)确定数据依赖</p>
+<p> (2)参照最小覆盖算法对每个关系模式内及关系模式间的数据依赖进行极小化处理，消除冗余依赖</p>
+<p> (3)逐一分析每个关系模式属于第几范式，一般只要达到$3NF$或$BCNF$即可</p>
+<p>==由于性能方面的原因而对关系模式进行的调整主要包括：==</p>
+<p> (1)减少连接运算          (2)从水平方向和垂直方向对关系进行分解，避免出现过大的关系</p>
+</li>
+<li><p><strong>用户子模式设计</strong></p>
+<p>得到优化的系统全局模式后，还需针对不同局部应用设计出用户子模式即外模式。设计时应注意：</p>
+<p> (1)能适应不同用户的使用需求    (2)提供一定的逻辑数据独立性     (3)数据安全性</p>
+</li>
+</ul>
+<hr>
+<h4 id="5-5物理设计"><a href="#5-5物理设计" class="headerlink" title="5.5物理设计"></a>5.5物理设计</h4><ul>
+<li><p>数据库物理结构依赖于给定的$DBMS$、$OS$及硬件系统，因此设计人员必须(1)充分了解所用$DBMS$的内部特征，特别是存储结构和存取方法；(2)充分了解应用环境，特别是应用的处理频率和响应时间要求；(3)充分了解外存设备的特性  </p>
+</li>
+<li><p> <strong>物理设计的步骤:</strong></p>
+</li>
+</ul>
+<ol>
+<li><p><strong>确定数据的存储结构</strong></p>
+<p>确定数据库存放位置和存储结构时要综合考虑存取时间、存储空间利用率和维护代价三方面的因素</p>
+</li>
+<li><p><strong>确定数据的存放位置</strong></p>
+<ul>
+<li><p>目前许多计算机都有多个磁盘，因此进行物理设计时可以考虑将表和索引分别放在不同的磁盘上，在查询时，由于两个磁盘驱动器分别在工作，因而可以保证物理读写速度比较快</p>
+</li>
+<li><p>可以将比较大的表分别放在两个磁盘上，以加快存取速度，这在多用户环境下特别有效。此外还可以将日志文件与数据库对象（表、索引等）放在不同的磁盘以改进系统的性能</p>
+</li>
+<li><p>数据可以按照使用频繁程度或者稳定程度进行划分并确定其存储位置，对于需要频繁访问的大关系，可以考虑将其按照一定的原则进行分片，然后放置在不同的磁盘上，此外也可以将索引和具体的数据文件放置在不同的磁盘上，同样可以提高$I/O$速度</p>
+</li>
+</ul>
+<p><strong>将数据划分到不同的磁盘驱动器或磁盘阵列上的设计参考原则：</strong></p>
+<p> (1)减少磁盘访问冲突，提高$I/O$并行性</p>
+<p> (2)分散需要频繁访问的数据，均衡$I/O$负载</p>
+<p> (3)提高关键数据存取速度</p>
+</li>
+<li><p><strong>确定数据的存取方法</strong></p>
+<ul>
+<li><p>==存取方式设计的任务就是确定采用何种存取路径以获得最快的数据存取速度，$DBMS$一般都会提供索引、聚簇、散列等常见的存取路径供选择，其中索引是使用最多的存取方法==</p>
+<p>(1)关系的主键和外键上应该建立索引</p>
+<p>(2)对于经常作为连接条件或查询条件的属性或属性集</p>
+<p>(3)有些查询无需访问具体数据通过查找索引就可以直接给出结果，例如带有$MIN$、$MAX$、$AVG$、$SUM$、$COUNT$等聚集函数的查询以及带有存在谓词$EXISTS$的查询，可以在这些属性上建立索引</p>
+<p>(4)对于以读操作为主的关系，可以多建立一些索引</p>
+</li>
+<li><p>存取路径的确定并不是惟一的，同一个数据对象上可以有满足不同应用需求的多种存取方式同时存在</p>
+</li>
+<li><p>在关系数据库中，选择存取路径主要是指确定如何建立索引，例如，应把那些属性作为次键建立次索引，建立单键索引还是组合索引，建立多少个为合适，是否建立聚集索引等</p>
+</li>
+<li><p>==常用的存取方法==</p>
+<p><strong>索引法：</strong></p>
+<ul>
+<li><p>为加快按某个属性(组)进行存取的效率，根据该属性(组)建立索引，如$B+$树</p>
+</li>
+<li><p>索引建立在单个关系上</p>
+</li>
+</ul>
+<p><strong>聚簇($Cluster$)法:</strong></p>
+<ul>
+<li><p>为提高按聚簇键进行查询的效率，将聚簇键上具有相同值的元组存放在连续物理块,可以有效提高在物理上连续存储的相关数据的存取速度</p>
+</li>
+<li><p>一个数据库可以建立多个聚簇，但一个关系只能有一个聚簇</p>
+</li>
+<li><p>聚簇可以建立在单表上，也可建立在进行连接操作的多个表上</p>
+</li>
+<li><p>$SQL$中与聚簇有关的操作如$ORDER$ $BY$, $GROUP$ $BY$, $UNION$, $DISTINCT$等</p>
+</li>
+<li><p>对于以下的几种情况，可以考虑采用聚簇的存取方式：</p>
+<p> (1)对于经常进行等值查询的属性，可以为其建立聚簇</p>
+<p> (2)对聚簇属性的存取应该是关系上的主要应用，而且很少访问其它属性集，特别的，当$SQL$语句中含有与聚簇属性有关的$ORDER BY、GROUP BY、UNION、DISTINCT$等子句时，聚簇是非常有利的</p>
+<p> (3)聚簇属性上每个取值所对应的元组个数应比较多，否则聚簇的性能优势并不明显</p>
+<p> (4)聚簇属性上的取值应相对稳定，这样可以降低聚簇的维护开销</p>
+</li>
+</ul>
+<p><strong>$HASH$法:</strong></p>
+<ul>
+<li><p>设计合理的$HASH$函数，根据关键字值计算得到存储地址,对可能出现的地址冲突现象设计合理的解决方案</p>
+</li>
+<li><p>当某属性(组)主要出现在等连接条件或相等比较条件中，而且关系的大小可以预知，或关系大小动态变化而$DBMS$提供了$HASH$存取方法时，可考虑选用</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>确定系统配置</strong></p>
+<p>$DBMS$产品一般都提供了一些存储分配参数，供设计人员和$DBA$对数据库进行物理优化。初始情况下，系统都为这些变量赋予了合理的缺省值，但是这些值不一定适合每一种应用环境，在进行物理设计时，需要重新对这些变量赋值以改善系统的性能</p>
+<p>通常情况下，这些配置变量包括：<u>同时使用数据库的用户数，同时打开的数据库对象数，使用的缓冲区长度、个数，时间片大小、数据库的大小，装填因子，锁的数目</u>等等，这些参数值影响存取时间和存储空间的分配，在物理设计时就要根据应用环境确定这些参数值，以使系统性能最优</p>
+</li>
+<li><p><strong>物理结构评价</strong></p>
+<p>数据库物理设计过程中需要对时间效率、空间效率、维护代价和各种用户要求进行权衡，其结果可以产生多种方案，数据库设计人员必须对这些方案进行细致的评价，从中选择一个较优的方案作为数据库的物理结构。评价物理数据库的方法很大程度上依赖于所选用的$DBMS$，主要是从定量估算各种方案的存储空间、存取时间和维护代价入手，对估算结果进行权衡、比较，选择出一个较优的合理的物理结构，如果该结构不符合用户需求，则需要修改设计</p>
+</li>
+</ol>
+<h3 id="第八章-事务管理"><a href="#第八章-事务管理" class="headerlink" title="第八章 事务管理"></a>第八章 事务管理</h3><hr>
+<h4 id="8-1引言"><a href="#8-1引言" class="headerlink" title="8.1引言"></a>8.1引言</h4><p>1.事务是数据库系统中故障恢复和并发控制的基本单位</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://example.com">John Doe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2022/07/22/DataBase/">http://example.com/2022/07/22/DataBase/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> Donate</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/07/01/hello-world/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">Hello World</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://avatars.githubusercontent.com/u/92515552?s=400&amp;u=1e1aa62c4d1cd15f520cf2d40e2a4388e05c11bb&amp;v=4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">John Doe</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/SuGuilin"><i class="fab fa-github"></i><span>GitHub</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/SuGuilin" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:suguilin0419@163.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="/13679203151" target="_blank" title="Mobile"><i class="fa-solid fa-mobile"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title%EF%BC%9ADataBse"><span class="toc-number">1.</span> <span class="toc-text">title：DataBse</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.</span> <span class="toc-text">关系模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.1.</span> <span class="toc-text">2.1基本概念</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2%E5%85%B3%E7%B3%BB%E4%BB%A3%E6%95%B0"><span class="toc-number">1.1.2.</span> <span class="toc-text">2.2关系代数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3%E5%85%B3%E7%B3%BB%E6%BC%94%E7%AE%97"><span class="toc-number">1.1.3.</span> <span class="toc-text">2.3关系演算</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%8F%E5%85%B8%E4%BE%8B%E9%A2%98"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">经典例题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%85%B3%E7%B3%BB%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%AD%E8%A8%80-SQL"><span class="toc-number">1.2.</span> <span class="toc-text">第三章 关系数据库语言$SQL$</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-SQL-%E8%AF%AD%E8%A8%80%E6%A6%82%E8%BF%B0"><span class="toc-number">1.2.1.</span> <span class="toc-text">3.1 $SQL$语言概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-SQL-%E6%95%B0%E6%8D%AE%E5%AE%9A%E4%B9%89%E5%8A%9F%E8%83%BD"><span class="toc-number">1.2.2.</span> <span class="toc-text">3.2 $SQL$数据定义功能</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-SQL-%E6%95%B0%E6%8D%AE%E6%9F%A5%E8%AF%A2%E5%8A%9F%E8%83%BD"><span class="toc-number">1.2.3.</span> <span class="toc-text">3.3 $SQL$数据查询功能</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-1%E5%9F%BA%E6%9C%AC%E6%9F%A5%E8%AF%A2%E8%AF%AD%E5%8F%A5"><span class="toc-number">1.2.3.1.</span> <span class="toc-text">3.3.1基本查询语句</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-2%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.2.3.2.</span> <span class="toc-text">3.3.2单表查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-4%E5%B5%8C%E5%A5%97%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.2.3.3.</span> <span class="toc-text">3.3.4嵌套查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-5%E9%9B%86%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.2.3.4.</span> <span class="toc-text">3.3.5集合查询</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-SQL-%E6%95%B0%E6%8D%AE%E6%93%8D%E7%BA%B5%E5%8A%9F%E8%83%BD"><span class="toc-number">1.2.4.</span> <span class="toc-text">3.4 $SQL$数据操纵功能</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-1%E6%95%B0%E6%8D%AE%E6%8F%92%E5%85%A5"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">3.4.1数据插入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-2%E6%95%B0%E6%8D%AE%E5%88%A0%E9%99%A4"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">3.4.2数据删除</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-3%E6%95%B0%E6%8D%AE%E4%BF%AE%E6%94%B9"><span class="toc-number">1.2.4.3.</span> <span class="toc-text">3.4.3数据修改</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-%E8%A7%86%E5%9B%BE"><span class="toc-number">1.2.5.</span> <span class="toc-text">3.5 视图</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-5-1%E8%A7%86%E5%9B%BE%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">1.2.5.1.</span> <span class="toc-text">3.5.1视图的定义</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-5-2%E8%A7%86%E5%9B%BE%E7%9A%84%E5%88%A0%E9%99%A4"><span class="toc-number">1.2.5.2.</span> <span class="toc-text">3.5.2视图的删除</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-5-3%E8%A7%86%E5%9B%BE%E7%9A%84%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.2.5.3.</span> <span class="toc-text">3.5.3视图的查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-5-4%E8%A7%86%E5%9B%BE%E7%9A%84%E6%9B%B4%E6%96%B0"><span class="toc-number">1.2.5.4.</span> <span class="toc-text">3.5.4视图的更新</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-5-5%E8%A7%86%E5%9B%BE%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-number">1.2.5.5.</span> <span class="toc-text">3.5.5视图的应用</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-6-SQL-%E6%95%B0%E6%8D%AE%E6%8E%A7%E5%88%B6%E5%8A%9F%E8%83%BD"><span class="toc-number">1.2.6.</span> <span class="toc-text">3.6 $SQL$数据控制功能</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-6-1%E6%9D%83%E9%99%90%E4%B8%8E%E8%A7%92%E8%89%B2"><span class="toc-number">1.2.6.1.</span> <span class="toc-text">3.6.1权限与角色</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-6-2%E6%9D%83%E9%99%90%E7%9A%84%E6%8E%88%E4%BA%88%E5%92%8C%E6%94%B6%E5%9B%9E"><span class="toc-number">1.2.6.2.</span> <span class="toc-text">3.6.2权限的授予和收回</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E7%AB%A0-%E6%95%B0%E6%8D%AE%E4%BE%9D%E8%B5%96%E4%BA%8E%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%BC%8F%E8%A7%84%E8%8C%83%E5%8C%96"><span class="toc-number">1.3.</span> <span class="toc-text">第四章 数据依赖于关系模式规范化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%BC%8F%E8%AE%BE%E8%AE%A1%E4%B8%AD%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.3.1.</span> <span class="toc-text">4.1关系模式设计中的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2%E6%95%B0%E6%8D%AE%E4%BE%9D%E8%B5%96"><span class="toc-number">1.3.2.</span> <span class="toc-text">4.2数据依赖</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#4-2-1%E5%87%BD%E6%95%B0%E4%BE%9D%E8%B5%96"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">4.2.1函数依赖</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-2-2%E5%A4%9A%E5%80%BC%E4%BE%9D%E8%B5%96"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">4.2.2多值依赖</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%BC%8F%E5%88%86%E8%A7%A3"><span class="toc-number">1.3.3.</span> <span class="toc-text">4.3关系模式分解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-4%E5%85%B3%E7%B3%BB%E6%A8%A1%E5%BC%8F%E7%9A%84%E8%A7%84%E8%8C%83%E5%8C%96"><span class="toc-number">1.3.4.</span> <span class="toc-text">4.4关系模式的规范化</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.4.</span> <span class="toc-text">第五章 数据库设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-1%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E6%A6%82%E8%BF%B0"><span class="toc-number">1.4.1.</span> <span class="toc-text">5.1数据库设计概述</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#5-1-1%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%9A%84%E7%89%B9%E7%82%B9"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">5.1.1数据库设计的特点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-1-2%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E6%96%B9%E6%B3%95"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">5.1.2数据库设计方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-1-3%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">5.1.3数据库设计的基本步骤</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="toc-number">1.4.2.</span> <span class="toc-text">5.2需求分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3%E6%A6%82%E5%BF%B5%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.4.3.</span> <span class="toc-text">5.3概念设计</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#5-3-1%E9%87%87%E7%94%A8-ER-%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%A6%82%E5%BF%B5%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.4.3.1.</span> <span class="toc-text">5.3.1采用$ER$模型的概念设计</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-3-2%E6%A6%82%E5%BF%B5%E8%AE%BE%E8%AE%A1%E7%9A%84%E7%AD%96%E7%95%A5"><span class="toc-number">1.4.3.2.</span> <span class="toc-text">5.3.2概念设计的策略</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-3-3%E6%A6%82%E5%BF%B5%E8%AE%BE%E8%AE%A1%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">1.4.3.3.</span> <span class="toc-text">5.3.3概念设计的方法</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-4%E9%80%BB%E8%BE%91%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.4.4.</span> <span class="toc-text">5.4逻辑设计</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-5%E7%89%A9%E7%90%86%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.4.5.</span> <span class="toc-text">5.5物理设计</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%85%AB%E7%AB%A0-%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.</span> <span class="toc-text">第八章 事务管理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#8-1%E5%BC%95%E8%A8%80"><span class="toc-number">1.5.1.</span> <span class="toc-text">8.1引言</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/07/22/DataBase/" title="No title"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="No title"/></a><div class="content"><a class="title" href="/2022/07/22/DataBase/" title="No title">No title</a><time datetime="2022-07-22T14:59:36.897Z" title="Created 2022-07-22 22:59:36">2022-07-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/07/01/hello-world/" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2022/07/01/hello-world/" title="Hello World">Hello World</a><time datetime="2022-07-01T14:55:23.485Z" title="Created 2022-07-01 22:55:23">2022-07-01</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By John Doe</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a target="_blank" rel="noopener" href="https://suguilin.github.io//">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Switch Between Traditional Chinese And Simplified Chinese">简</button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading the Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
