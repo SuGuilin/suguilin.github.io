@@ -1,6 +1,11 @@
-http://example.com/2022/07/01/hello-world/
-http://example.com/tags/index.html
-http://example.com/link/index.html
-http://example.com/2022/07/22/DataBase/
-http://example.com/categories/index.html
-http://example.com/
+http://suguilin.github.io/glSu/4a17b156.html
+http://suguilin.github.io/glSu/9017cb46.html
+http://suguilin.github.io/glSu/0.html
+http://suguilin.github.io/tags/index.html
+http://suguilin.github.io/link/index.html
+http://suguilin.github.io/categories/index.html
+http://suguilin.github.io/link/index-1.html
+http://suguilin.github.io/
+http://suguilin.github.io/tags/Algorithms/
+http://suguilin.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/
+http://suguilin.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/

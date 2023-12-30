@@ -2,45 +2,63 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://example.com/2022/07/01/hello-world/</loc>
+    <loc>http://suguilin.github.io/glSu/4a17b156.html</loc>
     
-    <lastmod>2022-07-23</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://example.com/tags/index.html</loc>
-    
-    <lastmod>2022-07-23</lastmod>
+    <lastmod>2023-12-30</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://example.com/link/index.html</loc>
+    <loc>http://suguilin.github.io/glSu/9017cb46.html</loc>
     
-    <lastmod>2022-07-23</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://example.com/2022/07/22/DataBase/</loc>
-    
-    <lastmod>2022-07-22</lastmod>
+    <lastmod>2023-12-30</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://example.com/categories/index.html</loc>
+    <loc>http://suguilin.github.io/glSu/0.html</loc>
     
-    <lastmod>2022-07-01</lastmod>
+    <lastmod>2023-12-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://suguilin.github.io/tags/index.html</loc>
+    
+    <lastmod>2023-12-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://suguilin.github.io/link/index.html</loc>
+    
+    <lastmod>2023-12-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://suguilin.github.io/categories/index.html</loc>
+    
+    <lastmod>2023-12-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://suguilin.github.io/link/index-1.html</loc>
+    
+    <lastmod>2023-12-30</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -48,13 +66,34 @@
   
 
   <url>
-    <loc>http://example.com/</loc>
-    <lastmod>2022-07-23</lastmod>
+    <loc>http://suguilin.github.io/</loc>
+    <lastmod>2023-12-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
+  <url>
+    <loc>http://suguilin.github.io/tags/Algorithms/</loc>
+    <lastmod>2023-12-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
+  
+  <url>
+    <loc>http://suguilin.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</loc>
+    <lastmod>2023-12-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://suguilin.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/</loc>
+    <lastmod>2023-12-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
   
 </urlset>
