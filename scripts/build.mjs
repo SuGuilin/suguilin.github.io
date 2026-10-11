@@ -21,7 +21,7 @@ const routes = [
   ['/library/', 'library', '知识库', '精选课程、论文、工程文章、框架、评测、岗位与社区入口。', 'books'],
   ['/learn/', 'learn', '专题学习', '带着要点学习机制、算法与工程，以实验深化理解。', 'file'],
   ['/assistant/', 'assistant', '学习助手', '围绕课程、源码和实验向 AI 提问，记录与保存对话。', 'spark'],
-  ['/account/', 'account', '账号与备份', '登录个人账号，管理云端同步、离线缓存、导入与导出。', 'shield'],
+  ['/account/', 'account', '账号与备份', '管理学习记录的本机保存、可选云端同步与 JSON / Obsidian 备份。', 'shield'],
   ['/saved/', 'saved', '收藏夹', '把资料放回自己的问题与学习计划中。', 'bookmark'],
   ['/about/', 'about', '关于工作台', 'SuGuilin 的个人 Agent 学习工作台：持续研究，记录过程，构建产品。', 'info'],
   ['/guide/', 'guide', '学习手记', '围绕 Agent 核心问题的原创实践导读与一手资料。', 'file']

@@ -1,6 +1,7 @@
 {
-  "supabaseUrl": "",
-  "supabasePublishableKey": "",
+  "supabaseUrl": "https://dzperkkgunudvjuccclw.supabase.co",
+  "supabasePublishableKey": "sb_publishable_F9kuGa_J_Ah8sTOl_UZacQ_mVGGASEJ",
+  "enableSignIn": false,
   "assistantFunction": "learning-assistant",
   "synthesisFunction": "learning-synthesis",
   "enableWebSearch": false
