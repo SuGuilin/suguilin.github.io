@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceTemplate = await readFile(path.join(root, 'src/shell.html'), 'utf8');
-const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json','content/study-units.json','assets/experience.css','assets/reader.css'].map(file=>readFile(path.join(root,file))));
+const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json','content/study-units.json','assets/experience.css','assets/reader.css','assets/workflow.css'].map(file=>readFile(path.join(root,file))));
 const assetVersion=createHash('sha256').update(Buffer.concat(versionFiles)).digest('hex').slice(0,12);
 const template=sourceTemplate.replaceAll('{{assetVersion}}',assetVersion);
 const data = JSON.parse(await readFile(path.join(root, 'content/workspace.json'), 'utf8'));
