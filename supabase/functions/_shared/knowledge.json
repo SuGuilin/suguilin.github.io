@@ -2,6 +2,216 @@
   "verifiedAt": "2026-10-11",
   "resources": [
     {
+      "id": "jev",
+      "title": "Jev / TypeSafe System One",
+      "category": "model",
+      "level": "进阶",
+      "tags": [
+        "决策模型",
+        "Jev",
+        "Choice",
+        "校准"
+      ],
+      "description": "理解类型化决策、置信度与回退，再用小实验检查判断是否值得信任。",
+      "whenToLearn": "当需要语义路由或分支判断时，先理解输出原语，完成概率与回退练习，再考虑接入 API。",
+      "url": "https://docs.typesafe.ai/introduction",
+      "source": "TypeSafe AI 官方文档",
+      "verification": "实际读取 Introduction、Models、Confidence 和 Jev 1.13 限制页；未调用 API。",
+      "verifiedAt": "2026-10-11",
+      "priority": "frontier",
+      "digest": {
+        "resourceId": "jev",
+        "title": "Jev：把语义判断与生成、计算分开",
+        "oneSentence": "理解类型化决策、置信度与回退，再用小实验检查判断是否值得信任。",
+        "prerequisites": [
+          "Python",
+          "概率与基本评测"
+        ],
+        "readingOrder": [
+          "Introduction：三个问题原语与原子问题",
+          "Confidence + Jaggedness：分布、阈值和失败边界",
+          "独立评测摘要：与官方限制对照，回到自己的数据验证"
+        ],
+        "takeaways": [
+          "Jev 接收状态与类型化问题，返回可由代码消费的决策；Choice 选候选项，Score 按等级评分，Noul 返回陈述成立的概率。它不负责生成解释或代码。",
+          "把宽泛判断拆成单一问题，再由确定性代码组合结果。数学、日期比较和权限检查留在代码中，模型负责语义判断。",
+          "Choice / Score 的 confidence 概括分布集中程度，不等于每次答对的概率；Noul 没有独立 confidence。业务阈值要在自己的有标签数据上选择。",
+          "当前文档列出 jev-1.13.0，latest 别名会随发布移动。实验应记录响应模型 ID；额外检查选项顺序、中文样本和无关上下文。"
+        ],
+        "pitfalls": [
+          "不要用厂商演示或单次高置信度代替独立验证。数学、计数、日期与复杂间接推理在当前官方限制清单中。",
+          "官方限制与独立评测可能呈现不同结果；核对版本、题型和协议后比较，而不是拿总分争论是否万能。",
+          "低置信度回退会改变总体时延和成本；同时报告自动处理比例与该子集的错误率。"
+        ],
+        "practice": [
+          "在 Colab 的离线概率实验中构造一个高置信度错误预测，比较 Brier 分数和不同阈值的覆盖率。"
+        ],
+        "selfCheck": [
+          "一个 Agent 要路由请求、计算账单、生成解释。哪些步骤适合 Jev，哪些应交给代码或生成模型？",
+          "为什么 confidence 很高仍可能答错？你会怎样验证路由阈值？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "intro",
+            "title": "TypeSafe Introduction",
+            "url": "https://docs.typesafe.ai/introduction",
+            "section": "State / Choice / Score / Noul",
+            "verification": "已实际打开所述范围",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "confidence",
+            "title": "TypeSafe Confidence",
+            "url": "https://docs.typesafe.ai/confidence",
+            "section": "Confidence 与 probabilities 的区别",
+            "verification": "已实际打开所述范围",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "limits",
+            "title": "Jev 1.13 jaggedness",
+            "url": "https://docs.typesafe.ai/model-jaggedness/jev-1.13",
+            "section": "2026-10-02 限制清单",
+            "verification": "已实际打开所述范围",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "models",
+            "title": "TypeSafe Models",
+            "url": "https://docs.typesafe.ai/models",
+            "section": "版本化模型 ID 与 aliases",
+            "verification": "已实际打开所述范围",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "benchmark",
+            "title": "Evaluating and Benchmarking the System One Model Jev",
+            "url": "https://arxiv.org/abs/2609.37647",
+            "section": "2026-09-29 v1 摘要；未阅读全文或复现",
+            "verification": "已实际打开所述范围",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "2026-10-11 核实当前文档；Jev 1.13 限制页标记 2026-10-02。教学 notebook 为合成数据，不调用 Jev。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "配套离线 notebook 已验证可执行；尚未进行 Jev API 实测。",
+        "pitfallStatus": "官方限制与本站学习归纳分列。"
+      }
+    },
+    {
+      "id": "typesafe-sdk",
+      "title": "TypeSafe Python SDK",
+      "category": "project",
+      "level": "进阶",
+      "tags": [
+        "Python",
+        "Jev",
+        "SDK"
+      ],
+      "description": "官方 Python 客户端；将类型化结果、模型 ID 与失败处理接入自己的实验。",
+      "whenToLearn": "学完 Jev 导读后，检查固定模型版本、请求结果与异常处理；真实调用需要另行配置服务。",
+      "url": "https://github.com/typesafe-ai/typesafe-sdk-python",
+      "source": "TypeSafe 官方 GitHub",
+      "verification": "官方文档链接到 typesafe-ai 组织，组织列为官方 Python SDK；本轮未执行 SDK 请求。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "jev-cookbook",
+      "title": "Datawhale · Jev 中文动手课程",
+      "category": "course",
+      "level": "进阶",
+      "tags": [
+        "Datawhale",
+        "Jev",
+        "Notebook"
+      ],
+      "description": "作者维护的中文教程与 notebook，包括原语、路由、评测及社区来源清单。离线示例与真实 API 输出需要分开辨认。",
+      "whenToLearn": "先读前几章理解原语，再选择一个路由或评测案例跟练；保留自己的修改与运行结果。",
+      "url": "https://github.com/datawhalechina/jev-cookbook",
+      "source": "Datawhale 作者仓库",
+      "verification": "实际打开 README、章节导航与 SOURCES 清单；未运行该仓库全部 notebook。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "jev-evaluation",
+      "title": "Jev 独立评测 · 2026-09-29 v1",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "Jev",
+        "独立评测",
+        "阈值"
+      ],
+      "description": "作者对固定 Jev 版本做多任务评测，讨论类型化输出、阈值与选择性预测；适合练习识别评测协议和结论边界。",
+      "whenToLearn": "设计决策模型测试时，先核对任务、阈值和版本；读全文后再分析统计与失败类别。",
+      "url": "https://arxiv.org/abs/2609.37647",
+      "source": "Tobias Deußer 等 · arXiv 原始摘要",
+      "verification": "实际读取 v1 摘要与提交日期；未阅读全文、下载结果或复现实验。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "creator-feixue",
+      "title": "公众号 · 飞雪谈AI",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "微信公众号",
+        "Agent",
+        "AI Coding",
+        "RL"
+      ],
+      "description": "你推荐关注的作者，简介讨论企业级 Agent、AI Coding、LLM 与 RL。微信内搜索公众号 ID feixue_ai_talking；具体文章可带署名与日期收录。",
+      "whenToLearn": "从企业 Agent、AI Coding 或 RL 的具体疑问选读文章，记录作者依据和自己需要验证的判断。",
+      "url": "https://weixin.sogou.com/weixin?type=2&query=%E9%A3%9E%E9%9B%AA%E8%B0%88AI",
+      "source": "用户提供的公众号资料截图",
+      "verification": "截图可核验名称与公众号 ID；未取得可确认的近期文章正文。此链接为公开搜索入口，不是文章原文。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore",
+      "creatorName": "飞雪谈AI"
+    },
+    {
+      "id": "discovery-wechat-pgjev",
+      "title": "公众号 · AI工程化的 pg-jev 实践线索",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "微信公众号",
+        "Jev",
+        "PostgreSQL"
+      ],
+      "description": "Datawhale Jev 来源清单关联的 PostgreSQL 判断调用实践入口。先读原文，再核对作者项目与官方 API。",
+      "whenToLearn": "围绕当前问题选读，保留作者、日期、模型版本和实际验证结果。",
+      "url": "https://mp.weixin.qq.com/s/FG9c3NCcbVz-6fhWhTMiug",
+      "source": "Datawhale SOURCES 关联 · AI工程化",
+      "verification": "实际读取仓库来源清单及原文出链；微信原文不可直接打开，未总结文章技术结论。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore",
+      "creatorName": "AI工程化"
+    },
+    {
+      "id": "discovery-wechat-jev-critique",
+      "title": "公众号 · 数字生命情酱的 Jev 质疑实测线索",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "微信公众号",
+        "Jev",
+        "观点比较"
+      ],
+      "description": "与宣传和官方说明对照的作者实测入口。关注样本、提示、模型版本与失败案例，形成自己的验证问题。",
+      "whenToLearn": "围绕当前问题选读，保留作者、日期、模型版本和实际验证结果。",
+      "url": "https://mp.weixin.qq.com/s/kvXWpHf68k-aKyonmyHIgA",
+      "source": "Datawhale SOURCES 关联 · 数字生命情酱",
+      "verification": "实际读取来源清单，清单标记 2026-10-05 快照；原文不可直接打开，未复核其测试结论。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore",
+      "creatorName": "数字生命情酱"
+    },
+    {
       "id": "langchain",
       "title": "LangChain",
       "category": "framework",
@@ -2499,7 +2709,8 @@
       "source": "Datawhale 官方项目关联作者 · 小红书",
       "verification": "官方 hello-agents 贡献者列表和视频导航可核验作者、主题与笔记链接；平台访问超时或受限，未读笔记或观看视频。",
       "verifiedAt": "2026-10-11",
-      "priority": "explore"
+      "priority": "explore",
+      "creatorName": "楚客（秦川楚客）"
     },
     {
       "id": "hello-agents",
@@ -3323,6 +3534,120 @@
       "verification": "已尝试直接打开，返回0行可读正文；没有将检索摘要当作已读原文。",
       "priority": "discovery",
       "relatedUrls": []
+    },
+    {
+      "id": "discovery-xiaohongshu-react",
+      "title": "小红书 · 范丽的ReAct 与反思范式",
+      "category": "discovery",
+      "url": "https://www.xiaohongshu.com/explore/6979d7ff0000000022032e0e",
+      "source": "Datawhale Hello-Agents 课程共创目录",
+      "creatorName": "范丽",
+      "verifiedAt": "2026-10-11",
+      "verification": "已阅读课程共创目录，核实作者署名、主题和原帖链接；小红书原帖暂不可访问，未观看视频、未获取全文，未据此断言讲解质量或实测效果。",
+      "description": "结合课程第 4 章，观察行动、环境反馈和反思怎样组成执行循环。当前为讲解线索；请在原平台观看，保留你的理解与问题。",
+      "whenToLearn": "学习对应章节时对照作者讲解，核对版本与代码，再记录自己的实验。",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "Datawhale",
+        "Hello-Agents",
+        "ReAct 与反思范式"
+      ],
+      "relatedUrls": [
+        "https://github.com/datawhalechina/hello-agents/blob/main/Extra-Chapter/Extra13-Hello-Agents%E8%A7%86%E9%A2%91%E8%AF%BE%E5%BD%95%E5%88%B6%E5%85%B1%E5%88%9B.md",
+        "https://github.com/datawhalechina/hello-agents"
+      ]
+    },
+    {
+      "id": "discovery-xiaohongshu-langgraph",
+      "title": "小红书 · 高鸿飞的LangGraph 跟练实战",
+      "category": "discovery",
+      "url": "https://www.xiaohongshu.com/explore/6a2e5987000000001702b364",
+      "source": "Datawhale Hello-Agents 课程共创目录",
+      "creatorName": "高鸿飞",
+      "verifiedAt": "2026-10-11",
+      "verification": "已阅读课程共创目录，核实作者署名、主题和原帖链接；小红书原帖要求登录，未观看视频、未获取全文，未据此断言讲解质量或实测效果。",
+      "description": "结合课程第 6 章第 5 节，跟练状态图、节点连接和调试。当前为讲解线索；请在原平台观看，保留你的理解与问题。",
+      "whenToLearn": "学习对应章节时对照作者讲解，核对版本与代码，再记录自己的实验。",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "Datawhale",
+        "Hello-Agents",
+        "LangGraph 跟练实战"
+      ],
+      "relatedUrls": [
+        "https://github.com/datawhalechina/hello-agents/blob/main/Extra-Chapter/Extra13-Hello-Agents%E8%A7%86%E9%A2%91%E8%AF%BE%E5%BD%95%E5%88%B6%E5%85%B1%E5%88%9B.md",
+        "https://github.com/datawhalechina/hello-agents"
+      ]
+    },
+    {
+      "id": "discovery-xiaohongshu-memory",
+      "title": "小红书 · 柠檬酸（不吃柠檬）的从认知科学到智能体记忆",
+      "category": "discovery",
+      "url": "https://www.xiaohongshu.com/explore/6abf3bc8000000000b0066de",
+      "source": "Datawhale Hello-Agents 课程共创目录",
+      "creatorName": "柠檬酸（不吃柠檬）",
+      "verifiedAt": "2026-10-11",
+      "verification": "已阅读课程共创目录，核实作者署名、主题和原帖链接；小红书原帖读取超时，未观看视频、未获取全文，未据此断言讲解质量或实测效果。",
+      "description": "结合课程第 8 章，对照记忆理论、具体存储与检索实现。当前为讲解线索；请在原平台观看，保留你的理解与问题。",
+      "whenToLearn": "学习对应章节时对照作者讲解，核对版本与代码，再记录自己的实验。",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "Datawhale",
+        "Hello-Agents",
+        "从认知科学到智能体记忆"
+      ],
+      "relatedUrls": [
+        "https://github.com/datawhalechina/hello-agents/blob/main/Extra-Chapter/Extra13-Hello-Agents%E8%A7%86%E9%A2%91%E8%AF%BE%E5%BD%95%E5%88%B6%E5%85%B1%E5%88%9B.md",
+        "https://github.com/datawhalechina/hello-agents"
+      ]
+    },
+    {
+      "id": "discovery-xiaohongshu-deepresearch",
+      "title": "小红书 · 潘钲日的自动化深度研究智能体",
+      "category": "discovery",
+      "url": "https://www.xiaohongshu.com/explore/6a91361a000000002a03376b",
+      "source": "Datawhale Hello-Agents 课程共创目录",
+      "creatorName": "潘钲日",
+      "verifiedAt": "2026-10-11",
+      "verification": "已阅读课程共创目录，核实作者署名、主题和原帖链接；小红书原帖要求登录，未观看视频、未获取全文，未据此断言讲解质量或实测效果。",
+      "description": "结合课程第 14 章，学习研究任务拆解、检索、验证与报告生成。当前为讲解线索；请在原平台观看，保留你的理解与问题。",
+      "whenToLearn": "学习对应章节时对照作者讲解，核对版本与代码，再记录自己的实验。",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "Datawhale",
+        "Hello-Agents",
+        "自动化深度研究智能体"
+      ],
+      "relatedUrls": [
+        "https://github.com/datawhalechina/hello-agents/blob/main/Extra-Chapter/Extra13-Hello-Agents%E8%A7%86%E9%A2%91%E8%AF%BE%E5%BD%95%E5%88%B6%E5%85%B1%E5%88%9B.md",
+        "https://github.com/datawhalechina/hello-agents"
+      ]
+    },
+    {
+      "id": "creator-xiaohongshu-tasselszcx",
+      "title": "小红书 · Tasselszcx / Chenxu 作者入口",
+      "category": "discovery",
+      "url": "https://www.xiaohongshu.com/user/profile/66eaf504000000001d030537",
+      "source": "作者自己的 GitHub 自我介绍",
+      "creatorName": "Tasselszcx",
+      "verifiedAt": "2026-10-11",
+      "verification": "已阅读作者 GitHub 自我介绍并核对其中的小红书主页链接；尚未获取小红书帖子正文，实习经历为作者自述，不据此推断个人帖子质量或技术结论。",
+      "description": "作者公开简介给出 Agent / Infra 经历、Hello-Agents 项目与小红书入口，可作为从代码项目发现作者分享的线索。",
+      "whenToLearn": "找到具体帖子后保存原帖、作者观点与自己的阅读问题，再与源码和论文对照。",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "Agent",
+        "Infra",
+        "作者入口"
+      ],
+      "relatedUrls": [
+        "https://github.com/Tasselszcx/Tasselszcx"
+      ]
     }
   ],
   "lessons": [
