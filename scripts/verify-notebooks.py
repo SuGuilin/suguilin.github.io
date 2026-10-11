@@ -36,6 +36,9 @@ for name in names:
                 assert len(report['results']) == 9
                 assert report['changed_id']['business_commits'] == 2
                 assert report['query_unavailable']['status'] == 'unknown'
+                assert report['sqlite'] == {'workers': 20, 'business_commits': 1,
+                                             'distinct_receipts': 1, 'payload_conflict': True,
+                                             'reopen_commits': 1, 'rollback_commits': 0}
             elif name == 'paired-agent-evaluation.ipynb':
                 report = json.loads(Path('evaluation_report.json').read_text())
                 assert report['tasks'] == 40 and report['paired_runs'] == 200

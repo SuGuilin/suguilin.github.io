@@ -7,12 +7,12 @@ export function studyQuestion(unit, progress, exerciseId = '', sectionTitle = ''
   progress=currentAttempt(progress);
   const exercise = unit.exercises.find(e => e.id === exerciseId);
   if (exercise) return `关于「${unit.title}」的这道练习：\n${exercise.prompt}\n\n我的作答：\n${progress.answers.find(a => a.id === exerciseId)?.text.trim().slice(0, 3000) || '还未作答'}\n\n请先指出推理中需要澄清的地方，用一个追问帮助我继续思考。`.slice(0, 6000);
-  return `我正在学习「${unit.title}」${sectionTitle ? '，读到「' + sectionTitle.slice(0, 150) + '」' : ''}。\n\n我的问题是：`;
+  return `我正在学习「${unit.title}」${sectionTitle ? '，读到「' + sectionTitle.slice(0, 150) + '」' : ''}。${progress.reflection.trim()?'\n\n当前学习笔记与实验观察：\n'+progress.reflection.trim().slice(0,3500):''}\n\n我的问题是：`;
 }
-export function questionWithContext(question, unit) {
+export function questionWithContext(question, unit, {sources=[]}={}) {
   if (!question.trim()) throw new Error('先写下你的问题');
   if (!unit) return question.trim();
-  return `${question.trim()}\n\n---\n学习单元：${unit.title}\n关键要点：\n${unit.takeaways.map(t => '- ' + t.point).join('\n')}\n阅读范围：${unit.source.scope}\n来源：${unit.source.url}\n\n请区分来源支持的事实与推断；先解释机制和边界，再给出一个最小验证方法。`;
+  return `${question.trim()}\n\n---\n学习单元：${unit.title}\n关键要点：\n${unit.takeaways.map(t => '- ' + t.point).join('\n')}\n阅读范围：${unit.source.scope}\n来源：${sources.length?sources.slice(0,8).map(s=>s.title+'：'+s.url+'\n支持范围：'+(s.supports||s.section||unit.source.scope)).join('\n'):unit.source.url}\n\n请区分来源支持的事实与推断；先解释机制和边界，再给出一个最小验证方法。`;
 }
 export function saveStudySnapshot(state, unit, progress, {now = new Date(), review = '', question = '', section = 'study-reflection', previous = null, id = crypto.randomUUID()} = {}) {
   progress=currentAttempt(progress);
