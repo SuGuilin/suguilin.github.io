@@ -5,9 +5,13 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import sys
 
 root = Path(__file__).resolve().parent.parent
-for name in ('durable-agent.ipynb', 'paired-agent-evaluation.ipynb'):
+names = ['durable-agent.ipynb', 'paired-agent-evaluation.ipynb', 'agent-mechanism-checks.ipynb']
+if '--sdk' in sys.argv:
+    names.append('langgraph-interrupts.ipynb')
+for name in names:
     notebook = json.loads((root / 'notebooks' / name).read_text())
     assert notebook['nbformat'] == 4
     assert len({cell['id'] for cell in notebook['cells']}) == len(notebook['cells'])
@@ -21,16 +25,26 @@ for name in ('durable-agent.ipynb', 'paired-agent-evaluation.ipynb'):
                 for cell in notebook['cells']:
                     if cell['cell_type'] == 'code':
                         assert cell['outputs'] == [] and cell['execution_count'] is None
+                        if name == 'langgraph-interrupts.ipynb' and 'subprocess.check_call' in ''.join(cell['source']):
+                            # Verification uses an already installed isolated environment.
+                            os.environ['LANGSMITH_TRACING'] = 'false'
+                            os.environ['LANGCHAIN_TRACING_V2'] = 'false'
+                            continue
                         exec(compile(''.join(cell['source']), name, 'exec'), namespace)
-            report_name = 'recovery_report.json' if name == 'durable-agent.ipynb' else 'evaluation_report.json'
-            report = json.loads(Path(report_name).read_text())
             if name == 'durable-agent.ipynb':
+                report = json.loads(Path('recovery_report.json').read_text())
                 assert len(report['results']) == 9
                 assert report['changed_id']['business_commits'] == 2
                 assert report['query_unavailable']['status'] == 'unknown'
-            else:
+            elif name == 'paired-agent-evaluation.ipynb':
+                report = json.loads(Path('evaluation_report.json').read_text())
                 assert report['tasks'] == 40 and report['paired_runs'] == 200
                 assert report['grouped']['width'] > report['naive']['width']
+            elif name == 'langgraph-interrupts.ipynb':
+                report = json.loads(Path('langgraph_report.json').read_text())
+                assert report['calls'] == {'before_interrupt': 4, 'after_interrupt': 2}
+                assert report['same_thread_approved'] and not report['other_thread_approved']
+                assert report['new_saver_state'] == {}
         finally:
             os.chdir(previous_cwd)
     print(f'{name}: all cells and output invariants passed')
