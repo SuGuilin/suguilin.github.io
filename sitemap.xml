@@ -1,135 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-  <url>
-    <loc>http://suguilin.github.io/glSu/4a17b156.html</loc>
-    
-    <lastmod>2023-12-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://suguilin.github.io/glSu/9017cb46.html</loc>
-    
-    <lastmod>2023-12-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://suguilin.github.io/glSu/0.html</loc>
-    
-    <lastmod>2023-12-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://suguilin.github.io/tags/index.html</loc>
-    
-    <lastmod>2023-12-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://suguilin.github.io/link/index.html</loc>
-    
-    <lastmod>2023-12-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://suguilin.github.io/categories/index.html</loc>
-    
-    <lastmod>2023-12-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://suguilin.github.io/link/index-1.html</loc>
-    
-    <lastmod>2023-12-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-
-  <url>
-    <loc>http://suguilin.github.io/</loc>
-    <lastmod>2023-12-30</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  
-  <url>
-    <loc>http://suguilin.github.io/tags/Algorithms/</loc>
-    <lastmod>2023-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-
-  
-  <url>
-    <loc>http://suguilin.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</loc>
-    <lastmod>2023-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://suguilin.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/</loc>
-    <lastmod>2023-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://suguilin.github.io/share/</loc>
-    <lastmod>2026-10-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://suguilin.github.io/photos/</loc>
-    <lastmod>2026-10-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://suguilin.github.io/music/</loc>
-    <lastmod>2026-10-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://suguilin.github.io/movies/</loc>
-    <lastmod>2026-10-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://suguilin.github.io/comment/</loc>
-    <lastmod>2026-10-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://suguilin.github.io/about/</loc>
-    <lastmod>2026-10-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+<url><loc>https://suguilin.github.io/</loc></url>
+<url><loc>https://suguilin.github.io/about/</loc></url>
+<url><loc>https://suguilin.github.io/blog/</loc></url>
+<url><loc>https://suguilin.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</loc></url>
+<url><loc>https://suguilin.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/</loc></url>
+<url><loc>https://suguilin.github.io/categories/index.html</loc></url>
+<url><loc>https://suguilin.github.io/comment/</loc></url>
+<url><loc>https://suguilin.github.io/glSu/0.html</loc></url>
+<url><loc>https://suguilin.github.io/glSu/4a17b156.html</loc></url>
+<url><loc>https://suguilin.github.io/glSu/9017cb46.html</loc></url>
+<url><loc>https://suguilin.github.io/guide/</loc></url>
+<url><loc>https://suguilin.github.io/guide/?id=agent-loop</loc></url>
+<url><loc>https://suguilin.github.io/guide/?id=context</loc></url>
+<url><loc>https://suguilin.github.io/guide/?id=evals</loc></url>
+<url><loc>https://suguilin.github.io/guide/?id=frameworks</loc></url>
+<url><loc>https://suguilin.github.io/guide/?id=portfolio</loc></url>
+<url><loc>https://suguilin.github.io/guide/?id=protocols</loc></url>
+<url><loc>https://suguilin.github.io/interview/</loc></url>
+<url><loc>https://suguilin.github.io/journal/</loc></url>
+<url><loc>https://suguilin.github.io/lab/</loc></url>
+<url><loc>https://suguilin.github.io/library/</loc></url>
+<url><loc>https://suguilin.github.io/link/index-1.html</loc></url>
+<url><loc>https://suguilin.github.io/link/index.html</loc></url>
+<url><loc>https://suguilin.github.io/movies/</loc></url>
+<url><loc>https://suguilin.github.io/music/</loc></url>
+<url><loc>https://suguilin.github.io/photos/</loc></url>
+<url><loc>https://suguilin.github.io/radar/</loc></url>
+<url><loc>https://suguilin.github.io/roadmap/</loc></url>
+<url><loc>https://suguilin.github.io/saved/</loc></url>
+<url><loc>https://suguilin.github.io/share/</loc></url>
+<url><loc>https://suguilin.github.io/tags/Algorithms/</loc></url>
+<url><loc>https://suguilin.github.io/tags/index.html</loc></url>
 </urlset>

@@ -1,0 +1,2774 @@
+{
+  "brand": "SuGuilin",
+  "verifiedAt": "2026-10-11",
+  "scope": "代表性一手资料与社区发现入口；课程、论文、框架、评测、岗位交叉覆盖，持续按项目需求扩展。",
+  "resources": [
+    {
+      "id": "langchain",
+      "title": "LangChain",
+      "category": "framework",
+      "level": "基础",
+      "tags": [
+        "Python",
+        "工具调用",
+        "Middleware",
+        "Agent Loop"
+      ],
+      "description": "用统一模型接口、工具和中间件构建可定制的 Agent 循环，适合做第一套工具调用项目。",
+      "whenToLearn": "理解模型 API 与 JSON Schema 后，第 2–3 周完成单 Agent 闭环。",
+      "url": "https://docs.langchain.com/oss/python/langchain/overview",
+      "source": "LangChain 官方文档",
+      "verification": "已打开总览：当前入口为 create_agent；Agent 建立在 LangGraph 运行时之上。旧教程 API 应按当前文档核对。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "langgraph",
+      "title": "LangGraph",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "状态图",
+        "持久化",
+        "HITL",
+        "Durable Execution"
+      ],
+      "description": "以显式状态与图控制复杂 Agent，学习检查点、恢复、流式输出和人工介入。",
+      "whenToLearn": "单 Agent 跑通后，第 5–6 周把学习助手升级为可恢复工作流。",
+      "url": "https://docs.langchain.com/oss/python/langgraph/overview",
+      "source": "LangChain 官方文档",
+      "verification": "已核实为底层编排框架和运行时；可独立使用，不要求依赖 LangChain。",
+      "verifiedAt": "2026-10-11",
+      "priority": "focus"
+    },
+    {
+      "id": "deep-agents",
+      "title": "Deep Agents",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "Harness",
+        "上下文工程",
+        "文件系统",
+        "Subagents"
+      ],
+      "description": "在 LangChain 与 LangGraph 上提供文件系统、上下文管理和子 Agent 等长任务支撑能力。",
+      "whenToLearn": "学习状态管理之后，比较研究助手、编码助手的 Harness 设计。",
+      "url": "https://docs.langchain.com/oss/python/deepagents/overview",
+      "source": "LangChain 官方文档",
+      "verification": "已打开总览：独立库，基于 LangChain 构件与 LangGraph 运行时；规划配置需查当前文档。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "microsoft-agent-framework",
+      "title": "Microsoft Agent Framework",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "Microsoft",
+        "Workflow",
+        "多 Agent",
+        "迁移"
+      ],
+      "description": "整合 AutoGen 与 Semantic Kernel 经验，提供 Agent、工作流、会话与企业集成能力。",
+      "whenToLearn": "做完主线框架后，用同一任务对比微软生态；微软岗位准备时重点学。",
+      "url": "https://learn.microsoft.com/en-us/agent-framework/overview/",
+      "source": "Microsoft Learn",
+      "verification": "总览明确为 AutoGen 与 Semantic Kernel 的直接后继；官方提供 AutoGen 迁移指南。不同语言能力应分别核实。",
+      "relatedUrls": [
+        "https://learn.microsoft.com/en-us/agent-framework/migration-guide/from-autogen/"
+      ],
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "autogen",
+      "title": "AutoGen · 历史与迁移",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "历史脉络",
+        "多 Agent 对话",
+        "维护模式",
+        "迁移"
+      ],
+      "description": "理解多 Agent 对话与事件驱动设计的经典项目，结合迁移资料阅读既有实现。",
+      "whenToLearn": "需要读历史项目、面试讨论演进或迁移已有系统时；新项目主线优先 MAF。",
+      "url": "https://github.com/microsoft/autogen",
+      "source": "Microsoft 官方 GitHub",
+      "verification": "README 明确进入 maintenance mode，不再增加新功能；新用户建议 Microsoft Agent Framework。",
+      "relatedUrls": [
+        "https://learn.microsoft.com/en-us/agent-framework/migration-guide/from-autogen/"
+      ],
+      "verifiedAt": "2026-10-11",
+      "priority": "reference"
+    },
+    {
+      "id": "google-adk",
+      "title": "Google Agent Development Kit",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "Google",
+        "工具",
+        "多 Agent",
+        "评测",
+        "A2A"
+      ],
+      "description": "覆盖 Agent 开发、调试、编排、评测与部署，适合观察 Google 的工程化路线。",
+      "whenToLearn": "第 7–8 周用同一研究任务与 LangGraph 对照；Google 生态项目时深学。",
+      "url": "https://adk.dev/",
+      "source": "Google ADK 官方文档",
+      "verification": "原 google.github.io/adk-docs 实际跳转至 adk.dev；总览包含多 Agent、图工作流、模型适配和 A2A 指南。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "mcp",
+      "title": "Model Context Protocol",
+      "category": "protocol",
+      "level": "基础",
+      "tags": [
+        "工具协议",
+        "Client/Server",
+        "Resources",
+        "Prompts"
+      ],
+      "description": "把外部工具、数据与提示接入 AI 应用的开放协议；先实现一个只读学习资料服务器。",
+      "whenToLearn": "工具调用概念清楚后，第 4 周实现并测试 MCP Server 与 Client。",
+      "url": "https://modelcontextprotocol.io/docs/getting-started/intro",
+      "source": "Model Context Protocol 官方项目",
+      "verification": "已打开官方入门与规范仓库：MCP 为连接 AI 应用和外部系统的开放标准。协议版本需随项目固定。",
+      "relatedUrls": [
+        "https://github.com/modelcontextprotocol/modelcontextprotocol"
+      ],
+      "verifiedAt": "2026-10-11",
+      "priority": "focus"
+    },
+    {
+      "id": "a2a",
+      "title": "Agent2Agent Protocol",
+      "category": "protocol",
+      "level": "进阶",
+      "tags": [
+        "互操作",
+        "Agent Card",
+        "远程 Agent",
+        "Linux Foundation"
+      ],
+      "description": "让不同框架构建的 Agent 发现彼此并协作，关注远程任务、能力描述与协议边界。",
+      "whenToLearn": "完成本地多 Agent 与 MCP 后，再连接两个独立服务做互操作实验。",
+      "url": "https://a2a-protocol.org/latest/",
+      "source": "Linux Foundation A2A 官方项目",
+      "verification": "官方说明由 Google 发起并捐赠 Linux Foundation；明确 A2A 与 MCP 互补。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "pydantic-ai",
+      "title": "Pydantic AI",
+      "category": "framework",
+      "level": "基础",
+      "tags": [
+        "Python",
+        "类型安全",
+        "结构化输出",
+        "依赖注入"
+      ],
+      "description": "以 Python 类型、结构化输出和依赖注入组织 Agent，适合做可验证的数据处理助手。",
+      "whenToLearn": "会 Python 类型与 Pydantic 后；作为 LangChain 单 Agent 的对照实现。",
+      "url": "https://pydantic.dev/docs/ai/overview/",
+      "source": "Pydantic 官方文档",
+      "verification": "ai.pydantic.dev 已跳转当前官方总览；核实 typed agent loop、输出验证、评测与可观测性入口。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "llamaindex",
+      "title": "LlamaIndex",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "RAG",
+        "数据连接器",
+        "Agent",
+        "Event-driven Workflow"
+      ],
+      "description": "围绕私有数据构建 RAG 与 Agent，学习连接器、索引、检索与事件驱动工作流。",
+      "whenToLearn": "第 3–4 周完成文档 RAG 后，比较数据与检索抽象，再做知识研究助手。",
+      "url": "https://developers.llamaindex.ai/python/framework/",
+      "source": "LlamaIndex 官方开发文档",
+      "verification": "总览明确开源框架覆盖 RAG 与 Agent；Workflows 为事件驱动多步骤流程。勿只按旧索引教程理解。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "haystack",
+      "title": "Haystack",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "deepset",
+        "Pipeline",
+        "RAG",
+        "Agent",
+        "评测"
+      ],
+      "description": "用可复用组件构建检索管线与工具调用 Agent，适合比较显式管线和动态决策。",
+      "whenToLearn": "有 RAG 基线后，学习组件化管线与部署评测，并与 LlamaIndex 对照。",
+      "url": "https://docs.haystack.deepset.ai/docs/intro",
+      "source": "deepset 官方文档",
+      "verification": "当前总览区分可预测 Pipeline 与 LLM 控制 Agent；旧主版本资料已单独归档，避免混用安装和 API。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "crewai",
+      "title": "CrewAI",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "多 Agent",
+        "Crews",
+        "Flows",
+        "状态管理"
+      ],
+      "description": "通过 Crews 表达角色协作，通过 Flows 管理状态和控制流程，适合做研究协作实验。",
+      "whenToLearn": "单 Agent 与评测基线完成后，对照验证多 Agent 是否改善研究任务。",
+      "url": "https://docs.crewai.com/en/introduction",
+      "source": "CrewAI 官方文档",
+      "verification": "当前总览强调 Flows 管整体结构、Crews 处理自治协作；生产场景官方建议从 Flow 开始。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "dify",
+      "title": "Dify",
+      "category": "platform",
+      "level": "实战",
+      "tags": [
+        "可视化",
+        "Workflow",
+        "知识库",
+        "自托管"
+      ],
+      "description": "可视化构建 Agent、工作流与知识应用，并以 Web App 或 API 接入自己的产品。",
+      "whenToLearn": "做 MVP 或验证学习助手交互时快速上手；随后补读工具、检索与日志原理。",
+      "url": "https://docs.dify.ai/en/home",
+      "source": "Dify 官方文档",
+      "verification": "已核实 Agent、Workflow、知识库、发布与监控入口；官方区分 Cloud 与自托管 Community Edition。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "coze-studio",
+      "title": "Coze Studio",
+      "category": "platform",
+      "level": "实战",
+      "tags": [
+        "扣子",
+        "可视化",
+        "Workflow",
+        "RAG",
+        "低代码"
+      ],
+      "description": "提供 Agent、应用与工作流的可视化开发，适合研究低代码产品的搭建与扩展方式。",
+      "whenToLearn": "做中文场景原型、比较国内 Agent 平台时；研究开源实现与商业产品差异。",
+      "url": "https://github.com/coze-dev/coze-studio",
+      "source": "coze-dev 官方 GitHub",
+      "verification": "官方 README 说明源自 Coze 开发平台核心引擎；开源版与商业版功能有差异，不能假定完全等价。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "langflow",
+      "title": "Langflow",
+      "category": "platform",
+      "level": "实战",
+      "tags": [
+        "可视化",
+        "Python",
+        "自定义组件",
+        "MCP"
+      ],
+      "description": "拖拽组件搭建模型、检索与 Agent 流程，支持 Python 扩展和 MCP 客户端与服务器。",
+      "whenToLearn": "构建流程原型与课堂演示时；把可视化流程与代码实现对照阅读。",
+      "url": "https://docs.langflow.org/",
+      "source": "Langflow 官方文档",
+      "verification": "总览核实 Python 扩展、API 调用和 MCP 双向接入；按当前组件文档选择实现。",
+      "relatedUrls": [
+        "https://github.com/langflow-ai/langflow"
+      ],
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "n8n",
+      "title": "n8n AI Workflows",
+      "category": "platform",
+      "level": "实战",
+      "tags": [
+        "自动化",
+        "外部集成",
+        "Agent",
+        "MCP",
+        "评测"
+      ],
+      "description": "把模型、工具、记忆和业务连接器组合为自动化流程，适合记录与资料整理实践。",
+      "whenToLearn": "知识站工作流明确后，用它连接资料采集、整理与审核；先控制执行权限。",
+      "url": "https://docs.n8n.io/build/integrate-ai.md",
+      "source": "n8n 官方文档",
+      "verification": "原 advanced-ai 入口跳转当前 Integrate AI 文档；已核实模型、Agent、工具、记忆、MCP 和评测入口。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "openhands",
+      "title": "OpenHands Software Agent SDK",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "Coding Agent",
+        "Workspace",
+        "Agent Server",
+        "SDK"
+      ],
+      "description": "学习编码 Agent 的工具、会话、工作空间与执行服务，把自动修复任务做成可验证项目。",
+      "whenToLearn": "第 9–10 周学习代码执行、隔离环境与轨迹记录后；选小型仓库复现修复任务。",
+      "url": "https://github.com/OpenHands/software-agent-sdk",
+      "source": "OpenHands 官方 GitHub",
+      "verification": "当前官方拆分 Agent Canvas、SDK/Agent Server 与 automation。执行内核学习应看 SDK，界面看 OpenHands 主仓库。",
+      "relatedUrls": [
+        "https://github.com/OpenHands/OpenHands"
+      ],
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "mini-swe-agent",
+      "title": "mini-SWE-agent",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "Coding Agent",
+        "最小实现",
+        "Bash",
+        "轨迹",
+        "SWE-bench"
+      ],
+      "description": "以精简循环与 Bash 执行动作为核心，适合从源码理解编码 Agent 与沙箱评测。",
+      "whenToLearn": "先读最小源码，再在隔离环境解决一条可复现 Issue；作为编码项目基线。",
+      "url": "https://github.com/SWE-agent/mini-swe-agent",
+      "source": "Princeton / Stanford SWE-agent 研究团队",
+      "verification": "已打开官方仓库：README 推荐默认选用 mini；当前 README 有迁移说明，教程需匹配当前 API。",
+      "verifiedAt": "2026-10-11",
+      "priority": "focus"
+    },
+    {
+      "id": "swe-agent",
+      "title": "SWE-agent · 经典实现",
+      "category": "project",
+      "level": "进阶",
+      "tags": [
+        "ACI",
+        "研究",
+        "Coding Agent",
+        "历史脉络"
+      ],
+      "description": "研究 Agent 与计算机交互接口如何影响自动软件工程，并与更精简的后继实现比较。",
+      "whenToLearn": "读 mini-SWE-agent 后，研究专用工具接口、历史处理器与架构取舍。",
+      "url": "https://github.com/SWE-agent/SWE-agent",
+      "source": "Princeton / Stanford SWE-agent 研究团队",
+      "verification": "官方 README 明确主要开发转向 mini-swe-agent，并建议后续优先选 mini；保留 SWE-agent 用于接口研究。",
+      "relatedUrls": [
+        "https://github.com/SWE-agent/mini-swe-agent"
+      ],
+      "verifiedAt": "2026-10-11",
+      "priority": "reference"
+    },
+    {
+      "id": "course-hf-agents",
+      "title": "Hugging Face Agents Course",
+      "category": "course",
+      "level": "入门",
+      "tags": [
+        "Agent Loop",
+        "工具调用",
+        "smolagents",
+        "实践"
+      ],
+      "description": "从 Tools、Actions、Observations 入手，覆盖 smolagents、LangGraph、LlamaIndex 与 Agentic RAG，并以基准任务完成项目。",
+      "whenToLearn": "第 1–3 周：已有 Python 与 LLM 基础时开始。",
+      "url": "https://huggingface.co/learn/agents-course/en/unit0/introduction",
+      "source": "Hugging Face Learn",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "course-langgraph-academy",
+      "title": "Introduction to LangGraph · Python",
+      "category": "course",
+      "level": "进阶",
+      "tags": [
+        "状态图",
+        "记忆",
+        "Human-in-the-loop",
+        "部署"
+      ],
+      "description": "官方课程覆盖状态与 reducer、流式输出、人工介入、子图、长期记忆与部署，适合把最小 Agent 改造成可恢复工作流。",
+      "whenToLearn": "第 4–6 周：先亲手实现工具调用循环。",
+      "url": "https://academy.langchain.com/courses/intro-to-langgraph",
+      "source": "LangChain Academy",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "focus"
+    },
+    {
+      "id": "course-dlai-langgraph",
+      "title": "AI Agents in LangGraph",
+      "category": "course",
+      "level": "进阶",
+      "tags": [
+        "原生循环",
+        "搜索",
+        "持久化",
+        "LangGraph"
+      ],
+      "description": "先用 Python 搭建 Agent，再以 LangGraph 重建，学习搜索、持久化、流式输出和人工介入；课程代码需对照当前 SDK 版本。",
+      "whenToLearn": "第 2–4 周：补充实践课，访问与收费以课程页面为准。",
+      "url": "https://www.deeplearning.ai/courses/ai-agents-in-langgraph",
+      "source": "DeepLearning.AI",
+      "verifiedAt": "2026-10-11",
+      "verification": "课程首页返回 403；官方索引、介绍视频及课程论坛交叉核实主题，未登录体验课程。",
+      "priority": "explore"
+    },
+    {
+      "id": "course-berkeley-agents",
+      "title": "Berkeley CS194/294-196 · LLM Agents",
+      "category": "course",
+      "level": "研究",
+      "tags": [
+        "推理",
+        "规划",
+        "论文阅读",
+        "评测",
+        "安全"
+      ],
+      "description": "2024 秋季官方讲义与公开视频，包含推理、Agent 基础设施、RAG、代码 Agent、多模态、评测和安全；作为研究基础课程使用。",
+      "whenToLearn": "第 7–12 周：按项目需要选择讲次，提前补 ML/DL 基础。",
+      "url": "https://rdi.berkeley.edu/llm-agents/f24",
+      "source": "UC Berkeley RDI",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-react",
+      "title": "ReAct · Reasoning + Acting",
+      "category": "paper",
+      "level": "入门",
+      "tags": [
+        "2022",
+        "Agent Loop",
+        "工具使用",
+        "轨迹"
+      ],
+      "description": "研究推理与行动交替生成的 Agent 结构。阅读后画出观察、行动与环境反馈的边界，并在小任务上复现。",
+      "whenToLearn": "第 2 周：对照自己的工具调用循环。",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "source": "Yao 等 · arXiv 原论文",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "focus"
+    },
+    {
+      "id": "paper-reflexion",
+      "title": "Reflexion · Verbal Reinforcement Learning",
+      "category": "paper",
+      "level": "进阶",
+      "tags": [
+        "2023",
+        "反思",
+        "反馈",
+        "记忆"
+      ],
+      "description": "以语言反馈和 episodic memory 改进后续尝试，无需在该流程中更新模型权重。适合研究失败复盘与重试策略。",
+      "whenToLearn": "第 6 周：先有可复现失败任务与基线。",
+      "url": "https://arxiv.org/abs/2303.11366",
+      "source": "Shinn 等 · arXiv 原论文",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-toolformer",
+      "title": "Toolformer · Learning to Use Tools",
+      "category": "paper",
+      "level": "研究",
+      "tags": [
+        "2023",
+        "工具学习",
+        "自监督",
+        "训练"
+      ],
+      "description": "研究模型如何通过自监督训练决定 API、调用时机与参数。与应用层 function calling 分开理解，避免混淆训练和编排。",
+      "whenToLearn": "第 9–10 周：补齐语言模型训练与数据构造基础。",
+      "url": "https://arxiv.org/abs/2302.04761",
+      "source": "Schick 等 · arXiv 原论文",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-dspy",
+      "title": "DSPy · Optimizing LM Programs",
+      "category": "paper",
+      "level": "进阶",
+      "tags": [
+        "2023",
+        "指标驱动",
+        "提示优化",
+        "复合系统"
+      ],
+      "description": "用声明式模块组织语言模型程序，并围绕给定指标优化程序。适合学习数据集、指标和提示优化之间的关系。",
+      "whenToLearn": "第 8 周：建立训练、验证、测试划分后再优化。",
+      "url": "https://arxiv.org/abs/2310.03714",
+      "source": "Khattab 等 · arXiv 原论文",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "eval-swebench",
+      "title": "SWE-bench · Coding Agents",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "代码 Agent",
+        "真实 Issue",
+        "执行评测",
+        "Verified"
+      ],
+      "description": "以真实 GitHub issue 检验代码修改能否通过任务测试。区分 Full、Lite、Verified 等子集，并记录 agent harness 与环境版本。",
+      "whenToLearn": "第 7–8 周：代码 Agent 项目，先选少量公开样例。",
+      "url": "https://www.swebench.com/",
+      "source": "SWE-bench 官方",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "focus"
+    },
+    {
+      "id": "eval-gaia",
+      "title": "GAIA · General AI Assistants",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "检索",
+        "多模态",
+        "工具调用",
+        "研究助手"
+      ],
+      "description": "以现实问题组合考察推理、网页浏览、多模态和工具使用，适合研究助手项目。公开验证集与隐藏测试集应分开使用。",
+      "whenToLearn": "第 5–7 周：研究助手与来源追踪完成后。",
+      "url": "https://huggingface.co/gaia-benchmark",
+      "source": "GAIA 作者团队 · Hugging Face",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "eval-tau-family",
+      "title": "τ-bench · Conversational Agents",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "多轮交互",
+        "业务策略",
+        "工具调用",
+        "可靠性"
+      ],
+      "description": "模拟用户与工具 Agent 的业务交互。旧 tau-bench 已提示任务过时；使用维护中的 tau2-bench 仓库，并固定具体版本与任务集。",
+      "whenToLearn": "第 6–8 周：客服或业务工具 Agent，需要策略约束时。",
+      "url": "https://github.com/sierra-research/tau2-bench",
+      "source": "Sierra Research 官方",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "eval-webarena",
+      "title": "WebArena · Browser Agents",
+      "category": "evaluation",
+      "level": "研究",
+      "tags": [
+        "浏览器",
+        "可执行环境",
+        "端到端任务",
+        "可复现"
+      ],
+      "description": "可自托管的网页任务环境。原仓库用于论文结果复现，并推荐 AgentLab/BrowserGym 实验基础设施；演示站点不等于正式评测环境。",
+      "whenToLearn": "第 9–10 周：浏览器 Agent 专题；先预算环境搭建时间。",
+      "url": "https://github.com/web-arena-x/webarena",
+      "source": "WebArena 作者团队",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "eval-osworld",
+      "title": "OSWorld · Computer Use",
+      "category": "evaluation",
+      "level": "研究",
+      "tags": [
+        "桌面操作",
+        "多模态",
+        "跨应用",
+        "执行评测"
+      ],
+      "description": "真实计算机环境的跨应用任务与执行式检查，适合分析截图理解、动作选择和桌面操作错误。报告中写清任务范围及环境设置。",
+      "whenToLearn": "第 10 周起：Computer Use 专题，可先分析公开轨迹。",
+      "url": "https://os-world.github.io/",
+      "source": "OSWorld 作者团队",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "eval-terminalbench",
+      "title": "Terminal-Bench · Terminal Agents",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "终端",
+        "软件工程",
+        "长任务",
+        "成本"
+      ],
+      "description": "评估终端任务执行能力。官方入口包含任务与运行方法，报告时同时记录解决率、token、成本、agent 与 benchmark 版本。",
+      "whenToLearn": "第 8–10 周：终端 Agent 项目，先做可承受的小样本。",
+      "url": "https://www.tbench.ai/",
+      "source": "Terminal-Bench 官方",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "career-openai-evals",
+      "title": "OpenAI · Frontier Evals & Environments",
+      "category": "career",
+      "level": "研究",
+      "tags": [
+        "研究工程",
+        "RL 环境",
+        "实验设计",
+        "评测"
+      ],
+      "description": "官方岗位强调评测可靠性与方差、持续评测系统、模型行为实验，以及 ML、软件、系统和统计基础。用于能力对标，岗位状态会变化。",
+      "whenToLearn": "第 1 周了解方向；第 11–12 周对照作品证据。",
+      "url": "https://openai.com/careers/research-engineer-frontier-evals-and-environments-san-francisco/",
+      "source": "OpenAI Careers",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "career-anthropic-evals",
+      "title": "Anthropic · Post-Training Model Evaluations",
+      "category": "career",
+      "level": "研究",
+      "tags": [
+        "Python",
+        "生产系统",
+        "评测",
+        "统计"
+      ],
+      "description": "官方职责包括设计并运行评测、监控训练、调查回归、建设质量仪表盘；要求 Python 与生产系统能力，统计实验设计属于加分背景。",
+      "whenToLearn": "第 7 周起：用评测报告与回归分析验证能力。",
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5198255008",
+      "source": "Anthropic 官方招聘",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "career-tencent-agentinfra",
+      "title": "腾讯 · 混元 Agent 强化学习框架工程师",
+      "category": "career",
+      "level": "进阶",
+      "tags": [
+        "Asyncio",
+        "Kubernetes",
+        "Trace",
+        "训练链路"
+      ],
+      "description": "官方职位信息强调 Python 异步并发、工具与上下文链路、容器和集群、训练基础、测试日志及性能稳定性，适合 Agent 基础设施方向对标。",
+      "whenToLearn": "第 4 周起：工程路线；岗位以官网实时内容为准。",
+      "url": "https://careers.tencent.com/jobdesc.html?postId=2061654749727600640",
+      "source": "腾讯招聘官方",
+      "verifiedAt": "2026-10-11",
+      "verification": "官方搜索索引可读职责；直接打开网页为动态空壳，岗位状态须在官网确认。",
+      "priority": "explore"
+    },
+    {
+      "id": "career-baidu-agent",
+      "title": "百度 · 智能体算法工程师 J101017",
+      "category": "career",
+      "level": "进阶",
+      "tags": [
+        "ReAct",
+        "规划",
+        "PyTorch",
+        "评估",
+        "校招"
+      ],
+      "description": "官方校招页面列出规划、工具、记忆、多智能体与效果/效率/成本评估，要求 Agent 原理及算法到工程落地能力，作品和开源贡献为优先项。",
+      "whenToLearn": "第 2 周起：算法与应用路线；第 12 周逐项准备项目讲解。",
+      "url": "https://talent.baidu.com/jobs/detail/GRADUATE/02f73086-be71-4d09-8d6e-f1c6981b8b48",
+      "source": "百度校园招聘官方",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "community-hf-papers",
+      "title": "Hugging Face · Daily Papers",
+      "category": "community",
+      "level": "入门",
+      "tags": [
+        "论文发现",
+        "研究动态",
+        "讨论"
+      ],
+      "description": "跟踪研究社区提交的论文与作者讨论，作为选题入口；技术结论仍回到原论文、代码和实验验证。",
+      "whenToLearn": "每周 30 分钟：筛选 1 篇与当前项目相关的论文。",
+      "url": "https://huggingface.co/papers",
+      "source": "Hugging Face 社区",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "community-langchain-discussions",
+      "title": "LangChain · GitHub Discussions",
+      "category": "community",
+      "level": "进阶",
+      "tags": [
+        "框架问题",
+        "开源",
+        "版本迁移"
+      ],
+      "description": "在项目官方仓库中查找实践讨论与版本问题。记录 package 版本、最小复现与维护者回复，避免直接沿用旧答案。",
+      "whenToLearn": "遇到框架问题时查阅；修复后沉淀复现笔记。",
+      "url": "https://github.com/langchain-ai/langchain/discussions",
+      "source": "LangChain 官方仓库社区",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "community-hf-forum",
+      "title": "Hugging Face · Forums",
+      "category": "community",
+      "level": "入门",
+      "tags": [
+        "开源模型",
+        "部署",
+        "学习问答"
+      ],
+      "description": "模型、数据集、部署和学习问题的社区入口。将帖子当作线索，优先检查官方文档与可运行示例。",
+      "whenToLearn": "第 1 周起：搜集环境问题和学习疑问。",
+      "url": "https://discuss.huggingface.co/",
+      "source": "Hugging Face 官方论坛",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "community-localllama",
+      "title": "Reddit · r/LocalLLaMA",
+      "category": "community",
+      "level": "进阶",
+      "tags": [
+        "本地模型",
+        "实践线索",
+        "社区"
+      ],
+      "description": "关注本地模型、推理与用户实践的讨论入口。帖子不作为性能结论；确认配置、代码、模型版本和复现实验后再引用。",
+      "whenToLearn": "每周少量浏览：以当前实验问题筛选信息。",
+      "url": "https://www.reddit.com/r/LocalLLaMA/",
+      "source": "Reddit 用户社区",
+      "verifiedAt": "2026-10-11",
+      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
+      "priority": "explore"
+    },
+    {
+      "id": "openai-agents",
+      "title": "OpenAI Agents SDK",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "工具调用",
+        "Handoffs",
+        "Tracing",
+        "Guardrails"
+      ],
+      "description": "轻量 Agent 构件与运行循环，适合从源码研究工具执行、交接、会话和追踪。",
+      "url": "https://developers.openai.com/api/docs/guides/agents/sdk",
+      "source": "OpenAI 官方开发文档",
+      "whenToLearn": "与原生循环对照，阅读 Runner 与工具执行路径。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "focus"
+    },
+    {
+      "id": "openai-tools",
+      "title": "OpenAI · Tools",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "工具契约",
+        "检索",
+        "Computer Use"
+      ],
+      "description": "查阅当前工具类型及接入方式，把模型输出与实际执行边界分开设计。",
+      "url": "https://developers.openai.com/api/docs/guides/tools",
+      "source": "OpenAI 官方开发文档",
+      "whenToLearn": "实现单 Agent 与工具集成时。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "explore"
+    },
+    {
+      "id": "openai-evals",
+      "title": "OpenAI · Agent Evals",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "评测",
+        "Trace Grading",
+        "回归"
+      ],
+      "description": "官方 Agent 评测入口，学习如何评估行为轨迹与最终任务结果。",
+      "url": "https://developers.openai.com/api/docs/guides/agent-evals",
+      "source": "OpenAI 官方开发文档",
+      "whenToLearn": "建立任务集、grader 与回归机制时。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "explore"
+    },
+    {
+      "id": "openai-cookbook",
+      "title": "OpenAI · Agents Cookbook",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "示例",
+        "工程实践",
+        "实验"
+      ],
+      "description": "查找 Agent 实践案例，再按当前 SDK 与自己的任务复现。",
+      "url": "https://developers.openai.com/cookbook/topic/agents",
+      "source": "OpenAI Cookbook",
+      "whenToLearn": "每次选与当前问题直接相关的一篇。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "explore"
+    },
+    {
+      "id": "effective-agents",
+      "title": "Building Effective Agents",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "Workflow",
+        "Agent",
+        "设计取舍"
+      ],
+      "description": "从简单构件理解工作流和自治 Agent 的适用条件，先为复杂度找到可验证的理由。",
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "source": "Anthropic Engineering",
+      "whenToLearn": "架构选型、单 Agent 与多 Agent 对照时。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "focus"
+    },
+    {
+      "id": "context-engineering",
+      "title": "Effective Context Engineering",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "上下文",
+        "压缩",
+        "记忆",
+        "Harness"
+      ],
+      "description": "围绕有限上下文组织系统指令、工具结果与状态，关注长任务的信息质量。",
+      "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "source": "Anthropic Engineering",
+      "whenToLearn": "长任务出现信息丢失或上下文膨胀时。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "focus"
+    },
+    {
+      "id": "demystifying-evals",
+      "title": "Demystifying Evals for Agents",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "Grader",
+        "任务结果",
+        "评测设计"
+      ],
+      "description": "区分轨迹、实际结果和不同评判方式，为 Agent 建立可重复的质量检查。",
+      "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+      "source": "Anthropic Engineering",
+      "whenToLearn": "设计评测系统与失败分类时。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "focus"
+    },
+    {
+      "id": "effective-tools",
+      "title": "Writing Effective Tools",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "工具设计",
+        "命名",
+        "Token效率"
+      ],
+      "description": "用任务评测检验工具描述、返回信息与调用接口，而不只看函数是否能运行。",
+      "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+      "source": "Anthropic Engineering",
+      "whenToLearn": "工具调用错误、冗余调用或返回内容过长时。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "explore"
+    },
+    {
+      "id": "agent-skills",
+      "title": "Agent Skills · Reference Repository",
+      "category": "project",
+      "level": "进阶",
+      "tags": [
+        "Skills",
+        "渐进加载",
+        "可复用知识"
+      ],
+      "description": "研究任务知识如何封装为可发现、可加载的技能，阅读示例与组织方式。",
+      "url": "https://github.com/anthropics/skills",
+      "source": "Anthropic 官方 GitHub",
+      "whenToLearn": "设计学习助手的资料整理与实践技能时。",
+      "verifiedAt": "2026-10-11",
+      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
+      "priority": "explore"
+    },
+    {
+      "id": "smolagents",
+      "title": "smolagents · Code Agents",
+      "category": "framework",
+      "level": "基础",
+      "tags": [
+        "Hugging Face",
+        "CodeAgent",
+        "ReAct",
+        "Python",
+        "沙箱"
+      ],
+      "description": "以 Python 代码表达行动的精简 Agent 框架，适合对照代码执行与结构化工具调用。",
+      "whenToLearn": "理解 ReAct 与工具调用后，写同一任务的 CodeAgent 和 ToolCallingAgent 两种实现。",
+      "url": "https://github.com/huggingface/smolagents",
+      "source": "Hugging Face 官方 GitHub",
+      "verification": "已打开 README 与 Release。最新发布入口核查日指向 v1.26.0；当前 README 区分 CodeAgent、ToolCallingAgent，明确 LocalPythonExecutor 不能作为安全沙箱边界。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/huggingface/smolagents/releases/tag/v1.26.0"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "dspy-framework",
+      "title": "DSPy · 可优化的 LM 程序",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "Stanford NLP",
+        "提示优化",
+        "GEPA",
+        "指标",
+        "程序化"
+      ],
+      "description": "把模型调用组织为 Python 程序，以数据与指标优化提示和示例，补齐手写 Prompt 的实验方法。",
+      "whenToLearn": "已有固定评测集和基线后，比较手写提示与自动优化；与既有 DSPy 论文配套读代码。",
+      "url": "https://github.com/stanfordnlp/dspy",
+      "source": "Stanford NLP / DSPy 作者团队",
+      "verification": "README 当前安装包为 dspy，并列出 GEPA 等作者论文。最新发布入口核查日指向 3.4.0；旧论文示例须与当前 API 核对。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/stanfordnlp/dspy/releases/tag/3.4.0"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "browser-use",
+      "title": "Browser Use",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "Browser Agent",
+        "浏览器自动化",
+        "Python",
+        "Harness"
+      ],
+      "description": "让 Agent 观察并操作网页，研究浏览器动作、结构化输出、失败恢复与可复现任务。",
+      "whenToLearn": "工具 Agent 跑通后，用本地测试网页练习搜索、表单和导航，再接浏览器基准。",
+      "url": "https://github.com/browser-use/browser-use",
+      "source": "Browser Use 官方 GitHub",
+      "verification": "README 区分托管 Cloud、CLI 与开源 Python Library；库入口要求 Python >=3.11。最新发布入口核查日指向 0.13.11，不能把 Cloud 能力当作本地库默认能力。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/browser-use/browser-use/releases/tag/0.13.11"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "browsergym",
+      "title": "BrowserGym",
+      "category": "project",
+      "level": "进阶",
+      "tags": [
+        "ServiceNow",
+        "Gymnasium",
+        "WebArena",
+        "环境",
+        "Benchmark"
+      ],
+      "description": "统一浏览器任务环境与多个网页基准，适合学习观察、动作、奖励和任务适配器。",
+      "whenToLearn": "已有浏览器 Agent 后，固定环境与任务种子，建立可重跑的评测流程。",
+      "url": "https://github.com/ServiceNow/BrowserGym",
+      "source": "ServiceNow 研究团队官方 GitHub",
+      "verification": "README 核实 Gymnasium 环境、openended 任务、多基准适配及分包安装。最新发布入口核查日指向 v0.14.3；各基准仍需独立按说明部署。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/ServiceNow/BrowserGym/releases/tag/v0.14.3"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "agentlab",
+      "title": "AgentLab · Web Agent 实验",
+      "category": "project",
+      "level": "进阶",
+      "tags": [
+        "ServiceNow",
+        "BrowserGym",
+        "实验管理",
+        "轨迹",
+        "复现"
+      ],
+      "description": "在 BrowserGym 上运行和分析网页 Agent 实验，关注并行评测、轨迹与复现证据。",
+      "whenToLearn": "BrowserGym 单任务跑通后，批量比较模型、提示与动作设计，并记录失败类别。",
+      "url": "https://github.com/ServiceNow/AgentLab",
+      "source": "ServiceNow 研究团队官方 GitHub",
+      "verification": "README 明确面向 Web Agent 研究，基于 BrowserGym，并提供 Ray 并行实验与复现工具。最新发布入口核查日指向 v0.4.2。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/ServiceNow/AgentLab/releases/tag/v0.4.2"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "agentscope",
+      "title": "AgentScope",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "ReAct",
+        "多 Agent",
+        "Context",
+        "MCP",
+        "A2A"
+      ],
+      "description": "组合推理行动循环、工具、上下文与事件系统，适合阅读国产框架的工程抽象。",
+      "whenToLearn": "完成主线框架后，把研究助手移植一次，比较中断恢复、工具并发和团队编排。",
+      "url": "https://github.com/agentscope-ai/agentscope",
+      "source": "AgentScope 官方 GitHub",
+      "verification": "最新发布入口核查日指向 v2.0.9；当前 README 要求 Python >=3.11，包含 ReAct、Toolkit、Context、Event System。SOP 与实时语音部分标记为 Experimental，勿按稳定能力承诺。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/agentscope-ai/agentscope/releases/tag/v2.0.9"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "qwen-agent",
+      "title": "Qwen-Agent",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "Qwen",
+        "Function Calling",
+        "MCP",
+        "RAG",
+        "代码解释器"
+      ],
+      "description": "研究 Qwen 的工具解析、规划与应用示例，适合做国产模型驱动的文档和代码助手。",
+      "whenToLearn": "了解模型服务和工具 Schema 后，比较本地兼容服务与托管模型的工具调用轨迹。",
+      "url": "https://github.com/QwenLM/Qwen-Agent",
+      "source": "Qwen 团队官方 GitHub",
+      "verification": "README 包含 Qwen3.5 示例、MCP、RAG、代码解释器及原生工具调用配置。最新发布入口核查日指向 v0.0.26；不同 Qwen 模型的工具解析参数不同，应按对应示例核对。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/QwenLM/Qwen-Agent/releases/tag/v0.0.26"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "camel",
+      "title": "CAMEL",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "多 Agent",
+        "Role Playing",
+        "Workforce",
+        "研究",
+        "数据生成"
+      ],
+      "description": "研究角色协作、任务自动化与数据生成，比较多 Agent 带来的效果与额外成本。",
+      "whenToLearn": "有单 Agent 基线后，用固定任务集对照角色协作、团队编排与简单工作流。",
+      "url": "https://github.com/camel-ai/camel",
+      "source": "CAMEL-AI 作者团队官方 GitHub",
+      "verification": "README 核实 ChatAgent、角色协作、Workforce cookbook 和研究入口。最新发布入口核查日指向 v0.2.90；未采用 README 的排名或规模宣传作为学习依据。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/camel-ai/camel/releases/tag/v0.2.90"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "letta-code",
+      "title": "Letta · Stateful Agent Harness",
+      "category": "project",
+      "level": "进阶",
+      "tags": [
+        "MemGPT",
+        "长期记忆",
+        "Stateful Agent",
+        "Harness",
+        "MemFS"
+      ],
+      "description": "围绕持续状态与记忆构建 Agent，研究记忆块、历史检索及跨会话上下文管理。",
+      "whenToLearn": "短期状态与 RAG 清楚后，设计跨会话记忆实验，验证保留、检索和遗忘行为。",
+      "url": "https://github.com/letta-ai/letta-code",
+      "source": "Letta / MemGPT 作者团队官方 GitHub",
+      "verification": "旧 letta-ai/letta README 明确当前代码在 letta-code。已打开新仓库和 Release，核查日最新入口指向 v0.34.10；当前 AgentFile .af 导入导出已弃用，不应照搬旧教程。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/letta-ai/letta",
+        "https://github.com/letta-ai/letta-code/releases/tag/v0.34.10"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "mem0",
+      "title": "Mem0 · Agent Memory",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "长期记忆",
+        "User/Session",
+        "检索",
+        "Python",
+        "Node SDK"
+      ],
+      "description": "为 Agent 增加可检索的持久记忆，适合比较用户偏好、会话状态与知识检索的差别。",
+      "whenToLearn": "学习状态存储后，为学习助手加入经确认的偏好记忆，并测量错记、重复和检索质量。",
+      "url": "https://github.com/mem0ai/mem0",
+      "source": "Mem0 官方 GitHub",
+      "verification": "README 核实 Memory.add/search、多层记忆与托管选项。releases/latest 核查日指向 Node SDK ts-v3.3.1，不能据此称 Python SDK 版本为 3.3.1。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/mem0ai/mem0/releases/tag/ts-v3.3.1"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "ag2",
+      "title": "AG2 · 当前主线与 Classic",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "多 Agent",
+        "Network",
+        "HITL",
+        "迁移",
+        "AG2 Classic"
+      ],
+      "description": "研究多 Agent 网络和对话编排，并区分当前 AG2 与旧 autogen 命名空间的迁移边界。",
+      "whenToLearn": "理解多 Agent 后，与微软 MAF 做概念对照；接手旧 GroupChat 项目时先识别发行包。",
+      "url": "https://github.com/ag2ai/ag2",
+      "source": "AG2 作者团队官方 GitHub",
+      "verification": "最新发布入口核查日指向 v1.1.2。README 明确 import ag2 新主线与 autogen.* Classic 不兼容直升；Classic 迁至 ag2-classic 且仍维护。AG2 与 Microsoft AutoGen 是不同仓库与路线。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/ag2ai/ag2-classic",
+        "https://github.com/ag2ai/ag2/releases/tag/v1.1.2"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "agent-skills-spec",
+      "title": "Agent Skills · 开放格式规范",
+      "category": "protocol",
+      "level": "基础",
+      "tags": [
+        "SKILL.md",
+        "Progressive Disclosure",
+        "可复用知识",
+        "规范"
+      ],
+      "description": "用元数据、指令和资源封装可复用的 Agent 技能，学习按需加载与跨工具复用。",
+      "whenToLearn": "完成一条稳定实践流程后，把论文阅读或实验复盘整理成可审阅的技能包。",
+      "url": "https://github.com/agentskills/agentskills",
+      "source": "Agent Skills 官方规范项目",
+      "verification": "已打开官方仓库与 specification：技能以 SKILL.md 为核心，并采用发现、激活、执行的渐进披露方式。规范与现有 anthropics/skills 示例库分列；不把规范误写为某个厂商 SDK 版本。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://agentskills.io/specification"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "claude-code",
+      "title": "Claude Code · 官方学习入口",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "Anthropic",
+        "Coding Agent",
+        "CLI",
+        "Plugins",
+        "工程实践"
+      ],
+      "description": "通过官方文档与插件示例学习编码 Agent 的工作流、上下文组织和工具扩展。",
+      "whenToLearn": "在真实小型项目上练习阅读、修改、验证与复盘，把可复现工程经验写进学习日志。",
+      "url": "https://github.com/anthropics/claude-code",
+      "source": "Anthropic 官方 GitHub 与 Claude Code Docs",
+      "verification": "已打开 README、官方 overview 与 Release。最新入口核查日指向 v2.1.296；README 明确 npm 安装已弃用。此仓库提供文档、插件与问题反馈等入口，不应当成完整 CLI 核心源码教程。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://code.claude.com/docs/en/overview",
+        "https://github.com/anthropics/claude-code/releases/tag/v2.1.296"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "codex-cli",
+      "title": "Codex CLI · 官方代码与学习",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "OpenAI",
+        "Coding Agent",
+        "Rust",
+        "SDK",
+        "Harness"
+      ],
+      "description": "从官方学习资料到开源 CLI，研究编码 Agent 的会话、工具、权限与应用集成。",
+      "whenToLearn": "先完成一次代码修改与验证，再按单条调用链阅读 CLI、工具执行和 SDK 入口。",
+      "url": "https://github.com/openai/codex",
+      "source": "OpenAI 官方 GitHub 与 OpenAI Developers",
+      "verification": "已搜索并打开官方 Codex 学习页，再核实官方仓库中的 codex-rs、docs、sdk。最新发布入口核查日指向 rust-v0.162.1；CLI 发布号不能等同于桌面应用版本。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://developers.openai.com/learn/codex",
+        "https://github.com/openai/codex/releases/tag/rust-v0.162.1"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "arize-phoenix",
+      "title": "Arize Phoenix · 观测与评测",
+      "category": "platform",
+      "level": "实战",
+      "tags": [
+        "OpenTelemetry",
+        "OpenInference",
+        "Tracing",
+        "Evals",
+        "Dataset"
+      ],
+      "description": "查看 Agent 的调用轨迹、数据集和实验结果，把质量、延迟与失败定位纳入实践记录。",
+      "whenToLearn": "第一个工具 Agent 建成时接入轨迹，再对同一数据集比较提示、模型与检索改动。",
+      "url": "https://github.com/Arize-ai/phoenix",
+      "source": "Arize AI 官方 GitHub",
+      "verification": "README 核实 OpenTelemetry/OpenInference、轨迹、评测和实验管理；当前许可证注明 ELv2。latest 入口指向 MCP 子包 4.3.16，不能视为核心版本；旧 stdio MCP 包标注维护模式，官方建议内置远程 MCP。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/Arize-ai/phoenix/releases/tag/@arizeai/phoenix-mcp@4.3.16"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "ragas",
+      "title": "Ragas · 应用与 Agent 评测",
+      "category": "framework",
+      "level": "实战",
+      "tags": [
+        "评测",
+        "测试数据",
+        "RAG",
+        "Agent",
+        "指标"
+      ],
+      "description": "组合模型与传统指标、测试集生成和评测工作流，为知识助手建立持续实验基线。",
+      "whenToLearn": "完成 RAG 或工具 Agent 后，建立小型人工审核集，再逐步使用自动指标和测试集生成。",
+      "url": "https://github.com/vibrantlabsai/ragas",
+      "source": "Ragas 作者团队官方 GitHub",
+      "verification": "旧 explodinggradients/ragas 实际跳转至 vibrantlabsai/ragas。README 核实测试数据生成、LLM/传统指标及 agent_evals 示例；最新发布入口核查日指向 v0.4.3，避免混用旧主版本教程。",
+      "verifiedAt": "2026-10-11",
+      "relatedUrls": [
+        "https://github.com/vibrantlabsai/ragas/releases/tag/v0.4.3"
+      ],
+      "priority": "explore"
+    },
+    {
+      "id": "verl",
+      "title": "verl / HybridFlow",
+      "category": "framework",
+      "level": "研究",
+      "tags": [
+        "Agent RL",
+        "PPO",
+        "GRPO",
+        "分布式训练"
+      ],
+      "description": "研究模型后训练的 rollout、奖励、策略更新与分布式执行，进一步连接多轮工具调用。仓库已迁至 verl-project，学习时记录所用版本与 recipe。",
+      "whenToLearn": "完成工具调用与评测项目后，第 10–12 周选修；训练前先核对 GPU 与环境要求。",
+      "url": "https://github.com/verl-project/verl",
+      "source": "verl 官方仓库 / ByteDance Seed 发起的开源项目",
+      "verification": "已打开 README，核验框架架构、算法与工具调用说明；未安装或运行训练。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "openrlhf",
+      "title": "OpenRLHF",
+      "category": "framework",
+      "level": "研究",
+      "tags": [
+        "Agent RL",
+        "RLHF",
+        "Ray",
+        "vLLM"
+      ],
+      "description": "从 Ray、vLLM、DeepSpeed 的组合理解 rollout 与训练调度，查看单轮和多轮 Agent 执行如何与 PPO、GRPO 等算法衔接。",
+      "whenToLearn": "掌握策略梯度和基本后训练流程后，与 verl 对照阅读一个最小训练路径。",
+      "url": "https://github.com/OpenRLHF/OpenRLHF",
+      "source": "OpenRLHF 官方维护仓库",
+      "verification": "已打开 README，核验 Agent 执行接口与支持算法；未复现训练结果。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "agent-lightning",
+      "title": "Microsoft Agent Lightning v1.0",
+      "category": "framework",
+      "level": "研究",
+      "tags": [
+        "Agent RL",
+        "Harness",
+        "训练数据",
+        "Microsoft"
+      ],
+      "description": "研究 Trainer、API Gateway、Rollout Controller 如何在真实 Agent 执行环境中收集训练样本。v1.0 完全重构，旧教程要核对分支。",
+      "whenToLearn": "已有可评测 Agent 后，第 10–12 周阅读架构并设计奖励；报告见 arXiv:2608.17528。",
+      "url": "https://github.com/microsoft/agent-lightning",
+      "source": "Microsoft 官方仓库与作者技术报告",
+      "verification": "已打开当前 README 与 v1.0 原报告摘要，核验版本和三组件架构；未训练或验证其成绩。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-ragen",
+      "title": "RAGEN：多轮 Agent 强化学习",
+      "category": "paper",
+      "level": "研究",
+      "tags": [
+        "Agent RL",
+        "多轮交互",
+        "StarPO",
+        "训练稳定性"
+      ],
+      "description": "研究长时程交互中的轨迹优化与训练不稳定现象，理解 rollout 多样性、奖励粒度和采样策略为什么需要联合考虑。",
+      "whenToLearn": "先掌握 PPO / GRPO，再设计一个小型交互环境和奖励函数，记录失败轨迹。",
+      "url": "https://arxiv.org/abs/2504.20073",
+      "source": "Wang 等作者原论文 / arXiv",
+      "verification": "已打开论文摘要与修订信息；未阅读全文或复现 StarPO 训练。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "search-r1",
+      "title": "Search-R1",
+      "category": "framework",
+      "level": "研究",
+      "tags": [
+        "Agent RL",
+        "搜索",
+        "工具调用",
+        "RAG"
+      ],
+      "description": "将推理与搜索交替执行纳入 RL 训练，仓库提供检索服务、数据处理与 PPO / GRPO 路径，适合连接 RAG 和工具使用研究。",
+      "whenToLearn": "完成可追踪的搜索 Agent 后，先读推理和检索服务，再分析训练样本与奖励。",
+      "url": "https://github.com/PeterGriffinJin/Search-R1",
+      "source": "Bowen Jin 等作者官方仓库",
+      "verification": "已打开 README，核验搜索与推理交替设计、检索器和训练入口；未运行代码。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-deepseek-r1",
+      "title": "DeepSeek-R1：推理后训练基础",
+      "category": "paper",
+      "level": "研究",
+      "tags": [
+        "RL",
+        "SFT",
+        "推理",
+        "蒸馏"
+      ],
+      "description": "区分 R1-Zero 的 RL 路径与 R1 的冷启动和多阶段训练，建立 SFT、RL、蒸馏的概念边界，为 Agent 后训练阅读打基础。",
+      "whenToLearn": "算法专题起点；先画出两条训练流程，再讨论如何迁移到工具使用任务。",
+      "url": "https://github.com/deepseek-ai/DeepSeek-R1",
+      "source": "DeepSeek 官方仓库与技术报告入口",
+      "verification": "已打开官方 README 的 R1 / R1-Zero 与蒸馏说明；未复现模型训练。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-dapo",
+      "title": "DAPO：可复现的 RL 后训练",
+      "category": "paper",
+      "level": "研究",
+      "tags": [
+        "RL",
+        "动态采样",
+        "裁剪",
+        "verl"
+      ],
+      "description": "研究解耦裁剪与动态采样的策略优化方法，关注训练细节、数据与系统实现对复现的影响；作者公开了基于 verl 的代码。",
+      "whenToLearn": "掌握 GRPO 后，与基础算法对照写出采样和策略更新的变化，再做小规模消融计划。",
+      "url": "https://arxiv.org/abs/2503.14476",
+      "source": "Qiying Yu 等作者原论文 / arXiv",
+      "verification": "已打开摘要与 v2 修订记录；未阅读全文或复现其数学评测成绩。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "lightrag",
+      "title": "LightRAG",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "RAG",
+        "知识图谱",
+        "检索",
+        "增量更新"
+      ],
+      "description": "结合图索引与向量检索，比较 local、global、hybrid、naive、mix 模式。适合验证跨文档问题是否值得引入图结构及其成本。",
+      "whenToLearn": "完成基础 RAG 和评测集后，第 5–7 周用同一数据比较答案质量、引用与耗时。",
+      "url": "https://github.com/HKUDS/LightRAG",
+      "source": "HKUDS 作者官方仓库",
+      "verification": "已打开 README 的图结构、检索模式和存储说明；未独立验证性能或成本宣传。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-raptor",
+      "title": "RAPTOR：层次化文档检索",
+      "category": "paper",
+      "level": "进阶",
+      "tags": [
+        "RAG",
+        "聚类",
+        "递归摘要",
+        "长文档"
+      ],
+      "description": "通过递归嵌入、聚类和摘要构建多层文本树，在不同抽象层级检索长文档内容；适合与固定切块检索对照。",
+      "whenToLearn": "基础 RAG 之后，用一组跨章节问题比较检索命中与摘要失真，记录索引构建成本。",
+      "url": "https://arxiv.org/abs/2401.18059",
+      "source": "Parth Sarthi 等作者原论文 / arXiv",
+      "verification": "已打开原论文摘要，核验树结构方法；未阅读全文或复现 benchmark。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "paper-memgpt",
+      "title": "MemGPT：分层记忆与虚拟上下文",
+      "category": "paper",
+      "level": "进阶",
+      "tags": [
+        "长期记忆",
+        "上下文工程",
+        "分层存储",
+        "经典论文"
+      ],
+      "description": "借鉴操作系统的快慢存储层，研究有限上下文中的数据搬移与控制流。适合建立记忆管理的基础模型，而非把外部记忆等同模型训练。",
+      "whenToLearn": "阅读上下文工程后，与滑动窗口、摘要和检索记忆三种策略比较。",
+      "url": "https://arxiv.org/abs/2310.08560",
+      "source": "Charles Packer 等作者原论文 / arXiv",
+      "verification": "已打开论文摘要及 2024 修订信息；这是经典基础资料，未复现实验。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "discovery-bilibili-datawhale",
+      "title": "B站 · Datawhale × OWL / OpenManus 作者分享",
+      "category": "discovery",
+      "level": "实战",
+      "tags": [
+        "B站",
+        "Datawhale",
+        "OWL",
+        "OpenManus"
+      ],
+      "description": "从项目团队的公开分享寻找 Agent 实现线索。视频发布于 2025 年 3 月，学习时结合项目当前源码核对架构与版本。",
+      "whenToLearn": "实战阶段选看；提炼一个可验证的技术问题后回到作者仓库，避免只收藏视频。",
+      "url": "https://www.bilibili.com/video/BV1CjRYYkE8L/",
+      "source": "二次元的Datawhale · Bilibili 公开视频索引",
+      "verification": "公开索引可核验标题、UP主、日期与项目团队嘉宾；直接访问返回 412，未观看视频。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "discovery-zhihu-agentlightning",
+      "title": "知乎 · 微软亚洲研究院的 Agent Lightning v1.0 解析",
+      "category": "discovery",
+      "level": "研究",
+      "tags": [
+        "知乎",
+        "Microsoft",
+        "Agent RL",
+        "Harness"
+      ],
+      "description": "微软亚洲研究院署名的中文解析，介绍真实 Agent Harness 中的强化学习与样本处理；可作为阅读英文官方仓库和原报告的导读。",
+      "whenToLearn": "Agent RL 专题中与 v1.0 仓库及技术报告一起阅读，记录术语和版本。",
+      "url": "https://zhuanlan.zhihu.com/p/2074220666811949400",
+      "source": "微软亚洲研究院 · 知乎专栏",
+      "verification": "正文与署名可直接读取，已与 Microsoft 官方仓库及 v1.0 报告摘要交叉核验。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "discovery-juejin-langgraph",
+      "title": "掘金 · LangGraph / AgentScope 同案例实践",
+      "category": "discovery",
+      "level": "实战",
+      "tags": [
+        "掘金",
+        "LangGraph",
+        "AgentScope",
+        "多智能体"
+      ],
+      "description": "作者以同一业务案例实践多智能体协作，适合练习状态与多轮工作流比较。社区实例的代码和 API 需按当前 SDK 复核。",
+      "whenToLearn": "理解状态图后自行重建案例，用同一任务比较两种实现，再写工程取舍。",
+      "url": "https://juejin.cn/post/7591697558377431082",
+      "source": "木昆子记录AI · 掘金作者实践",
+      "verification": "已打开正文、署名与 2026-01-06 发布日期；未运行示例，不作为框架性能结论。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "discovery-wechat-verl",
+      "title": "公众号 · veMLP × verl 强化学习训练",
+      "category": "discovery",
+      "level": "研究",
+      "tags": [
+        "微信公众号",
+        "verl",
+        "RL",
+        "训练实践"
+      ],
+      "description": "verl 官方 README 列出的中文训练实践文章入口，用于发现部署和调试问题；具体技术参数仍回到官方文档确认。",
+      "whenToLearn": "准备训练环境时作为中文线索，先核对框架版本、硬件和 recipe。",
+      "url": "https://mp.weixin.qq.com/s/7nbqxk4knMGd-hQE9ls2tA",
+      "source": "verl 官方仓库推荐的公众号文章",
+      "verification": "已在官方 README 核验标题与出链；公众号正文访问受限，未读取全文。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "discovery-x-mem0",
+      "title": "X · Mem0 官方账号",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "X",
+        "Mem0",
+        "长期记忆",
+        "研究发现"
+      ],
+      "description": "维护者的记忆研究与版本发布发现入口。找到具体讨论后继续查原论文、变更记录和实验条件。",
+      "whenToLearn": "记忆专题中按需查更新，并把有效线索转成论文阅读或可复现实验。",
+      "url": "https://x.com/mem0ai",
+      "source": "Mem0 官方仓库关联的 X 账号",
+      "verification": "已在官方 README 核验账号出链；X 返回 403，未读取帖子。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "discovery-youtube-deepagents",
+      "title": "YouTube · LangChain 的 Deep Agents 介绍",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "YouTube",
+        "LangChain",
+        "Deep Agents",
+        "上下文工程"
+      ],
+      "description": "官方频道 2026 年 9 月的简短介绍，提供文件系统、子 Agent、摘要与 Harness 的学习线索；具体行为结合当前文档和源码核对。",
+      "whenToLearn": "多步工具调用后作为概览，再学习完整官方课程并完成一个长任务案例。",
+      "url": "https://www.youtube.com/watch?v=WbMTdpVhNsw",
+      "source": "LangChain 官方 YouTube 频道",
+      "verification": "公开索引可核验频道、标题、2026-09-16 日期及简介；直接页面未成功读取，未观看视频。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "discovery-xiaohongshu-context",
+      "title": "小红书 · 楚客的上下文工程讲解与实战",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "Datawhale",
+        "Hello-Agents",
+        "上下文工程"
+      ],
+      "description": "Datawhale Hello-Agents 官方视频导航关联第 9 章贡献者楚客（秦川楚客）的内容入口，适合与开源课件一起学习上下文管理。",
+      "whenToLearn": "第 5–7 周上下文专题；先读 Hello-Agents 对应章节，再按平台可访问状态查看作者视频。",
+      "url": "https://www.xiaohongshu.com/explore/6a3f7ba2000000001c026d7d",
+      "source": "Datawhale 官方项目关联作者 · 小红书",
+      "verification": "官方 hello-agents 贡献者列表和视频导航可核验作者、主题与笔记链接；平台访问超时或受限，未读笔记或观看视频。",
+      "verifiedAt": "2026-10-11",
+      "priority": "explore"
+    },
+    {
+      "id": "hello-agents",
+      "title": "Datawhale · Hello-Agents",
+      "category": "course",
+      "level": "进阶",
+      "tags": [
+        "中文开源课程",
+        "原生实现",
+        "上下文工程",
+        "实战"
+      ],
+      "description": "中文 Agent 学习项目，结合章节、代码和作者分享，从原理实现到工程专题逐项对照实践。",
+      "whenToLearn": "按当前问题选择章节：原生循环、框架、上下文、记忆与评测，不要求重读已掌握的基础。",
+      "url": "https://github.com/datawhalechina/hello-agents",
+      "source": "Datawhale 官方 GitHub",
+      "verification": "已打开官方仓库；社交平台入口关联其贡献者与视频导航，具体代码需固定仓库版本。",
+      "verifiedAt": "2026-10-11",
+      "priority": "focus"
+    }
+  ],
+  "curriculum": [
+    {
+      "id": "w1",
+      "week": 1,
+      "title": "Agent 机制与基线审计",
+      "label": "MECHANISMS",
+      "description": "建立可解释的最小闭环，而后再选择框架。",
+      "hours": 10,
+      "resources": [
+        "paper-react",
+        "effective-agents",
+        "openai-agents",
+        "hello-agents"
+      ],
+      "tasks": [
+        {
+          "id": "w1-t1",
+          "text": "手写带工具调用的 Agent 循环，记录每一步的输入、动作和结果。"
+        },
+        {
+          "id": "w1-t2",
+          "text": "加入参数验证、超时、步数与 token 预算，构造 5 个失败案例。"
+        },
+        {
+          "id": "w1-t3",
+          "text": "用同一任务对照 SDK 实现，解释框架增加了哪些运行能力。"
+        }
+      ],
+      "deliverable": "一份最小实现 + 执行轨迹 + 架构取舍笔记",
+      "project": "research"
+    },
+    {
+      "id": "w2",
+      "week": 2,
+      "title": "工具设计与可靠执行",
+      "label": "TOOLING",
+      "description": "把工具当作模型与真实系统之间的契约。",
+      "hours": 10,
+      "resources": [
+        "effective-tools",
+        "openai-tools",
+        "pydantic-ai"
+      ],
+      "tasks": [
+        {
+          "id": "w2-t1",
+          "text": "为搜索、读取和写入设计明确的 schema、错误码与权限。"
+        },
+        {
+          "id": "w2-t2",
+          "text": "实现异步并发、退避重试和幂等键，测试重复调用与取消。"
+        },
+        {
+          "id": "w2-t3",
+          "text": "比较工具描述和返回长度的两种设计，记录失败率与成本。"
+        }
+      ],
+      "deliverable": "工具契约文档 + 异常测试 + 对照结果",
+      "project": "research"
+    },
+    {
+      "id": "w3",
+      "week": 3,
+      "title": "Agentic RAG 与检索算法",
+      "label": "RETRIEVAL",
+      "description": "先解释检索质量，再解释生成质量。",
+      "hours": 10,
+      "resources": [
+        "llamaindex",
+        "haystack",
+        "eval-gaia"
+      ],
+      "tasks": [
+        {
+          "id": "w3-t1",
+          "text": "建立不少于 30 个任务的小型开发集与独立保留集。"
+        },
+        {
+          "id": "w3-t2",
+          "text": "比较稠密检索、关键词/混合检索与 rerank，记录召回与延迟。"
+        },
+        {
+          "id": "w3-t3",
+          "text": "实现来源引用、证据不足时的回答策略，分类检索与生成错误。"
+        }
+      ],
+      "deliverable": "带引用的研究助手 + 数据划分 + 检索报告",
+      "project": "research"
+    },
+    {
+      "id": "w4",
+      "week": 4,
+      "title": "状态图与持久化运行",
+      "label": "ORCHESTRATION",
+      "description": "让任务能恢复，让状态有明确归属。",
+      "hours": 10,
+      "resources": [
+        "langgraph",
+        "course-langgraph-academy",
+        "google-adk"
+      ],
+      "tasks": [
+        {
+          "id": "w4-t1",
+          "text": "把原生循环迁移为显式状态图，定义 reducer 与节点输入输出。"
+        },
+        {
+          "id": "w4-t2",
+          "text": "加入 checkpoint、人工确认和流式状态；模拟中断后恢复。"
+        },
+        {
+          "id": "w4-t3",
+          "text": "测试两会话隔离与副作用幂等，用相同任务比较原生与图实现。"
+        }
+      ],
+      "deliverable": "状态图 + 恢复演示 + 隔离测试",
+      "project": "durable"
+    },
+    {
+      "id": "w5",
+      "week": 5,
+      "title": "上下文工程与长期记忆",
+      "label": "CONTEXT",
+      "description": "把记忆策略写成可证伪的实验。",
+      "hours": 10,
+      "resources": [
+        "context-engineering",
+        "paper-reflexion",
+        "deep-agents"
+      ],
+      "tasks": [
+        {
+          "id": "w5-t1",
+          "text": "比较全历史、摘要与检索记忆，固定任务与预算。"
+        },
+        {
+          "id": "w5-t2",
+          "text": "定义记忆写入、更新、遗忘和用户隔离策略；构造污染样本。"
+        },
+        {
+          "id": "w5-t3",
+          "text": "统计成功率、重复运行方差、token 和时延，分析反思引入的新错。"
+        }
+      ],
+      "deliverable": "记忆消融实验 + 失败轨迹 + 成本表",
+      "project": "durable"
+    },
+    {
+      "id": "w6",
+      "week": 6,
+      "title": "MCP、A2A 与 Agent Skills",
+      "label": "INTEROPERABILITY",
+      "description": "理解连接边界，而后实现互操作。",
+      "hours": 10,
+      "resources": [
+        "mcp",
+        "a2a",
+        "agent-skills"
+      ],
+      "tasks": [
+        {
+          "id": "w6-t1",
+          "text": "实现只读 MCP Server，测试 schema、错误处理和访问控制。"
+        },
+        {
+          "id": "w6-t2",
+          "text": "为两套独立服务描述能力和任务状态，完成一次 A2A 实验。"
+        },
+        {
+          "id": "w6-t3",
+          "text": "把资料整理流程封装为技能，记录信任边界与版本依赖。"
+        }
+      ],
+      "deliverable": "协议实验仓库 + 工具/任务契约 + 技能示例",
+      "project": "durable"
+    },
+    {
+      "id": "w7",
+      "week": 7,
+      "title": "评测、统计与可观测性",
+      "label": "EVALUATION",
+      "description": "让每一次优化都能解释、比较和复现。",
+      "hours": 10,
+      "resources": [
+        "demystifying-evals",
+        "openai-evals",
+        "eval-tau-family"
+      ],
+      "tasks": [
+        {
+          "id": "w7-t1",
+          "text": "实现离线 eval runner，区分执行式 grader 与模型评委。"
+        },
+        {
+          "id": "w7-t2",
+          "text": "保留 trace、随机种子/采样配置、版本及重复运行结果。"
+        },
+        {
+          "id": "w7-t3",
+          "text": "测成功率、成本、p95 时延与方差；抽样人工校验评判偏差。"
+        }
+      ],
+      "deliverable": "可复现评测包 + 回归报告 + 指标说明",
+      "project": "evalops"
+    },
+    {
+      "id": "w8",
+      "week": 8,
+      "title": "Coding Agent 与 Harness",
+      "label": "SOFTWARE AGENTS",
+      "description": "在隔离环境中学习行动接口与执行评测。",
+      "hours": 10,
+      "resources": [
+        "mini-swe-agent",
+        "openhands",
+        "eval-swebench",
+        "eval-terminalbench"
+      ],
+      "tasks": [
+        {
+          "id": "w8-t1",
+          "text": "读最小编码 Agent 源码，画出模型、shell、历史与停止条件。"
+        },
+        {
+          "id": "w8-t2",
+          "text": "选少量可承受的任务在隔离环境执行，固定 harness 与版本。"
+        },
+        {
+          "id": "w8-t3",
+          "text": "以实际测试结果判定成功，分析补丁、环境与工具错误。"
+        }
+      ],
+      "deliverable": "小样本实验 + 可回放轨迹 + 失败分类",
+      "project": "coding"
+    },
+    {
+      "id": "w9",
+      "week": 9,
+      "title": "多 Agent 与架构消融",
+      "label": "MULTI-AGENT",
+      "description": "同预算比较协作收益与通信代价。",
+      "hours": 10,
+      "resources": [
+        "crewai",
+        "microsoft-agent-framework",
+        "effective-agents"
+      ],
+      "tasks": [
+        {
+          "id": "w9-t1",
+          "text": "实现研究/审查分工，明确共享状态、权限和冲突解决。"
+        },
+        {
+          "id": "w9-t2",
+          "text": "对照同预算单 Agent、固定工作流与多 Agent 方案。"
+        },
+        {
+          "id": "w9-t3",
+          "text": "报告真实收益、通信成本、失败传播与适用场景。"
+        }
+      ],
+      "deliverable": "三种架构对照 + 协作 trace + 取舍结论",
+      "project": "durable"
+    },
+    {
+      "id": "w10",
+      "week": 10,
+      "title": "算法深化与研究专题",
+      "label": "RESEARCH",
+      "description": "选择一个问题深入复现，控制研究范围。",
+      "hours": 10,
+      "resources": [
+        "paper-dspy",
+        "paper-toolformer",
+        "eval-osworld",
+        "verl",
+        "agent-lightning",
+        "paper-ragen",
+        "search-r1"
+      ],
+      "tasks": [
+        {
+          "id": "w10-t1",
+          "text": "选择 DSPy 优化、工具学习/SFT/RL 或 Computer Use 一条分支。"
+        },
+        {
+          "id": "w10-t2",
+          "text": "设计小规模复现与消融，明确数据划分、硬件/API 预算。"
+        },
+        {
+          "id": "w10-t3",
+          "text": "从原论文与代码解释目标函数、优化方法、限制与失败。"
+        }
+      ],
+      "deliverable": "专题复现报告 + 代码 + 适用边界",
+      "project": "evalops"
+    },
+    {
+      "id": "w11",
+      "week": 11,
+      "title": "Agent 产品工程",
+      "label": "PRODUCTION",
+      "description": "把演示升级为可运维、可回归的系统。",
+      "hours": 10,
+      "resources": [
+        "career-tencent-agentinfra",
+        "dify",
+        "n8n"
+      ],
+      "tasks": [
+        {
+          "id": "w11-t1",
+          "text": "为主项目补充 API、队列、并发限流、取消与恢复。"
+        },
+        {
+          "id": "w11-t2",
+          "text": "定义密钥保管、工具权限、日志脱敏、预算与成本上界。"
+        },
+        {
+          "id": "w11-t3",
+          "text": "完成容器化、监控和版本回归，输出部署与排障手册。"
+        }
+      ],
+      "deliverable": "主项目交付包 + 稳定性报告 + 运维手册",
+      "project": "evalops"
+    },
+    {
+      "id": "w12",
+      "week": 12,
+      "title": "作品集与面试答辩",
+      "label": "CAREER",
+      "description": "用证据解释自己的技术判断。",
+      "hours": 10,
+      "resources": [
+        "career-openai-evals",
+        "career-anthropic-evals",
+        "career-baidu-agent"
+      ],
+      "tasks": [
+        {
+          "id": "w12-t1",
+          "text": "整理两份 case study：需求、架构、基线、失败、指标和取舍。"
+        },
+        {
+          "id": "w12-t2",
+          "text": "完成一次系统设计、一次算法/代码练习和一次项目答辩。"
+        },
+        {
+          "id": "w12-t3",
+          "text": "把答不好的问题转成实验，制定下一轮 12 周深化目标。"
+        }
+      ],
+      "deliverable": "作品集 + 模拟面试复盘 + 下一轮问题清单",
+      "project": "evalops"
+    }
+  ],
+  "projects": [
+    {
+      "id": "research",
+      "number": "01",
+      "title": "有证据的研究助手",
+      "subtitle": "EVIDENCE-DRIVEN RESEARCH",
+      "description": "把你的 Agent 学习资料变成有来源、可检验的问答与研究系统。",
+      "tags": [
+        "Agentic RAG",
+        "工具调用",
+        "引用评测"
+      ],
+      "difficulty": "工程主线",
+      "weeks": "W01 — W03",
+      "accent": "green",
+      "resources": [
+        "llamaindex",
+        "haystack",
+        "effective-tools",
+        "eval-gaia"
+      ],
+      "milestones": [
+        "建立文档数据集与 30 条任务，明确开发/保留划分",
+        "完成工具调用、检索、rerank 与来源引用",
+        "比较检索与生成错误；记录成功率、成本和延迟",
+        "发布可复现代码、失败样本和 case study"
+      ],
+      "acceptance": "每条结论可追溯到证据；无证据问题有合理处理；优化以独立任务集验证。"
+    },
+    {
+      "id": "durable",
+      "number": "02",
+      "title": "可恢复的协作工作流",
+      "subtitle": "DURABLE AGENT SYSTEM",
+      "description": "从单 Agent 走向带状态、记忆、人工介入与互操作的长任务系统。",
+      "tags": [
+        "LangGraph",
+        "MCP / A2A",
+        "上下文工程"
+      ],
+      "difficulty": "系统深化",
+      "weeks": "W04 — W06 / W09",
+      "accent": "purple",
+      "resources": [
+        "langgraph",
+        "mcp",
+        "a2a",
+        "context-engineering"
+      ],
+      "milestones": [
+        "定义状态契约，完成 checkpoint 与中断恢复",
+        "实现人工介入、会话隔离和幂等副作用",
+        "接入只读 MCP 工具与技能；验证访问边界",
+        "同预算对照单 Agent 与多 Agent，分析协作收益"
+      ],
+      "acceptance": "故障可恢复，用户数据隔离；同预算消融证明架构的价值与边界。"
+    },
+    {
+      "id": "coding",
+      "number": "03",
+      "title": "受控 Coding Agent",
+      "subtitle": "SOFTWARE ENGINEERING AGENT",
+      "description": "阅读最小执行内核，搭建有沙箱、有测试、有回放轨迹的代码修复实验。",
+      "tags": [
+        "mini-SWE-agent",
+        "Sandbox",
+        "执行式 Grader"
+      ],
+      "difficulty": "专题实践",
+      "weeks": "W08 — W10",
+      "accent": "orange",
+      "resources": [
+        "mini-swe-agent",
+        "openhands",
+        "eval-swebench",
+        "eval-terminalbench"
+      ],
+      "milestones": [
+        "阅读执行循环，描述工具接口与停止条件",
+        "在隔离环境运行少量固定版本任务",
+        "记录补丁、测试结果与完整 trace，分析失败",
+        "比较工具/上下文改动，公开实验范围与成本"
+      ],
+      "acceptance": "以实际测试判定修复成功；固定 harness/任务版本；结果可以被复现。"
+    },
+    {
+      "id": "evalops",
+      "number": "04",
+      "title": "Agent EvalOps 工作台",
+      "subtitle": "MEASURE · SHIP · ITERATE",
+      "description": "围绕自己的 Agent 建立评测、回归、成本与稳定性闭环，形成面试作品。",
+      "tags": [
+        "Eval Runner",
+        "Tracing",
+        "部署与回归"
+      ],
+      "difficulty": "产品交付",
+      "weeks": "W07 / W11 — W12",
+      "accent": "blue",
+      "resources": [
+        "demystifying-evals",
+        "openai-evals",
+        "career-tencent-agentinfra",
+        "career-openai-evals"
+      ],
+      "milestones": [
+        "建立执行/模型/人工 grader 与失败分类",
+        "保存版本、运行次数、方差、成本与 p95 延迟",
+        "加入异步队列、并发限流、容器化与回归检查",
+        "整理架构、失败、优化证据与项目答辩材料"
+      ],
+      "acceptance": "指标定义明确且可重复；能定位回归；有运维手册与两个项目 case study。"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "category": "原理",
+      "title": "Agent 与固定工作流的边界是什么？",
+      "rubric": [
+        "从控制权与动态决策解释两者。",
+        "结合一个任务说明自治何时值得引入。",
+        "讨论可预测性、成本与评测方式。"
+      ]
+    },
+    {
+      "id": "q2",
+      "category": "原理",
+      "title": "写出工具调用循环的状态与停止条件。",
+      "rubric": [
+        "区分模型消息、工具请求与执行结果。",
+        "处理多工具、schema 错误和异常。",
+        "限制步数、时间、token，避免无限重试。"
+      ]
+    },
+    {
+      "id": "q3",
+      "category": "原理",
+      "title": "ReAct 的关键机制是什么？如何验证它的价值？",
+      "rubric": [
+        "描述行动与观察如何影响下一次决策。",
+        "对照无工具/固定流程基线，控制预算。",
+        "分析工具环境和任务定义，而不只背论文成绩。"
+      ]
+    },
+    {
+      "id": "q4",
+      "category": "原理",
+      "title": "长任务上下文为什么会失效？",
+      "rubric": [
+        "区分遗漏、干扰、陈旧状态与长度约束。",
+        "说明摘要、检索记忆和外部状态的取舍。",
+        "设计长任务评测与消融。"
+      ]
+    },
+    {
+      "id": "q5",
+      "category": "原理",
+      "title": "长期记忆如何写入、更新和遗忘？",
+      "rubric": [
+        "定义事实来源、时间、置信度与用户隔离。",
+        "控制写入门槛和污染；允许修正与删除。",
+        "检验记忆是否帮助而非增加偏差。"
+      ]
+    },
+    {
+      "id": "q6",
+      "category": "原理",
+      "title": "MCP 与 A2A 各解决什么问题？",
+      "rubric": [
+        "工具/数据连接与 Agent 间协作分别解释。",
+        "描述 client/server 与远程任务生命周期。",
+        "说明鉴权、版本和信任边界。"
+      ]
+    },
+    {
+      "id": "q7",
+      "category": "算法",
+      "title": "如何设计混合检索与 rerank 实验？",
+      "rubric": [
+        "固定数据集与查询划分；定义相关性。",
+        "对比关键词、向量、混合和重排。",
+        "同时分析召回、排序、延迟与成本。"
+      ]
+    },
+    {
+      "id": "q8",
+      "category": "算法",
+      "title": "如何区分 RAG 检索错误与生成错误？",
+      "rubric": [
+        "先评估证据是否被召回。",
+        "再检查答案是否忠实使用证据。",
+        "给出引用、拒答和端到端指标。"
+      ]
+    },
+    {
+      "id": "q9",
+      "category": "算法",
+      "title": "工具学习的 SFT 与 RL 如何比较？",
+      "rubric": [
+        "定义训练样本、动作与执行反馈。",
+        "解释奖励稀疏、信用分配与数据质量。",
+        "设计开发/测试划分与成本可承受的实验。"
+      ]
+    },
+    {
+      "id": "q10",
+      "category": "算法",
+      "title": "如何评价 DSPy 优化是否泛化？",
+      "rubric": [
+        "固定 program、数据划分与优化预算。",
+        "对照人工提示与未优化基线。",
+        "用保留集与多次运行检验收益和方差。"
+      ]
+    },
+    {
+      "id": "q11",
+      "category": "算法",
+      "title": "规划搜索何时适合 Agent？",
+      "rubric": [
+        "比较贪心执行、plan-and-execute 与搜索。",
+        "定义状态、动作、启发式和预算。",
+        "说明状态空间、工具反馈与搜索成本。"
+      ]
+    },
+    {
+      "id": "q12",
+      "category": "算法",
+      "title": "反思机制为什么可能降低成功率？",
+      "rubric": [
+        "分析错误反馈、自证偏差与记忆污染。",
+        "区分额外尝试带来的收益与反思本身。",
+        "做同预算消融并保留失败案例。"
+      ]
+    },
+    {
+      "id": "q13",
+      "category": "工程",
+      "title": "异步工具调用如何控制并发与限流？",
+      "rubric": [
+        "区分 I/O 与 CPU 工作。",
+        "设计 semaphore、队列、超时和退避。",
+        "处理取消传播、部分失败和资源释放。"
+      ]
+    },
+    {
+      "id": "q14",
+      "category": "工程",
+      "title": "如何做到工具副作用幂等？",
+      "rubric": [
+        "定义任务/动作标识与幂等键。",
+        "分离规划与执行，保存执行状态。",
+        "处理超时后结果未知与重复提交。"
+      ]
+    },
+    {
+      "id": "q15",
+      "category": "工程",
+      "title": "checkpoint 与恢复需要保存什么？",
+      "rubric": [
+        "保存消息、状态、版本、任务与工具结果。",
+        "解释恢复边界与副作用去重。",
+        "用故障注入验证恢复和隔离。"
+      ]
+    },
+    {
+      "id": "q16",
+      "category": "工程",
+      "title": "如何设计 Agent 的 trace？",
+      "rubric": [
+        "记录任务、模型/工具 span、时间与状态。",
+        "保留版本、成本和错误分类。",
+        "脱敏输入，支持失败回放和关联日志。"
+      ]
+    },
+    {
+      "id": "q17",
+      "category": "工程",
+      "title": "不可信网页内容如何影响工具权限？",
+      "rubric": [
+        "将网页内容视为数据，分析注入路径。",
+        "隔离凭据、限制工具能力与写操作。",
+        "在必要执行点人工确认并记录审计。"
+      ]
+    },
+    {
+      "id": "q18",
+      "category": "工程",
+      "title": "如何优化成功率、成本与 p95 延迟？",
+      "rubric": [
+        "先定义任务价值与可接受预算。",
+        "定位模型、检索、工具和队列瓶颈。",
+        "用缓存、并发、路由与预算控制做对照。"
+      ]
+    },
+    {
+      "id": "q19",
+      "category": "评测",
+      "title": "如何设计 task grader？",
+      "rubric": [
+        "优先检查实际结果与业务约束。",
+        "区分代码、模型与人工判定。",
+        "校验误判，避免只匹配单一措辞。"
+      ]
+    },
+    {
+      "id": "q20",
+      "category": "评测",
+      "title": "pass@k 与任务可靠性有什么区别？",
+      "rubric": [
+        "说明多次中至少一次成功与重复稳定成功的差别。",
+        "固定采样与运行次数，报告方差。",
+        "讨论产品一次执行时的风险与成本。"
+      ]
+    },
+    {
+      "id": "q21",
+      "category": "评测",
+      "title": "提示词升级后如何发现回归？",
+      "rubric": [
+        "冻结任务集、环境与基线版本。",
+        "对比整体指标和任务类别分布。",
+        "回放失败，形成回归样本与回滚条件。"
+      ]
+    },
+    {
+      "id": "q22",
+      "category": "评测",
+      "title": "模型评委为什么需要校准？",
+      "rubric": [
+        "分析位置、风格、长度与模型偏好。",
+        "用人工标注样本检查一致性与误判。",
+        "在关键结果上结合执行式检查。"
+      ]
+    },
+    {
+      "id": "q23",
+      "category": "系统设计",
+      "title": "设计一个有引用的企业知识助手。",
+      "rubric": [
+        "需求、权限与知识更新先于模型选型。",
+        "描述检索、重排、生成、引用与评测链路。",
+        "处理多租户、成本、降级和可观测性。"
+      ]
+    },
+    {
+      "id": "q24",
+      "category": "系统设计",
+      "title": "设计可持续运行的研究 Agent。",
+      "rubric": [
+        "拆分任务状态、执行器与工具服务。",
+        "设计队列、checkpoint、取消和预算。",
+        "分析长上下文、重复行动与质量验证。"
+      ]
+    },
+    {
+      "id": "q25",
+      "category": "系统设计",
+      "title": "设计一个多 Agent 审查系统。",
+      "rubric": [
+        "定义角色、共享数据与冲突解决。",
+        "与单 Agent/固定流程作同预算比较。",
+        "处理失败传播、通信开销与权限。"
+      ]
+    },
+    {
+      "id": "q26",
+      "category": "系统设计",
+      "title": "设计 Coding Agent 的执行环境。",
+      "rubric": [
+        "定义沙箱、文件/网络权限和凭据边界。",
+        "测试作为结果验证，固定仓库与任务版本。",
+        "记录补丁、日志、资源上限与回放。"
+      ]
+    },
+    {
+      "id": "q27",
+      "category": "项目复盘",
+      "title": "用一个失败案例说明你的技术判断。",
+      "rubric": [
+        "给出具体任务、失败轨迹与指标。",
+        "解释定位过程、被否定的假设和改动。",
+        "讲清复验、残余问题与下一次实验。"
+      ]
+    },
+    {
+      "id": "q28",
+      "category": "项目复盘",
+      "title": "为什么选这个框架？替代方案如何比较？",
+      "rubric": [
+        "从任务、团队、部署与控制要求出发。",
+        "给出最小实现与替代框架的证据。",
+        "说明版本锁定、迁移成本与边界。"
+      ]
+    },
+    {
+      "id": "q29",
+      "category": "项目复盘",
+      "title": "你的作品如何证明从算法到产品的能力？",
+      "rubric": [
+        "展示数据、代码、评测与部署链路。",
+        "用真实成功率/成本/时延解释迭代。",
+        "说明用户问题、技术取舍与维护方式。"
+      ]
+    },
+    {
+      "id": "q30",
+      "category": "项目复盘",
+      "title": "接下来一次实验，你会优先验证什么？",
+      "rubric": [
+        "从失败分布与产品价值选择假设。",
+        "定义基线、变量、预算与停止条件。",
+        "写出可否证的结论与后续动作。"
+      ]
+    }
+  ],
+  "guides": [
+    {
+      "id": "agent-loop",
+      "title": "把 Agent 拆成一个可解释的循环",
+      "subtitle": "从机制出发，理解框架为你承担了什么。",
+      "tag": "机制笔记",
+      "minutes": 6,
+      "refs": [
+        "paper-react",
+        "effective-agents",
+        "openai-agents"
+      ],
+      "sections": [
+        [
+          "问题",
+          "当一个任务需要查询、执行和根据结果继续决策时，单次文本生成不再足够。先把状态、动作和观察记录清楚，才能知道系统为什么成功或失败。"
+        ],
+        [
+          "实践路径",
+          "用你熟悉的 Python 写一个小循环：接收目标，调用模型，验证工具参数，执行工具，追加结果，检查停止条件。为模型和工具分别设定错误处理，为总任务设置预算。"
+        ],
+        [
+          "验证方法",
+          "选择五个正常任务与五个错误场景。检查错误参数、空结果、超时和重复行动。比较原生实现与框架实现时，保持模型、任务和预算一致。"
+        ],
+        [
+          "留下什么",
+          "一段可运行代码、一条正常轨迹、一条失败轨迹，以及关于状态、权限和停止条件的说明。"
+        ]
+      ]
+    },
+    {
+      "id": "context",
+      "title": "上下文工程：把信息送到需要它的地方",
+      "subtitle": "用消融实验选择记忆，而不靠越来越长的提示词。",
+      "tag": "工程方法",
+      "minutes": 7,
+      "refs": [
+        "context-engineering",
+        "paper-reflexion",
+        "deep-agents"
+      ],
+      "sections": [
+        [
+          "问题",
+          "长任务中的信息既可能被遗漏，也可能已经过时。把所有历史永久塞回模型，往往难以解释成本和错误来自哪里。"
+        ],
+        [
+          "实践路径",
+          "为同一任务比较全历史、摘要、检索记忆三种方案。外部状态保留精确事实，检索只带回当前需要的证据。为记忆加入来源、时间、所属用户和更新规则。"
+        ],
+        [
+          "验证方法",
+          "构造跨步骤约束、冲突事实和用户隔离任务。记录成功率、token、时间以及每次错用或丢失信息的轨迹。"
+        ],
+        [
+          "留下什么",
+          "一张消融结果表、一个记忆污染样本、一次删除/修正记录，以及你选择当前策略的理由。"
+        ]
+      ]
+    },
+    {
+      "id": "evals",
+      "title": "Agent 评测：演示之后，证据之前",
+      "subtitle": "结果、过程与成本一起看，才能解释系统质量。",
+      "tag": "评测实践",
+      "minutes": 8,
+      "refs": [
+        "demystifying-evals",
+        "openai-evals",
+        "eval-tau-family"
+      ],
+      "sections": [
+        [
+          "问题",
+          "一个漂亮的演示只覆盖一次任务执行。Agent 的随机性、工具环境与多步骤失败，需要更明确的任务定义和评判方法。"
+        ],
+        [
+          "实践路径",
+          "先定义真实任务和可检查结果，再设计 grader。保留执行轨迹辅助定位，但不要把轨迹好看当作完成任务。模型评委适合部分开放问题，关键副作用尽量使用执行式检查。"
+        ],
+        [
+          "验证方法",
+          "冻结数据划分、模型、提示、工具和环境版本。重复运行，记录结果分布、成本和时延；抽取部分样本进行人工校验。"
+        ],
+        [
+          "留下什么",
+          "一个可复现 eval runner、grader 文档、失败分类和回归报告。把自己跑过的结果与来源论文结果分开记录。"
+        ]
+      ]
+    },
+    {
+      "id": "protocols",
+      "title": "MCP 与 A2A：连接工具，也连接协作",
+      "subtitle": "沿着系统边界理解协议，不把名词堆成架构。",
+      "tag": "协议地图",
+      "minutes": 6,
+      "refs": [
+        "mcp",
+        "a2a",
+        "agent-skills"
+      ],
+      "sections": [
+        [
+          "问题",
+          "工具接入和不同 Agent 之间的任务协作，都需要契约，但它们传递的对象和管理的生命周期不同。"
+        ],
+        [
+          "实践路径",
+          "先实现只读 MCP 资料工具，再让两个独立服务完成一次协作实验。画出谁发现能力、谁执行任务、谁保存状态，以及谁拥有数据。"
+        ],
+        [
+          "验证方法",
+          "测试参数错误、协议版本变化、权限不足和服务中断。记录每次请求与最终任务状态，避免把连接成功等同于协作正确。"
+        ],
+        [
+          "留下什么",
+          "一张边界图、最小服务器与客户端、错误测试，以及版本与鉴权说明。"
+        ]
+      ]
+    },
+    {
+      "id": "frameworks",
+      "title": "框架选型：先有问题，再有工具",
+      "subtitle": "用同一个任务比较，而不是用热度决定投入。",
+      "tag": "技术判断",
+      "minutes": 5,
+      "refs": [
+        "langgraph",
+        "openai-agents",
+        "microsoft-agent-framework",
+        "autogen"
+      ],
+      "sections": [
+        [
+          "问题",
+          "框架解决的层次不同：模型/工具构件、状态编排、长任务执行环境、可视化应用。先定义需求，才知道抽象是否合适。"
+        ],
+        [
+          "实践路径",
+          "选择一个代表任务，列出状态、恢复、人工介入、部署和可观测性需求。先做最小原生基线，再尝试两个替代实现。"
+        ],
+        [
+          "验证方法",
+          "记录实现复杂度、错误可定位程度、版本依赖与迁移成本。维护状态变化要回到官方仓库确认。"
+        ],
+        [
+          "留下什么",
+          "一页决策记录：选择、替代方案、证据、风险和下一次复核日期。"
+        ]
+      ]
+    },
+    {
+      "id": "portfolio",
+      "title": "把学习记录变成能答辩的作品",
+      "subtitle": "让代码、失败与指标串成一条可信的能力证据。",
+      "tag": "职业准备",
+      "minutes": 6,
+      "refs": [
+        "career-openai-evals",
+        "career-anthropic-evals",
+        "career-baidu-agent"
+      ],
+      "sections": [
+        [
+          "问题",
+          "读过课程和用过框架很难说明工程深度。面试准备需要解释具体问题、实现路径、真实结果和技术取舍。"
+        ],
+        [
+          "实践路径",
+          "为两个项目分别保留需求、架构、环境、基线、实验、失败、部署和后续计划。每次学习日志都对应一个可验证的问题。"
+        ],
+        [
+          "验证方法",
+          "找一个人按复现说明运行代码，再做一次 20 分钟答辩。把无法解释的结果转成下一次实验，而不补上未经验证的结论。"
+        ],
+        [
+          "留下什么",
+          "两个 case study、一份评测报告、一段可恢复运行演示，以及能讲清的失败案例。"
+        ]
+      ]
+    }
+  ],
+  "findings": [
+    "AutoGen 官方 README 已明确维护模式，并建议新用户采用 Microsoft Agent Framework。",
+    "SWE-agent 官方 README 已明确主要开发转向 mini-SWE-agent，并建议默认选用后者。",
+    "LangChain 提供 create_agent 高层入口；LangGraph 提供底层有状态编排；Deep Agents 在其上增加文件系统、上下文管理和子 Agent 等能力。",
+    "MCP 面向 AI 应用与外部工具/数据的连接，A2A 面向 Agent 间协作，两者互补。",
+    "OpenHands 当前需区分 Agent Canvas 仓库与 software-agent-sdk；学习执行内核优先阅读 SDK。",
+    "Coze Studio 开源版与 Coze 商业产品能力存在差异，不应承诺完全等价。",
+    "AG2 与 Microsoft AutoGen 属于不同主线；AG2 新版与 Classic 的 API 不兼容，学习与迁移需固定版本。",
+    "Letta 当前官方源码指向 letta-code；阅读记忆与执行实现时注意仓库演进。",
+    "Agent Lightning 已重构到新的主线；RL 教程与代码必须匹配版本。"
+  ],
+  "careerEvidence": [
+    {
+      "company": "OpenAI",
+      "role": "Research Engineer, Frontier Evals & Environments",
+      "url": "https://openai.com/careers/research-engineer-frontier-evals-and-environments-san-francisco/",
+      "verification": "直接打开官方岗位正文；阅读职责和任职偏好。",
+      "statedRequirements": [
+        "机器学习、软件、系统或统计等技术基础",
+        "LLM、强化学习、后训练、evals、graders、合成数据、代码/工具Agent或生产ML等动手经验",
+        "把模糊模型行为问题变成实验、流水线、结果分析",
+        "跨研究、产品、数据、基础设施与安全团队沟通"
+      ],
+      "statedResponsibilities": [
+        "构建RL环境",
+        "研究评测可扩展性、可靠性与方差",
+        "持续评测系统",
+        "自改进反馈闭环"
+      ],
+      "learningInference": "训练作品应包含问题定义、可运行环境、grader、重复评测与误差分析。这是学习建议，不是该公司公开面试题。"
+    },
+    {
+      "company": "Anthropic",
+      "role": "Research Engineer, Post-Training Model Evaluations",
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5198255008",
+      "verification": "由 Anthropic 官方职位列表点击进入官方Greenhouse职位并直接读取正文。",
+      "statedRequirements": [
+        "设计、运行、分析大规模ML评测的经验",
+        "强Python与生产系统能力",
+        "测量质量意识",
+        "复杂且时效敏感问题的debug与建议能力"
+      ],
+      "statedPlusQualifications": [
+        "LLM后训练经验",
+        "ML评测或benchmark研究",
+        "统计与实验设计",
+        "鲁棒评测指标设计"
+      ],
+      "statedResponsibilities": [
+        "优化评测组合",
+        "实时监测训练评测",
+        "调查模型回归",
+        "质量仪表盘、告警和报告"
+      ],
+      "learningInference": "项目中保留基线、版本、置信区间/方差、回归案例和报告，能展示比单次跑分更完整的能力。"
+    },
+    {
+      "company": "百度",
+      "role": "北京-智能体算法工程师(J101017)",
+      "url": "https://talent.baidu.com/jobs/detail/GRADUATE/02f73086-be71-4d09-8d6e-f1c6981b8b48",
+      "verification": "直接打开官方页面并读取完整职责与要求；页面标注2026-07-21，校招。",
+      "statedRequirements": [
+        "本科及以上相关专业",
+        "理解ReAct、CoT、Plan-and-Execute等Agent原理",
+        "PyTorch、LangChain、AutoGen等框架能力",
+        "从算法设计到工程落地",
+        "大模型技术原理与快速落地研究成果",
+        "业务理解、自驱与跨团队沟通"
+      ],
+      "statedResponsibilities": [
+        "自主规划、复杂推理、动态决策",
+        "意图、工具、长短记忆、多Agent模块",
+        "效果、效率、资源成本一体评估",
+        "从技术验证到业务落地"
+      ],
+      "statedPlusQualifications": [
+        "早期智能体产品建设",
+        "相关顶会论文",
+        "竞赛获奖",
+        "知名开源核心贡献"
+      ],
+      "learningInference": "可用论文复现 + 项目部署 + 效果/效率/成本对照说明端到端能力；不能把优先项解读为所有候选人的硬性门槛。"
+    },
+    {
+      "company": "腾讯",
+      "role": "混元Agent强化学习框架工程师（深圳/北京/上海）",
+      "url": "https://careers.tencent.com/jobdesc.html?postId=2061654749727600640",
+      "verification": "直接打开官方网页成功但文本为JS空壳；全文依据web搜索返回的官方页面索引，不是登录后页面实测。索引标注2026-09-30。",
+      "statedRequirements": [
+        "Python、Asyncio与并发",
+        "模型/工具调用、上下文、任务、Trace、结果评估链路",
+        "Kubernetes和容器集群的开发部署排障/优化",
+        "预训练、SFT、RLHF、RL或自动评估至少一类基础",
+        "模块化、测试、日志、性能和稳定性治理"
+      ],
+      "statedResponsibilities": [
+        "研究用Agent框架",
+        "RL、数据生成、自动评估、实验复现",
+        "统一调用、上下文、日志、评测组件",
+        "稳定性、并发与行为一致性"
+      ],
+      "learningInference": "Agent基础设施路线应补异步/并发、容器、trace、队列、恢复和测试；不要只收集框架API用法。"
+    }
+  ],
+  "careerEntrypoints": [
+    {
+      "company": "ByteDance Seed",
+      "url": "https://seed.bytedance.com/zh/career",
+      "verified": "直接读取官方页面，可见Code Agent、通用Agent、强化学习算法工程师等职位名称，社招北京/上海；未取得动态投递按钮后的详细JD。",
+      "limit": "仅支持方向存在，不能据名称推出具体任职要求或面试题。"
+    },
+    {
+      "company": "阿里巴巴",
+      "url": "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100016800012",
+      "verified": "官方页面索引显示智能引擎-AI应用研发工程师-杭州；直接打开被工具拒绝，尚无完整动态页面实测。",
+      "limit": "索引包含Agent编排/infra、工具链、知识库、系统基础、Java/Python/C++、RAG/LangChain实践优先；可作二次核验入口，暂不算完整核验岗位。"
+    }
+  ],
+  "communityPolicy": "GitHub/HF/Reddit/X/B站/知乎可用于发现项目和争议；引用技术事实应回到原论文、官方文档、作者代码或自己可复现数据。本轮实际打开GitHub Discussions、HF Papers/论坛与Reddit LocalLLaMA，未声称已全面抓取社交平台。",
+  "legacy": [
+    {
+      "title": "Greedy Algorithm",
+      "url": "/glSu/0.html",
+      "tag": "算法学习"
+    },
+    {
+      "title": "DataBase",
+      "url": "/glSu/9017cb46.html",
+      "tag": "数据库"
+    },
+    {
+      "title": "Hello World",
+      "url": "/glSu/4a17b156.html",
+      "tag": "博客搭建"
+    }
+  ]
+}
