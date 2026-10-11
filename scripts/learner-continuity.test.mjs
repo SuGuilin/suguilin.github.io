@@ -1,0 +1,77 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {defaultState} from '../assets/state.js';
+import {newProgress,recordReview,beginRecall} from '../assets/study-model.js';
+import {learningAction,dailyLearningQueue} from '../assets/learning-cycle.js';
+import {questionWithContext,saveStudySnapshot} from '../assets/study-session.js';
+import {questionNoteParts,journalTitle,journalReadingBody,noteDiscussion,noteLearningLink,filterJournal,journalScope} from '../assets/journal-model.js';
+import {resourceLearningUnit} from '../assets/catalog-view.js';
+import {StudyWorkspace} from '../assets/study.js';
+import {LearningPlatform} from '../assets/platform.js';
+import {saveAnnotation} from '../assets/learning-signals.js';
+const units=JSON.parse(await readFile('content/study-units.json','utf8')).units;
+const unit=units[0],now=new Date('2026-10-11T08:00:00Z');
+
+test('Continue actions target the saved reading position, unassessed practice or an independent recall',()=>{
+  assert.equal(learningAction(unit,null).label,'开始学习');
+  const reading={...newProgress(unit),readingSection:'chapter-2'};
+  assert.match(learningAction(unit,reading).url,/#chapter-2$/);
+  const checking={...reading,answers:[{id:'e1',text:'我的推理'}]};
+  assert.equal(learningAction(unit,checking).label,'继续自检');
+  assert.match(learningAction(unit,checking).url,/#study-practice$/);
+  const reviewed=recordReview(checking,'hard',15,now);
+  assert.match(learningAction(unit,reviewed,{now:new Date('2026-10-13T08:00:00Z')}).url,/mode=recall#study-practice$/);
+  assert.equal(learningAction(unit,beginRecall(reviewed,now)).label,'继续复习');
+});
+
+test('Question summaries fold only generated context; editing and backups retain the full original and user additions',()=>{
+  const question='检查点是否也保存外部副作用？';
+  const note=saveStudySnapshot(defaultState(),unit,newProgress(unit),{question:questionWithContext(question,unit),section:'exercise-e1',now,id:'question'}).note;
+  note.body+='\n\n## 后续理解\n\n需要查询远端操作。';
+  const original=note.body,parts=questionNoteParts(note);
+  assert.equal(parts.question,question);assert.match(parts.context,/关键要点/);
+  assert.ok(!parts.body.includes('关键要点'));assert.match(parts.body,/后续理解/);
+  assert.equal(note.body,original);assert.equal(journalTitle(note),question);
+  assert.ok(!journalReadingBody(note).includes(question));assert.match(journalReadingBody(note),/后续理解/);assert.equal(note.body,original);
+  const context=noteDiscussion(note,unit);
+  assert.equal(context.question,question);assert.equal(context.journalNoteId,note.id);assert.equal(context.section,'exercise-e1');
+  assert.equal(noteLearningLink(note).id,unit.id);
+  const custom={...note,body:'## 待解答的问题\n\n自己的说明\n\n---\n学习单元：我的格式\n关键要点：\n用户自己的正文'};
+  assert.equal(questionNoteParts(custom).body,custom.body);assert.equal(questionNoteParts(custom).context,'');
+  assert.equal(noteLearningLink({...note,body:'[外部](https://example.org/study/?id=lesson-a)'}),null);
+});
+
+test('Today recommendations use the remaining time after recorded learning, without altering stored budgets or backend models',()=>{
+  const reviewed=recordReview({...newProgress(unit),answers:[{id:'e1',text:'回答'}]},'hard',30,now);
+  const s={...defaultState(),dailyMinutes:45,studyProgress:[reviewed]};
+  assert.ok(dailyLearningQueue(s,units,now).reduce((n,q)=>n+q.minutes,0)<=15);
+  assert.equal(s.dailyMinutes,45);
+  s.dailyMinutes=30;assert.deepEqual(dailyLearningQueue(s,units,now),[]);
+});
+
+test('Per-unit journals include annotations and snapshots without mixing drafts from other units',()=>{
+  const mark=saveAnnotation(defaultState(),unit,{section:'study-essentials',quote:'状态恢复的边界'},{now,id:'mark'}).note;
+  const note=saveStudySnapshot(defaultState(),units[1],{...newProgress(units[1]),reflection:'另一篇的理解'},{now,id:'other'}).note;
+  assert.deepEqual(filterJournal([mark,note],{unit:unit.id}).map(n=>n.id),[mark.id]);
+  assert.equal(journalScope(new URLSearchParams('new=1&unit='+unit.id)),'unit:'+unit.id);
+  assert.notEqual(journalScope(new URLSearchParams('new=1&unit='+unit.id)),journalScope(new URLSearchParams('new=1&unit='+units[1].id)));
+  const platform=Object.create(LearningPlatform.prototype);
+  platform.context={studyUnit:unit,journalNoteId:mark.id};
+  assert.equal(platform.draftKey(),'journal:'+mark.id);
+});
+
+test('Reference material enters a genuinely related unit through an exact source, never just a shared tag',()=>{
+  const source={id:'source',url:'https://example.org/source',tags:['Harness']},related={id:'related',source:{url:source.url}};
+  assert.equal(resourceLearningUnit(source,[related]),related);
+  assert.equal(resourceLearningUnit(source,[{id:'other',source:{url:'https://example.org/other'},tags:['Harness']}]),undefined);
+  assert.equal(resourceLearningUnit(source,[{...related,id:'lesson'}],[{id:'lesson',sources:[{url:source.url}]}]).id,'lesson');
+});
+
+test('An empty plan offers learning without empty calendars; existing work is not duplicated in needs',()=>{
+  const s=defaultState(),workspace=Object.assign(Object.create(StudyWorkspace.prototype),{getState:()=>s,getCurated:()=>units,getData:()=>({resources:[]})});
+  const empty=workspace.plan();assert.match(empty,/开始学习/);assert.ok(!empty.includes('plan-calendar'));assert.ok(!empty.includes('learning-needs'));assert.ok(!empty.includes('learning-queue'));
+  s.studyProgress=[{...newProgress(unit),answers:[{id:'e1',text:'独立作答'}]}];
+  const active=workspace.plan();assert.match(active,/继续自检/);assert.ok(!active.includes('待自检</span>'));
+  assert.match(active,/<details class="plan-details plan-schedule"/);
+});

@@ -1,5 +1,6 @@
-import {dayKey} from './study-model.js';
+import {dayKey,dailyQueue} from './study-model.js';
 import {noteUnitId,readAnnotation} from './learning-signals.js';
+import {journalTitle} from './journal-model.js';
 
 // These are observable records, never a mastery score or an inferred ability.
 export function learningStage(progress, now=new Date()) {
@@ -13,6 +14,18 @@ export function learningStage(progress, now=new Date()) {
 export function learningURL(unit, progress, {review=false,section=''}={}) {
   return '/study/?id='+encodeURIComponent(unit.id)+(review||progress?.recall?'&mode=recall':'')+(section?'#'+section:'');
 }
+export function learningAction(unit,progress,{review=false,now=new Date()}={}){
+  const stage=learningStage(progress,now);
+  if(stage.id==='recalling')return {url:learningURL(unit,progress,{section:'study-practice'}),label:'继续复习',stage};
+  if(review||stage.id==='due')return {url:learningURL(unit,progress,{review:true,section:'study-practice'}),label:'开始复习',stage};
+  if(stage.id==='checking')return {url:learningURL(unit,progress,{section:'study-practice'}),label:'继续自检',stage};
+  return {url:learningURL(unit,progress,{section:progress?.readingSection||''}),label:progress?'继续阅读':'开始学习',stage};
+}
+export function dailyLearningQueue(state,units,now=new Date(),resources=[]){
+  const today=dayKey(now),spent=state.studyProgress.flatMap(p=>p.history).filter(h=>dayKey(new Date(h.at))===today).reduce((n,h)=>n+h.minutes,0);
+  const remaining=Math.max(0,state.dailyMinutes-spent);
+  return remaining?dailyQueue({...state,dailyMinutes:remaining},units,now,resources):[];
+}
 export function learningNeeds(state, units, now=new Date()) {
   const byId=new Map(units.map(u=>[u.id,u])),today=dayKey(now),needs=[];
   const add=(kind,title,detail,url,key)=>needs.push({kind,title,detail,url,key});
@@ -25,7 +38,7 @@ export function learningNeeds(state, units, now=new Date()) {
   }
   for(const n of state.notes){
     const u=byId.get(noteUnitId(n));
-    if(n.kind==='待解答问题')add('question',n.title,'回看上下文，继续讨论；理解后补上解释与验证结果。','/journal/?id='+n.id,n.id);
+    if(n.kind==='待解答问题')add('question',journalTitle(n),'回看问题，继续提问或补充理解。','/journal/?id='+n.id,n.id);
     else if(readAnnotation(n)&&u&&!state.studyProgress.some(p=>p.id===u.id&&(p.history.length||p.answers.some(a=>a.text.trim())))){
       if(!needs.some(x=>x.kind==='practice'&&x.key===u.id))add('practice',u.title,'有标注和想法，还可以选一道题检验自己的理解。',learningURL(u,null,{section:'study-practice'}),u.id);
     }else if(n.kind==='资料收件箱'&&!u&&!/\[阅读与练习\]\(\/study\//.test(n.body))add('source',n.title,'保留了来源线索，还没有整理成可学习的要点和练习。','/journal/?id='+n.id+'&kind=inbox',n.id);

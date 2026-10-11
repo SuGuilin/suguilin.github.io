@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-content-version="1e23de9e6f06" lang="zh-CN">
+<html data-content-version="d20446543960" lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,12 +8,12 @@
   <title>学习助手 · SuGuilin</title>
   <link rel="canonical" href="https://suguilin.github.io/assistant/">
   <link rel="icon" type="image/svg+xml" href="/assets/mark.svg">
-  <link rel="stylesheet" href="/assets/workspace.css?v=1e23de9e6f06">
-  <link rel="stylesheet" href="/assets/product.css?v=1e23de9e6f06">
-  <link rel="stylesheet" href="/assets/experience.css?v=1e23de9e6f06">
-  <link rel="stylesheet" href="/assets/reader.css?v=1e23de9e6f06">
-  <link rel="stylesheet" href="/assets/workflow.css?v=1e23de9e6f06">
-  <script type="module" src="/assets/app.js?v=1e23de9e6f06"></script>
+  <link rel="stylesheet" href="/assets/workspace.css?v=d20446543960">
+  <link rel="stylesheet" href="/assets/product.css?v=d20446543960">
+  <link rel="stylesheet" href="/assets/experience.css?v=d20446543960">
+  <link rel="stylesheet" href="/assets/reader.css?v=d20446543960">
+  <link rel="stylesheet" href="/assets/workflow.css?v=d20446543960">
+  <script type="module" src="/assets/app.js?v=d20446543960"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -21,10 +21,9 @@
     <aside class="sidebar" id="sidebar" aria-label="工作台导航">
       <a href="/" class="brand" data-nav aria-label="SuGuilin 工作台首页">
         <img src="/assets/mark.svg" width="36" height="36" alt="">
-        <span>SuGuilin<small>个人研究与学习</small></span>
+        <span>SuGuilin<small>Agent 学习工作台</small></span>
       </a>
       <div class="sidebar-navigation">
-      <div class="workspace-label"><span class="status-dot"></span> 个人学习工作台 <span class="version">v3.0</span></div>
       <nav class="primary-nav" aria-label="主要页面">
         <span class="nav-caption">学习工作区</span>
         <a href="/" data-nav data-route="home"><span data-icon="grid"></span>总览</a>
@@ -47,7 +46,6 @@
       </nav>
       </div>
       <div class="sidebar-bottom">
-        <div class="sidebar-note"><span data-icon="spark"></span><p>学得更深，做得更实。<small>Build. Measure. Understand.</small></p></div>
         <a class="profile" id="account-entry" href="/account/" data-nav><span class="avatar">SG</span><span>SuGuilin<small><span data-sync-label>本机保存</span></small></span><span data-icon="chevron"></span></a>
       </div>
     </aside>
@@ -57,8 +55,8 @@
         <div class="topbar-start"><button class="icon-button mobile-menu" id="mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><span data-icon="menu"></span></button><span class="breadcrumb">工作台 <span>/</span> <strong id="breadcrumb-title">学习助手</strong></span></div>
         <div class="topbar-actions"><button class="topbar-assistant" data-platform="assistant" aria-label="向学习助手提问"><span data-icon="spark"></span><span>学习助手</span></button><button id="open-search" class="search-trigger" aria-label="搜索全站"><span data-icon="search"></span><span>搜索知识、框架、问题…</span><kbd>⌘ K</kbd></button><button class="icon-button" id="theme-toggle" aria-label="切换深色模式"><span data-icon="sun"></span></button><a href="/journal/?new=1" class="button button-dark button-small" data-nav aria-label="记录学习"><span data-icon="plus"></span><span>记录学习</span></a></div>
       </header>
-      <main id="main" tabindex="-1"><div class="loading-view"><span class="eyebrow">SUGUILIN / AGENT WORKSPACE</span><h1>学习助手</h1><p>围绕课程、源码和实验向 AI 提问，记录与保存对话。</p><p class="loading-label">正在载入工作台…</p><noscript><p>互动工作台需要启用 JavaScript。你仍可以访问<a href="/blog/">历史博客</a>和<a href="https://github.com/SuGuilin/suguilin.github.io/tree/main/content">公开学习资料</a>。</p></noscript></div></main>
-      <footer class="page-footer"><span>© SuGuilin · Learn in public. Build with evidence.</span><a href="https://github.com/SuGuilin/suguilin.github.io" target="_blank" rel="noopener noreferrer">GitHub <span data-icon="external"></span></a></footer>
+      <main id="main" tabindex="-1"><div class="loading-view"><h1>学习助手</h1><p>围绕课程、源码和实验向 AI 提问，记录与保存对话。</p><p class="loading-label">正在载入工作台…</p><noscript><p>互动工作台需要启用 JavaScript。你仍可以访问<a href="/blog/">历史博客</a>和<a href="https://github.com/SuGuilin/suguilin.github.io/tree/main/content">公开学习资料</a>。</p></noscript></div></main>
+      <footer class="page-footer"><span>© SuGuilin</span><a href="https://github.com/SuGuilin/suguilin.github.io" target="_blank" rel="noopener noreferrer">GitHub <span data-icon="external"></span></a></footer>
     </div>
   </div>
   <dialog id="search-dialog" aria-labelledby="search-dialog-title" class="search-dialog"><div class="search-head"><span data-icon="search"></span><h2 class="sr-only" id="search-dialog-title">全站搜索</h2><input id="global-search" type="search" placeholder="搜索知识、框架、学习阶段与面试问题" aria-label="全站搜索" autocomplete="off"><button class="icon-button" data-close-dialog aria-label="关闭搜索"><span data-icon="close"></span></button></div><div class="search-results" id="search-results"></div><div class="search-footer">搜索资源、路线、项目与训练题 <kbd>ESC 关闭</kbd></div></dialog>
