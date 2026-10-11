@@ -126,7 +126,7 @@ const actionHandlers={
  'journal-clear':()=>{filterJournalView({q:'',type:''});if($('#journal-search'))$('#journal-search').value='';if($('#journal-type'))$('#journal-type').value='';},
  'journal-old-draft':()=>{const draft=journal.conflictingDraft||journal.recoveryDraft;if(draft)copyText('# '+draft.note.title+'\n\n'+draft.note.body);},
  'journal-template':()=>{const title=$('#note-title').value||'本次实验';const body=$('#note-body');body.value=(body.value?body.value+'\n\n':'')+journalTemplate(title);draftDirty=true;$('#editor-status').textContent='模板已插入，保存后可回看。';draftDirty=!journal.saveDraft(body.closest('form'));body.focus();},
- 'resolve-question':button=>{const note=state.notes.find(n=>n.id===button.dataset.id);if(!note)return;note.kind=note.kind==='待解答问题'?'已解决问题':'待解答问题';note.updatedAt=new Date().toISOString();persist();render();notify(note.kind==='已解决问题'?'已标记解决，可随时重新打开':'疑问已重新打开');},
+ 'resolve-question':button=>{const note=state.notes.find(n=>n.id===button.dataset.id);if(!note)return;note.kind=note.kind==='待解答问题'?'已解决问题':'待解答问题';note.updatedAt=new Date().toISOString();const saved=persist();render();notify(saved?(note.kind==='已解决问题'?'已标记解决，可随时重新打开':'疑问已重新打开'):'本机保存失败，请立即导出备份');},
  'export-json':()=>platform.backup(),
  'export-note':button=>exportNote(button.dataset.id),
  'import':()=>platform.action({dataset:{platform:'restore'}}),
