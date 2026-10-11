@@ -129,7 +129,7 @@ html:has(.study-reader){scroll-behavior:auto}
 body.reader-focus .reading-toolbar{top:0}body.reader-focus .study-reader-aside{top:92px}body.reader-focus .study-reader [id]{scroll-margin-top:88px}
 @media(max-width:700px){body.reader-focus .study-reader [id]{scroll-margin-top:116px}}
 
-.study-reader .learning-notebook{margin:0 0 28px;padding:0 0 14px;border-bottom:1px solid var(--line)}
+.study-reader .learning-notebook{margin:0 0 28px;padding:0;border-bottom:0}
 .learning-notebook h3{margin:0 0 12px;font-size:var(--reading-size,18px)}
 .notebook-row{flex-wrap:wrap;gap:10px 18px}
 .notebook-row>div{flex-basis:100%}
