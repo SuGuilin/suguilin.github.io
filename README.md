@@ -7,9 +7,9 @@
 ## 可直接使用
 
 - 首页按每日时间预算推荐学习与到期复习。21 个学习单元、42 道配有提示 / 参考思路 / 自检标准的练习，6 个可探索的原创机制示意；作答和复盘自动保存。
-- 专题用要点、短章节、机制与边界组织阅读；字号和专注模式可调整。15 / 30 / 45 分钟以上的建议帮助利用闲暇时间，不强制完成额外工作任务。
+- 专题先展示具体案例、输入和运行结果，再解释机制；字号和专注模式可调整。正文连续排版，示意图按需展开，不强制完成额外工作任务。
 - 每日计划：新资料排入空闲日期，自评后按 1 / 2 / 3 / 7 / 14 / 30 天规则复习；记录不代表已掌握技能。
-- Harness / 工具可靠性 / 评测专题提供 Colab 打开和 .ipynb 下载：2 个纯 Python CPU 微实验，分别验证故障恢复协议与任务分组统计。无需模型密钥；已在本机逐单元格执行，Colab 运行由用户启动。
+- 六个专题提供 Colab 打开和 .ipynb 下载：4 个 CPU 笔记本，包含真实 LangGraph 1.2.14 审批恢复、故障协议、任务分组统计，以及记忆 / loss mask / Worker 版本检查。无需模型密钥；全部已在本机逐单元格执行，Colab 运行由用户启动。
 - 知识库分类、搜索、分页、收藏及 15 份要点 / 误区 / 练习 / 自检导读。
 - 路线任务、阅读完成、项目里程碑、面试掌握度保存到本机；日志支持 Markdown、编辑和删除撤销。
 - 面试页区分原创训练、公开面经与练习资料，可按公司筛选。
@@ -49,7 +49,7 @@ python3 -m http.server 8000 --bind 127.0.0.1
 - src/shell.html、scripts/build.mjs：外壳、导航、15 路由与 sitemap。
 - assets/study.js / study-visuals.js / experience.css：每日学习、问题入口、机制探索、阅读与练习排版。
 - assets/study-model.js / source-reader.js：学习单元、正文适配、排期与复习规则，浏览器和后端共用。
-- notebooks/：Colab 学习实验；scripts/verify-notebooks.py 检查全部代码单元与结果不变量。
+- notebooks/：Colab 学习实验；scripts/verify-notebooks.py 默认执行三个标准库笔记本。在已安装 LangGraph 1.2.14 的 Python 3.10+ 隔离环境运行 `python scripts/verify-notebooks.py --sdk`，额外执行真实 SDK 笔记本；验证脚本不会自动安装依赖。
 - assets/product.js / product.css：专题索引、知识库与通用组件。
 - assets/workspace.js：路线、项目、日志、资料详情、搜索与路由。
 - assets/discovery.js / updates.js：实时发现、资料收件箱与发布动态。

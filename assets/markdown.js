@@ -1,6 +1,6 @@
 import {escapeHTML as esc, safeURL} from './state.js';
 
-// Small local renderer: headings, lists, quotes, emphasis and fenced code.
+// Small local renderer: headings, lists, tables, quotes, emphasis and fenced code.
 // Raw HTML is always displayed as text. Links allow HTTP(S) only.
 export function renderMarkdown(text, options={}) {
   const inline = value => {
@@ -23,13 +23,29 @@ export function renderMarkdown(text, options={}) {
     if (paragraph.length) {out.push(`<p>${paragraph.map(inline).join('<br>')}</p>`); paragraph = [];}
     if (list.length) {out.push(`<${listType}>${list.map(item=>`<li>${inline(item)}</li>`).join('')}</${listType}>`); list = []; listType = '';}
   };
-  for (const line of String(text).split('\n')) {
+  const lines=String(text).split('\n');
+  const cells=line=>line.trim().replace(/^\|/,'').replace(/(?<!\\)\|$/,'').split(/(?<!\\)\|/).map(cell=>cell.trim().replace(/\\\|/g,'|'));
+  for (let row=0;row<lines.length;row++) {
+    const line=lines[row];
     if (/^\s*(```|~~~)/.test(line)) {
       if (code === null) {flush(); code = [];language=line.replace(/^\s*(```|~~~)/,'').trim();} else {out.push(codeBlock());code = null;}
       continue;
     }
     if (code !== null) {code.push(line);continue;}
     if (!line.trim()) {flush();continue;}
+    if(line.includes('|')&&row+1<lines.length){
+      const headers=cells(line),delimiters=cells(lines[row+1]);
+      if(headers.length>=2&&headers.length<=20&&headers.length===delimiters.length&&delimiters.every(cell=>/^:?-{3,}:?$/.test(cell))){
+        flush();row++;
+        const body=[];
+        while(row+1<lines.length&&lines[row+1].trim()&&lines[row+1].includes('|')){
+          const values=cells(lines[row+1]);if(values.length!==headers.length)break;
+          row++;body.push(values);
+        }
+        out.push('<div class="table-scroll" role="region" aria-label="表格，可横向滚动" tabindex="0"><table><thead><tr>'+headers.map(cell=>'<th scope="col">'+inline(cell)+'</th>').join('')+'</tr></thead><tbody>'+body.map(values=>'<tr>'+values.map(cell=>'<td>'+inline(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>');
+        continue;
+      }
+    }
     const heading = /^(#{1,3})\s+(.+)$/.exec(line);
     if (heading) {flush();const level = heading[1].length+1;const id=options.headingPrefix?` id="${esc(options.headingPrefix)}-${headingIndex}"`:'';headingIndex++;out.push(`<h${level}${id}>${inline(heading[2])}</h${level}>`);continue;}
     const bullet = /^\s*([-*]|\d+\.)\s+(.+)$/.exec(line);

@@ -29,3 +29,12 @@ test('Readable notes preserve code and distinguish headings and lists',()=>{
   const output=renderMarkdown('## 结论\n\n- 结果一\n- 结果二\n\n```python\nif x < 2:\n    print(x)\n```');
   assert.ok(output.includes('<h3>结论</h3>'));assert.ok(output.includes('<ul><li>结果一</li><li>结果二</li></ul>'));assert.ok(output.includes('if x &lt; 2:'));
 });
+test('Comparison tables preserve escaped separators and keep untrusted cell content inert',()=>{
+  const output=renderMarkdown('| 方法 | 次数 |\n| --- | --- |\n| a\\|b | **1** |\n| <img src=x onerror=alert(1)> | [坏链接](javascript:test) |\n\n下面的正文');
+  assert.ok(output.includes('<th scope="col">方法</th>'));
+  assert.ok(output.includes('<td>a|b</td><td><strong>1</strong></td>'));
+  assert.ok(output.includes('&lt;img'));
+  assert.equal(output.includes('<img'),false);assert.equal(output.includes('href="javascript:'),false);
+  assert.ok(output.includes('<p>下面的正文</p>'));
+  assert.equal(renderMarkdown('```text\n| a | b |\n| --- | --- |\n```').includes('<table>'),false);
+});

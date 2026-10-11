@@ -4,7 +4,7 @@
       "id": "lesson-harness",
       "title": "Harness：把模型决策变成可恢复的执行系统",
       "topic": "执行系统",
-      "summary": "模型负责提出下一步，运行时负责让它可靠发生。本篇从状态、事件、检查点与产物验真拆解 Harness，并用崩溃恢复和预算实验检验执行边界。",
+      "summary": "运行一个真实 LangGraph 审批节点，观察恢复前后计数 1→2；解释检查点、节点重入与外部副作用的边界。",
       "mode": "editorial",
       "minutes": 30,
       "prerequisites": [
@@ -27,8 +27,8 @@
         }
       ],
       "pitfalls": [
-        "教学伪代码和验收阈值需要实际复现；读完不代表已经掌握。",
-        "请固定模型、SDK、数据和运行协议后进行对比。"
+        "InMemorySaver 只保留内存状态；跨进程恢复要使用持久检查点。",
+        "节点恢复可能重新执行 interrupt 前的代码，外部操作仍需幂等与结果查询。"
       ],
       "exercises": [
         {
@@ -57,7 +57,7 @@
       "source": {
         "title": "Deep Agents overview",
         "url": "https://docs.langchain.com/oss/python/deepagents/overview",
-        "scope": "多来源编辑导读；来源与支持范围见正文末尾。练习为原创教学设计，尚未运行。",
+        "scope": "多来源机制解释与原创案例；最小代码及配套微实验已本机执行，完整系统实验未执行。",
         "accessedAt": "2026-10-11T08:00:00.000Z",
         "excerpt": ""
       },
@@ -67,7 +67,7 @@
       "id": "lesson-tool-reliability",
       "title": "工具可靠性：幂等、并发与结果不确定",
       "topic": "工具工程",
-      "summary": "工具调用超时之后，业务操作可能已经成功。从结果未知、稳定操作 ID 到幂等写入与跨系统对账，理解一次调用背后的可靠性协议。",
+      "summary": "一次保存订单超时，远端可能已提交。对比无条件重试、稳定操作 ID 去重、先查询再重试的实际模拟输出。",
       "mode": "editorial",
       "minutes": 30,
       "prerequisites": [
@@ -90,8 +90,8 @@
         }
       ],
       "pitfalls": [
-        "教学伪代码和验收阈值需要实际复现；读完不代表已经掌握。",
-        "请固定模型、SDK、数据和运行协议后进行对比。"
+        "每次重试换新业务 ID 会绕过原来的去重记录。",
+        "查询不可用时保留 unknown；不能把超时解释为服务端没有提交。"
       ],
       "exercises": [
         {
@@ -120,7 +120,7 @@
       "source": {
         "title": "Anthropic Writing Effective Tools",
         "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
-        "scope": "多来源编辑导读；来源与支持范围见正文末尾。练习为原创教学设计，尚未运行。",
+        "scope": "多来源机制解释与原创案例；最小代码及配套微实验已本机执行，完整系统实验未执行。",
         "accessedAt": "2026-10-11T08:00:00.000Z",
         "excerpt": ""
       },
@@ -130,7 +130,7 @@
       "id": "lesson-evaluation-statistics",
       "title": "评测统计与消融：判断改进是否可信",
       "topic": "实验评测",
-      "summary": "成功率提高几个百分点，是否说明系统真的变好了？从任务配对、重复运行、消融和置信区间开始，让评测结果能够支持工程决策。",
+      "summary": "40 道题重复运行 5 次，为什么不能当作 200 道独立题？用合成 A/B 结果验证任务分组与伪重复。",
       "mode": "editorial",
       "minutes": 30,
       "prerequisites": [
@@ -153,8 +153,8 @@
         }
       ],
       "pitfalls": [
-        "教学伪代码和验收阈值需要实际复现；读完不代表已经掌握。",
-        "请固定模型、SDK、数据和运行协议后进行对比。"
+        "同题重复运行共享任务结构，按行 bootstrap 可能低估不确定性。",
+        "当前成绩来自合成数据；真实实验要说明任务总体、版本与评分协议。"
       ],
       "exercises": [
         {
@@ -183,7 +183,7 @@
       "source": {
         "title": "Anthropic Demystifying Evals",
         "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
-        "scope": "多来源编辑导读；来源与支持范围见正文末尾。练习为原创教学设计，尚未运行。",
+        "scope": "多来源机制解释与原创案例；最小代码及配套微实验已本机执行，完整系统实验未执行。",
         "accessedAt": "2026-10-11T08:00:00.000Z",
         "excerpt": ""
       },
@@ -193,7 +193,7 @@
       "id": "lesson-long-term-memory",
       "title": "长期记忆：证据、时间与可删除的数据管线",
       "topic": "记忆系统",
-      "summary": "记忆不是“存进向量数据库”这么简单。围绕写入、更新、时效与检索，设计能够适应偏好变化、隔离用户并保留证据的长期记忆。",
+      "summary": "用当前与历史 Python 版本偏好检查记忆检索：先隔离用户与有效时间，再按相关性排序。",
       "mode": "editorial",
       "minutes": 30,
       "prerequisites": [
@@ -216,8 +216,8 @@
         }
       ],
       "pitfalls": [
-        "教学伪代码和验收阈值需要实际复现；读完不代表已经掌握。",
-        "请固定模型、SDK、数据和运行协议后进行对比。"
+        "相似度不代表当前有效性，也不代表当前用户有权访问。",
+        "这个例子使用日期区间；来源冲突、抽取错误与数据库访问控制需另行处理。"
       ],
       "exercises": [
         {
@@ -246,7 +246,7 @@
       "source": {
         "title": "MemGPT Original Paper",
         "url": "https://arxiv.org/abs/2310.08560",
-        "scope": "多来源编辑导读；来源与支持范围见正文末尾。练习为原创教学设计，尚未运行。",
+        "scope": "多来源机制解释与原创案例；最小代码及配套微实验已本机执行，完整系统实验未执行。",
         "accessedAt": "2026-10-11T08:00:00.000Z",
         "excerpt": ""
       },
@@ -256,7 +256,7 @@
       "id": "lesson-agent-rl",
       "title": "Agent RL：从执行轨迹到可靠的策略更新",
       "topic": "后训练",
-      "summary": "把 Agent 的多轮交互变成可训练的轨迹，关键在奖励与数据。从 action、observation 和 loss mask 出发，判断奖励升高是否真的带来可迁移能力。",
+      "summary": "从五个 token 位置计算 loss mask，检查工具观察如何影响上下文、为什么不直接计入动作生成损失。",
       "mode": "editorial",
       "minutes": 30,
       "prerequisites": [
@@ -279,8 +279,8 @@
         }
       ],
       "pitfalls": [
-        "教学伪代码和验收阈值需要实际复现；读完不代表已经掌握。",
-        "请固定模型、SDK、数据和运行协议后进行对比。"
+        "loss mask 排除直接生成损失，工具观察仍可以影响后续动作。",
+        "示例只计算位置级 NLL；真实训练还要检查 label shift、advantage、KL 和 rollout logprob。"
       ],
       "exercises": [
         {
@@ -309,7 +309,7 @@
       "source": {
         "title": "PPO Original Paper",
         "url": "https://arxiv.org/abs/1707.06347",
-        "scope": "多来源编辑导读；来源与支持范围见正文末尾。练习为原创教学设计，尚未运行。",
+        "scope": "多来源机制解释与原创案例；最小代码及配套微实验已本机执行，完整系统实验未执行。",
         "accessedAt": "2026-10-11T08:00:00.000Z",
         "excerpt": ""
       },
@@ -319,7 +319,7 @@
       "id": "lesson-production-system-design",
       "title": "生产架构与面试：设计可恢复的学习研究 Agent",
       "topic": "产品架构",
-      "summary": "长任务、多工具与人工审批会把系统推向更复杂的失败边界。先设计任务状态、队列、租约与恢复，再用运行证据解释架构选择。",
+      "summary": "用版本 7 与版本 8 的 Worker 竞争提交，验证过期 Worker 的状态写入怎样被拒绝，以及哪些副作用仍未受保护。",
       "mode": "editorial",
       "minutes": 30,
       "prerequisites": [
@@ -342,8 +342,8 @@
         }
       ],
       "pitfalls": [
-        "教学伪代码和验收阈值需要实际复现；读完不代表已经掌握。",
-        "请固定模型、SDK、数据和运行协议后进行对比。"
+        "比较版本与写入状态要是原子操作，顺序内存代码不证明数据库并发安全。",
+        "版本检查只保护当前状态存储，不能撤销其他系统已提交的写入。"
       ],
       "exercises": [
         {
@@ -372,7 +372,7 @@
       "source": {
         "title": "AWS Transactional Outbox",
         "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html",
-        "scope": "多来源编辑导读；来源与支持范围见正文末尾。练习为原创教学设计，尚未运行。",
+        "scope": "多来源机制解释与原创案例；最小代码及配套微实验已本机执行，完整系统实验未执行。",
         "accessedAt": "2026-10-11T08:00:00.000Z",
         "excerpt": ""
       },

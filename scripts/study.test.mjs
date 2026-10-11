@@ -27,6 +27,8 @@ test('Free packs are grounded in actual text, keep access scope, and reject fabr
   const u=unit();assert.equal(u.mode,'extractive');assert.equal(u.exercises.length,2);assert.ok(u.takeaways.every(t=>u.source.excerpt.includes(t.evidence)));assert.match(u.summary,/未.*AI/);
   assert.throws(()=>validateUnit({...u,mode:'ai',takeaways:u.takeaways.map(t=>({...t,evidence:'fabricated evidence'}))}),/正文依据/);
   assert.throws(()=>pastedSource(item,'title only'),/250/);assert.throws(()=>pastedSource(item,'a'.repeat(24001)),/24,000/);
+  const promotion=pastedSource(item,'We build swarms for complex, long-running agentic workloads.\nOur powerful agent product helps teams get started quickly and achieve great results.\nJoin our community to learn more about the agent ecosystem and our roadmap.\nContact our sales team to get a personal demo and discuss your needs.');
+  assert.throws(()=>extractiveUnit(promotion),/具体机制/);
 });
 test('New learning flows respect daily budget, preserve attempts and bring reviews back when due',()=>{
   const u=unit(),s=defaultState();s.studyUnits=[u,{...u,id:'second-unit'}];s.dailyMinutes=30;
@@ -46,7 +48,7 @@ test('Editorial units include specific answers and rubrics, not only metadata or
   const {units}=JSON.parse(await readFile('content/study-units.json','utf8'));assert.equal(units.length,21);for(const u of units){validateUnit(u);assert.ok(u.summary.length>15);assert.ok(u.exercises.every(e=>e.answer.length>60&&e.rubric.length>=2));}
 });
 test('Colab notebooks execute all cells and demonstrate recovery and correlated evaluation invariants',()=>{
-  const output=execFileSync('python3',['scripts/verify-notebooks.py'],{encoding:'utf8'});assert.match(output,/durable-agent.ipynb: all cells/);assert.match(output,/paired-agent-evaluation.ipynb: all cells/);
+  const output=execFileSync('python3',['scripts/verify-notebooks.py'],{encoding:'utf8'});assert.match(output,/durable-agent.ipynb: all cells/);assert.match(output,/paired-agent-evaluation.ipynb: all cells/);assert.match(output,/agent-mechanism-checks.ipynb: all cells/);
 });
 test('Conflicting backup answers remain recoverable without creating an orphan plan or duplicating imports',()=>{
   const u=unit();const initial=scheduleUnit({...defaultState(),studyUnits:[u]},u,now);
