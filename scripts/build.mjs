@@ -1,9 +1,13 @@
 import {readFile, writeFile, mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const template = await readFile(path.join(root, 'src/shell.html'), 'utf8');
+const sourceTemplate = await readFile(path.join(root, 'src/shell.html'), 'utf8');
+const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json'].map(file=>readFile(path.join(root,file))));
+const assetVersion=createHash('sha256').update(Buffer.concat(versionFiles)).digest('hex').slice(0,12);
+const template=sourceTemplate.replaceAll('{{assetVersion}}',assetVersion);
 const data = JSON.parse(await readFile(path.join(root, 'content/workspace.json'), 'utf8'));
 const routes = [
   ['/', 'home', '总览', '从前沿机制到工程实践，建立持续深化的 Agent 学习与作品体系。', 'grid'],
@@ -13,11 +17,14 @@ const routes = [
   ['/journal/', 'journal', '学习日志', '记录假设、来源、版本、结果与下一次实验。', 'pen'],
   ['/interview/', 'interview', '面试准备', '用岗位能力对标、训练题与项目答辩深化理解。', 'briefcase'],
   ['/library/', 'library', '知识库', '精选课程、论文、工程文章、框架、评测、岗位与社区入口。', 'books'],
+  ['/learn/', 'learn', '专题学习', '带着要点学习机制、算法与工程，以实验深化理解。', 'file'],
+  ['/assistant/', 'assistant', '学习助手', '围绕课程、源码和实验向 AI 提问，记录与保存对话。', 'spark'],
+  ['/account/', 'account', '账号与备份', '登录个人账号，管理云端同步、离线缓存、导入与导出。', 'shield'],
   ['/saved/', 'saved', '收藏夹', '把资料放回自己的问题与学习计划中。', 'bookmark'],
   ['/about/', 'about', '关于工作台', 'SuGuilin 的个人 Agent 学习工作台：持续研究，记录过程，构建产品。', 'info'],
   ['/guide/', 'guide', '学习手记', '围绕 Agent 核心问题的原创实践导读与一手资料。', 'file']
 ];
-const navigation = routes.slice(0, 6).map(([url, id, title, , icon]) => `<a href="${url}" data-nav data-route="${id}"><span data-icon="${icon}"></span>${title}${id === 'radar' ? '<span class="new-dot" title="资料已核实"></span>' : ''}</a>`).join('\n');
+const navigation = [routes[0],routes.find(r=>r[1]==='learn'),...routes.slice(1,6),routes.find(r=>r[1]==='assistant')].map(([url, id, title, , icon]) => `<a href="${url}" data-nav data-route="${id}"><span data-icon="${icon}"></span>${title}${id === 'radar' ? '<span class="new-dot" title="资料已核实"></span>' : ''}</a>`).join('\n');
 for (const [url, id, title, description] of routes) {
   const dir = path.join(root, url);
   await mkdir(dir, {recursive: true});

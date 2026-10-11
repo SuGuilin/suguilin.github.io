@@ -39,7 +39,73 @@
       "source": "LangChain 官方文档",
       "verification": "已核实为底层编排框架和运行时；可独立使用，不要求依赖 LangChain。",
       "verifiedAt": "2026-10-11",
-      "priority": "focus"
+      "priority": "focus",
+      "digest": {
+        "resourceId": "langgraph",
+        "title": "LangGraph：状态与恢复先于复杂编排",
+        "oneSentence": "把 Agent 作为可检查、可暂停、可恢复的状态机，才能解释一次运行究竟做了什么。",
+        "prerequisites": [
+          "Python",
+          "单 Agent 工具循环"
+        ],
+        "readingOrder": [
+          "Overview 的 Core benefits",
+          "Persistence 的 checkpointer vs. store",
+          "Interrupts 的恢复与副作用"
+        ],
+        "takeaways": [
+          "LangGraph 提供底层编排运行时，可混合确定性节点和模型决策节点；图结构不自动决定你的提示或业务架构。",
+          "checkpointer 保存同一 thread 的图状态快照；store 保存跨 thread 的应用知识，两者解决不同范围的问题。",
+          "人工介入通过持久状态和恢复输入继续工作流，设计时要确定 thread_id 与暂停位置。",
+          "interrupt 所在节点恢复时会重新运行；暂停前的副作用需要幂等，或移到独立节点。"
+        ],
+        "pitfalls": [
+          "内存 saver 在进程重启后丢失状态，跑通演示不等于生产恢复。",
+          "把检查点当作远端 API 恰好执行一次的保证，忽略网络超时后重复副作用。",
+          "不限制检查点增长，长会话可能积累存储和延迟。"
+        ],
+        "practice": [
+          "实现检索→起草→人工审核→保存四节点图，用临时文件或数据库 saver 验证重启恢复。",
+          "在暂停前注入一次重复写入，再加入请求标识与幂等保护，记录数据库结果差异。",
+          "对两条 thread 和同一用户 store 做隔离/共享实验，解释哪些信息应当可见。"
+        ],
+        "selfCheck": [
+          "checkpointer 与 store 的范围为何不同？",
+          "节点恢复时，哪一段代码可能重跑？",
+          "如何处理 API 已成功但本地还没保存检查点？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "overview",
+            "title": "LangGraph overview",
+            "url": "https://docs.langchain.com/oss/python/langgraph/overview",
+            "section": "Core benefits",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "persistence",
+            "title": "LangGraph persistence",
+            "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+            "section": "Checkpointer vs. store / Troubleshooting",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "interrupts",
+            "title": "LangGraph interrupts",
+            "url": "https://docs.langchain.com/oss/python/langgraph/interrupts",
+            "section": "Side effects called before interrupt must be idempotent",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "概念来自 2026-10-11 文档；示例实现时需锁定实际安装版本。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "deep-agents",
@@ -58,7 +124,57 @@
       "source": "LangChain 官方文档",
       "verification": "已打开总览：独立库，基于 LangChain 构件与 LangGraph 运行时；规划配置需查当前文档。",
       "verifiedAt": "2026-10-11",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "deep-agents",
+        "title": "Deep Agents：Harness 的组件与边界",
+        "oneSentence": "把执行环境、上下文、委派和人工控制作为可组合组件，而不是仅延长提示词。",
+        "prerequisites": [
+          "工具 Agent",
+          "LangGraph 基本状态管理"
+        ],
+        "readingOrder": [
+          "Overview 的 component groups",
+          "Context management",
+          "Delegation 与 Task planning"
+        ],
+        "takeaways": [
+          "Deep Agents 是建立在 LangChain 组件和 LangGraph 运行时之上的 Agent harness。",
+          "执行能力包括文件/工具与环境连接；上下文管理包括技能、记忆、总结与外置内容。",
+          "子 Agent 用于隔离子任务；结构化待办用于跟踪任务，两者不能替代产物验收。",
+          "当前文档明确 v0.7 起 task planning 为 opt-in，需要 TodoListMiddleware；早期版本默认启用。"
+        ],
+        "pitfalls": [
+          "按旧教程假定任何版本默认具有 write_todos，运行时工具集合可能不同。",
+          "让子 Agent 共用所有上下文和写权限，抵消任务隔离收益。",
+          "将文件化或总结视为无损压缩，关键限制和证据仍需可恢复。"
+        ],
+        "practice": [
+          "用同一资料整理任务比较基础工具循环与带文件上下文的 harness，记录 token、成本、引用丢失情况。",
+          "将证据检索交给受限子任务，主 Agent 使用结构化结果进行检查。",
+          "显式启用/关闭规划，比较长任务遗漏项；验收待办状态必须对应可查产物。"
+        ],
+        "selfCheck": [
+          "框架、运行时与 harness 分别承担什么？",
+          "子任务返回哪些字段才能审查结论？",
+          "总结后如何保留原始来源与硬性约束？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "overview",
+            "title": "Deep Agents Overview",
+            "url": "https://docs.langchain.com/oss/python/deepagents/overview",
+            "section": "Execution / Context management / Delegation / Task planning",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "v0.7 opt-in 来自本次实际文档；实践时核对锁定版本及中间件。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "microsoft-agent-framework",
@@ -144,7 +260,74 @@
         "https://github.com/modelcontextprotocol/modelcontextprotocol"
       ],
       "verifiedAt": "2026-10-11",
-      "priority": "focus"
+      "priority": "focus",
+      "digest": {
+        "resourceId": "mcp",
+        "title": "MCP：统一连接接口与明确工具契约",
+        "oneSentence": "协议统一发现和调用方式，服务端仍需实现授权、输入验证与业务规则。",
+        "prerequisites": [
+          "JSON Schema",
+          "HTTP/RPC",
+          "工具调用"
+        ],
+        "readingOrder": [
+          "Introduction 与 Architecture",
+          "Tools 的 schema",
+          "Errors 与 Security Considerations"
+        ],
+        "takeaways": [
+          "MCP 通过 host、client、server 架构连接 AI 应用与外部能力；资源、提示和工具是不同协议能力。",
+          "工具的 inputSchema 描述输入契约，outputSchema 可选，结构化内容与展示文本可以分开处理。",
+          "工具名只要求在同一服务器内唯一；聚合多个服务器时客户端需要明确消歧。",
+          "协议错误与工具执行错误不同；执行错误可带 isError 和可行动的反馈，帮助模型调整参数。"
+        ],
+        "pitfalls": [
+          "把工具 annotations 当可信授权声明；规范要求未经可信服务器提供的注解视为不可信。",
+          "将 serverInfo.name 当全局唯一身份，可能把同名工具路由到错误服务。",
+          "只让模型判断权限，而服务端不校验输入和访问控制。"
+        ],
+        "practice": [
+          "做只读计算器/资料检索服务器，为有效与无效输入写出结构化返回契约。",
+          "同时接入两台都提供 search 的服务器，给它们可追踪的身份前缀并验证路由。",
+          "设计参数错误、业务拒绝和协议故障三种用例，检查客户端恢复行为和日志。"
+        ],
+        "selfCheck": [
+          "MCP 能标准化什么，业务授权由谁实现？",
+          "inputSchema、outputSchema、annotations 各有什么作用？",
+          "工具执行失败与未知方法错误怎样区分？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "intro",
+            "title": "MCP Introduction",
+            "url": "https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro",
+            "section": "Definition",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "architecture",
+            "title": "MCP Architecture",
+            "url": "https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture",
+            "section": "Host / Client / Server / Primitives",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "tools",
+            "title": "MCP Tools specification",
+            "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools",
+            "section": "Tool definition / Names / Errors / Security",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "本次 latest/intro 重定向到 2026-07-28；不要混用旧协议示例。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "a2a",
@@ -481,7 +664,65 @@
       "source": "Yao 等 · arXiv 原论文",
       "verifiedAt": "2026-10-11",
       "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
-      "priority": "focus"
+      "priority": "focus",
+      "digest": {
+        "resourceId": "paper-react",
+        "title": "ReAct：通过环境反馈更新行动",
+        "oneSentence": "让模型交错生成计划依据和行动，并用真实观察修正后续决策。",
+        "prerequisites": [
+          "LLM prompting",
+          "工具执行循环"
+        ],
+        "readingOrder": [
+          "作者项目页 Abstract",
+          "ReAct Prompting 与失败例",
+          "论文实验和 Appendix trajectories"
+        ],
+        "takeaways": [
+          "ReAct 将 reasoning 与 task-specific actions 交错组织，行动获取外部信息，推理负责跟踪计划和处理异常。",
+          "少样本提示包含完整轨迹：推理、动作及环境返回的观察，而不是只有最终答案。",
+          "作者比较 reason-only、act-only 与 ReAct，展示二者在指定问答和交互环境中的互补作用。",
+          "作者也公开失败例，轨迹可供人检查和修正；可解释格式不能消除行动错误。"
+        ],
+        "pitfalls": [
+          "把 2022–2023 论文的成绩当作当前模型、工具和任务的普遍排名。",
+          "用模型自己编写的 observation 代替工具返回，失去环境闭环。",
+          "只看文字推理是否流畅，不检查证据是否支持动作或答案。"
+        ],
+        "practice": [
+          "用固定的小资料库实现最多五步的检索循环，保存 action、参数、真实 observation 和最终引用。",
+          "在相同题目上比较一次生成、固定检索、交错检索三种方案，记录成功率与调用数。",
+          "加入空结果或过期信息，观察 Agent 是否调整查询或报告证据不足。"
+        ],
+        "selfCheck": [
+          "一次行动怎样改变下一次决策的上下文？",
+          "reason-only 与 act-only 的失败分别是什么？",
+          "观察结果可信是否足以保证最终答案可信？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "project",
+            "title": "ReAct authors' project",
+            "url": "https://react-lm.github.io/",
+            "section": "Abstract / Prompting / Failure example",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "paper",
+            "title": "ReAct paper",
+            "url": "https://arxiv.org/abs/2210.03629",
+            "section": "ICLR camera-ready abstract and paper links",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "研究结果限定于论文的模型、任务和提示设定；实践建议是本站设计，未执行。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "paper-reflexion",
@@ -538,7 +779,66 @@
       "source": "Khattab 等 · arXiv 原论文",
       "verifiedAt": "2026-10-11",
       "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "paper-dspy",
+        "title": "DSPy：把提示优化变成程序与指标",
+        "oneSentence": "先定义模块、数据和验收指标，再用优化器改进演示、提示或权重。",
+        "prerequisites": [
+          "Python 模块化",
+          "训练/验证划分",
+          "RAG"
+        ],
+        "readingOrder": [
+          "论文 Programming model",
+          "Compilation 与 BootstrapFewShot",
+          "官方仓库的研究与文档入口"
+        ],
+        "takeaways": [
+          "论文将 LM pipeline 抽象为可组合的文本转换程序，用 signature 声明输入输出目标。",
+          "编译过程以数据和 metric 评估程序；BootstrapFewShot 收集能够共同满足指标的多阶段轨迹作为演示。",
+          "指标可以是 EM/F1，也可加入答案是否受检索证据支持等多个条件。",
+          "官方框架提供提示和权重优化算法，原论文的 teleprompter 术语与旧代码不代表所有当前 API。"
+        ],
+        "pitfalls": [
+          "只优化字符串匹配，得到格式合格但证据不足的答案。",
+          "在同一批题上反复选择配置并报告该批成绩，掩盖过拟合。",
+          "把编译理解为消除模型调用，或以为所有优化器都会修改权重。"
+        ],
+        "practice": [
+          "把一个学习资料 QA 流程拆成检索与回答模块，先固定证据正确性指标。",
+          "用独立训练/开发/测试划分比较手写提示和自动优化；保留调用预算与失败样本。",
+          "用新主题做迁移评测，检查优化是否只记住特定答案写法。"
+        ],
+        "selfCheck": [
+          "signature 与手写 prompt 的职责有什么区别？",
+          "什么样的 metric 会奖励错误行为？",
+          "如何判断改进来自优化而非验证集泄漏？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "paper",
+            "title": "DSPy original paper",
+            "url": "https://arxiv.org/html/2310.03714",
+            "section": "Programming model / Compilation / Appendix E",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "repo",
+            "title": "DSPy official repository",
+            "url": "https://github.com/stanfordnlp/dspy",
+            "section": "README / Citation & Reading More",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "dspy.ai 优化器页本次仅返回极少文本，具体 API 未据此核验；以原论文与仓库说明概念。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "eval-swebench",
@@ -576,7 +876,66 @@
       "source": "GAIA 作者团队 · Hugging Face",
       "verifiedAt": "2026-10-11",
       "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "eval-gaia",
+        "title": "GAIA：检验跨工具的答案与证据链",
+        "oneSentence": "正确答案需要推理、浏览、多模态处理和工具组合，而不是仅靠流畅文本。",
+        "prerequisites": [
+          "工具 Agent",
+          "资料浏览与解析",
+          "评测基础"
+        ],
+        "readingOrder": [
+          "原论文任务动机",
+          "官方数据卡的 Levels 与 splits",
+          "当前数据格式说明"
+        ],
+        "takeaways": [
+          "GAIA 题目要求推理、多模态处理、浏览和工具使用等组合能力，原论文针对一般助手评测。",
+          "官方数据卡按三个难度等级组织任务，各等级包含公开开发集与答案/元数据不公开的测试集。",
+          "部分题目携带附件，数据包含任务与附件路径；评测不能只读取问题文字。",
+          "2025 年格式更新将 splits 改为 Parquet，以适配 HF datasets 4.x，不宜照搬旧 code-based loader。"
+        ],
+        "pitfalls": [
+          "把开发集长期调参后的成绩作为未见任务能力。",
+          "把联网不可用、附件缺失或工具错误全部归类为模型推理失败。",
+          "将受 gate 的验证/测试内容复制为公开网站题库；数据卡要求避免可抓取再分发。"
+        ],
+        "practice": [
+          "获得官方访问许可后，在受限本地环境抽取开发集小样本做失败分类，网站只记录题目 ID 与自写分析。",
+          "为每题记录所用工具、附件、证据位置和答案归一化规则。",
+          "比较基础回答与增加特定工具的版本，明确调用预算与失败差异。"
+        ],
+        "selfCheck": [
+          "为什么只报告整体准确率不足以诊断系统？",
+          "开发集与测试集怎样隔离？",
+          "附件和动态网页变化如何影响复现？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "card",
+            "title": "GAIA official dataset card",
+            "url": "https://huggingface.co/datasets/gaia-benchmark/GAIA",
+            "section": "Gating / Data and leaderboard / Dataset format update",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "paper",
+            "title": "GAIA original paper",
+            "url": "https://arxiv.org/abs/2311.12983",
+            "section": "Abstract / Paper links",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "仅公开数据卡和论文已打开；未登录接受数据条件或下载 gated 文件。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "eval-tau-family",
@@ -589,13 +948,81 @@
         "工具调用",
         "可靠性"
       ],
-      "description": "模拟用户与工具 Agent 的业务交互。旧 tau-bench 已提示任务过时；使用维护中的 tau2-bench 仓库，并固定具体版本与任务集。",
+      "description": "对话、工具和用户交互任务基准。tau2-bench 仓库已展示 τ³，新旧评测版本应分别记录。",
       "whenToLearn": "第 6–8 周：客服或业务工具 Agent，需要策略约束时。",
       "url": "https://github.com/sierra-research/tau2-bench",
       "source": "Sierra Research 官方",
       "verifiedAt": "2026-10-11",
-      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
-      "priority": "explore"
+      "verification": "已打开原仓库 README，当前展示 τ³；τ-bench、τ² 与 τ³ 的任务、用户模拟和评分协议不可混比。",
+      "priority": "explore",
+      "digest": {
+        "resourceId": "eval-tau-family",
+        "title": "τ-bench 系列：规则、状态与重复运行可靠性",
+        "oneSentence": "评测既要看真实状态达成，也要看持续遵守规则和引导用户的能力。",
+        "prerequisites": [
+          "工具调用",
+          "状态转换",
+          "重复试验与评测"
+        ],
+        "readingOrder": [
+          "原 τ-bench 的 Task/Reward/Metric",
+          "τ² 的 dual-control 与 ablations",
+          "当前仓库的版本与 grading note"
+        ],
+        "takeaways": [
+          "原 τ-bench 结合用户模拟器、领域 API 和 policy 文档，验证动态对话中的任务完成。",
+          "原论文奖励涉及最终数据库状态与必要信息输出，不能仅凭最后一句成功宣告验收。",
+          "pass^k 表示同一任务 k 次独立运行全部成功的概率再跨任务平均；不是至少一次成功的 pass@k。",
+          "τ² 引入用户与 Agent 都能改变共享环境的 dual-control，用消融区分推理与沟通协调问题。",
+          "当前同名仓库已提供 τ³；banking_knowledge 的 v1.0.1 grading 修正使前后分数不可直接比较。"
+        ],
+        "pitfalls": [
+          "未固定用户模拟器、任务版本、试验次数或工具环境就比较模型。",
+          "把 pass^k 当 pass@k，忽视系统偶发失败。",
+          "以对话自然度替代数据库/策略验收，漏掉不合法或不完整动作。"
+        ],
+        "practice": [
+          "用自建订单模拟域定义目标状态、允许动作与需确认的规则，先运行十个固定任务。",
+          "每题重复至少五次，分别统计平均成功率与全次成功比例，并保存轨迹。",
+          "比较有用户协作与全部信息直接提供两种场景，区分缺信息、沟通和执行失败。"
+        ],
+        "selfCheck": [
+          "为何好听的回复也可能得零分？",
+          "pass^k 与 pass@k 的业务含义有何差别？",
+          "怎样让 dual-control 的实验结果可比较？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "tau",
+            "title": "Original τ-bench paper",
+            "url": "https://arxiv.org/html/2406.12045",
+            "section": "Reward / Reliability metric pass^k",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "tau2",
+            "title": "τ²-bench original paper",
+            "url": "https://arxiv.org/html/2506.07982",
+            "section": "Dual-control / User simulator / Ablations",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "repo",
+            "title": "τ-bench official repository",
+            "url": "https://github.com/sierra-research/tau2-bench",
+            "section": "τ³ / v1.0.1 grading update / Compatibility",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "本站资源 ID 延续 eval-tau-family；必须分开标注 τ、τ²、τ³ 与评分版本。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "eval-webarena",
@@ -646,13 +1073,80 @@
         "长任务",
         "成本"
       ],
-      "description": "评估终端任务执行能力。官方入口包含任务与运行方法，报告时同时记录解决率、token、成本、agent 与 benchmark 版本。",
+      "description": "终端任务基准。当前官网展示 Terminal-Bench 4.0；不同代际、任务集与执行协议不可直接混比。",
       "whenToLearn": "第 8–10 周：终端 Agent 项目，先做可承受的小样本。",
       "url": "https://www.tbench.ai/",
       "source": "Terminal-Bench 官方",
       "verifiedAt": "2026-10-11",
-      "verification": "本轮已核实官方入口和主题；版本、访问条件与岗位状态以来源页面为准。",
-      "priority": "explore"
+      "verification": "已打开官网，当前首页展示 4.0；引用历史论文或榜单时必须标明版本、任务和执行协议。",
+      "priority": "explore",
+      "digest": {
+        "resourceId": "eval-terminalbench",
+        "title": "Terminal-Bench：用环境产物评估 Agent 工作",
+        "oneSentence": "在固定沙箱里让 Agent 完成任务，再由独立 verifier 检查产物和状态。",
+        "prerequisites": [
+          "Linux/容器基础",
+          "代码 Agent",
+          "自动验收"
+        ],
+        "readingOrder": [
+          "当前 Terminal-Bench 首页与 Run",
+          "Harbor Create a task",
+          "Viewer 的 trajectory 与 verifier logs"
+        ],
+        "takeaways": [
+          "本次官方首页展示 Terminal-Bench 4.0，并将结果定义为任务 resolution rate，图示说明带 95% 置信区间。",
+          "当前官方运行入口使用 Harbor；4.0 包含需要 GPU 的任务，示例使用具备 GPU 的 sandbox。",
+          "Harbor 自建任务把 instruction、配置、environment、solution 和 verifier 分开，验收检查真实产物。",
+          "官方教程先用 Oracle solution 验证题目可解，再运行真实 Agent，并在 viewer 检查轨迹与验证日志。"
+        ],
+        "pitfalls": [
+          "混用不同 benchmark 数据版本、Agent harness、模型和资源预算的分数。",
+          "拿 Agent 的完成宣告代替 verifier，或只测试文件存在而不检查内容正确性。",
+          "把需要 GPU 的完整基准直接当成普通本机 smoke test，环境失败会污染结论。"
+        ],
+        "practice": [
+          "在临时容器自建一个数据修复任务，要求生成特定文件与结构，并编写独立验收。",
+          "验证正确解法能通过、空解法和格式正确但内容错误的解法不能通过。",
+          "固定模型、工具权限和时间预算重复运行，报告成功率、成本与失败原因。"
+        ],
+        "selfCheck": [
+          "Oracle 通过证明什么，不能证明什么？",
+          "怎样设计不能被表面输出蒙混的验收？",
+          "模型、harness 和环境在榜单比较中各有什么影响？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "site",
+            "title": "Terminal-Bench official site",
+            "url": "https://www.tbench.ai/",
+            "section": "4.0 / Resolution rate / CI / Contamination notice",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "run",
+            "title": "Terminal-Bench Run",
+            "url": "https://www.tbench.ai/run",
+            "section": "Harbor / GPU sandbox / Viewer",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "task",
+            "title": "Harbor Create a task",
+            "url": "https://docs.harborframework.com/tutorials/create-a-task",
+            "section": "Environment / Verifier / Oracle / Viewer",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "核验的是 2026-10-11 的 4.0 页面；旧资源不可自动标成此版本，题目与评分版本必须记录。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "career-openai-evals",
@@ -842,21 +1336,24 @@
     },
     {
       "id": "openai-evals",
-      "title": "OpenAI · Agent Evals",
+      "title": "OpenAI Evals · 退役与迁移",
       "category": "evaluation",
       "level": "进阶",
       "tags": [
+        "迁移",
         "评测",
-        "Trace Grading",
-        "回归"
+        "历史参考"
       ],
-      "description": "官方 Agent 评测入口，学习如何评估行为轨迹与最终任务结果。",
+      "description": "官方 Evals 平台已公布退役计划：2026-10-31 转只读、11-30 关闭。新项目采用独立且可版本化的评测管线。",
       "url": "https://developers.openai.com/api/docs/guides/agent-evals",
       "source": "OpenAI 官方开发文档",
       "whenToLearn": "建立任务集、grader 与回归机制时。",
       "verifiedAt": "2026-10-11",
-      "verification": "已读取一手页面或官方仓库。技术与示例需匹配项目使用的版本。",
-      "priority": "explore"
+      "verification": "2026-10-11 已读取官方 deprecations 页面：Evals 10-31 只读，11-30 dashboard/API 关闭；Agent Builder 11-30 关闭。Agents SDK 不在这些退役范围。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://developers.openai.com/api/docs/deprecations"
+      ]
     },
     {
       "id": "openai-cookbook",
@@ -1195,7 +1692,66 @@
       "relatedUrls": [
         "https://github.com/mem0ai/mem0/releases/tag/ts-v3.3.1"
       ],
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "mem0",
+        "title": "Mem0：从存储偏好到有证据的记忆",
+        "oneSentence": "先定义谁的记忆、来自哪里、何时有效，再评测检索和回答是否使用正确事实。",
+        "prerequisites": [
+          "向量/关键词检索",
+          "多会话应用",
+          "用户隔离"
+        ],
+        "readingOrder": [
+          "README 的 memory API",
+          "当前算法与 managed/OSS 说明",
+          "LongMemEval 能力维度"
+        ],
+        "takeaways": [
+          "README 的基本流程为按 user_id 过滤检索相关记忆，生成回复，再把对话加入 memory。",
+          "当前 README 描述 2026 年新算法为 ADD-only 提取，并结合语义、关键词、实体与时间信号检索。",
+          "README 明确其展示的托管平台成绩含 OSS SDK 没有的专有优化，不应宣称本地 SDK 能复现相同分数。",
+          "LongMemEval 原始评测关注信息提取、多会话推理、知识更新、时间推理和拒答，帮助区分记住与正确使用。"
+        ],
+        "pitfalls": [
+          "缺少 user_id 或权限过滤，语义相近并不能证明同一用户可访问。",
+          "保存 Agent 的自述却没有来源和确认状态，错误行动可能形成错误记忆。",
+          "沿用旧 UPDATE/DELETE 说明假定新默认算法覆盖旧事实，未处理时间与冲突。"
+        ],
+        "practice": [
+          "自建两用户、多会话、偏好变更的合成数据，检查隔离、更新、历史查询和拒答。",
+          "每条记忆保留来源消息、发生时间、确认状态，回答时记录使用了哪些记忆。",
+          "比较无记忆、原文检索与事实记忆；同时统计答对率、错误引用、token 与延迟。"
+        ],
+        "selfCheck": [
+          "相似度最高的记忆为什么可能不该被使用？",
+          "ADD-only 系统怎样区分现在与过去？",
+          "提取错误和检索错误怎样分开诊断？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "repo",
+            "title": "Mem0 official repository",
+            "url": "https://github.com/mem0ai/mem0",
+            "section": "New Memory Algorithm / Managed caveat / Quickstart filters",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "memory-eval",
+            "title": "LongMemEval authors' repository",
+            "url": "https://github.com/xiaowu0162/LongMemEval",
+            "section": "Five core abilities / Timestamped histories",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "新算法描述来自当前 README，托管与 OSS 的配置和能力应分开核验。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "ag2",
@@ -1354,7 +1910,58 @@
       "source": "verl 官方仓库 / ByteDance Seed 发起的开源项目",
       "verification": "已打开 README，核验框架架构、算法与工具调用说明；未安装或运行训练。",
       "verifiedAt": "2026-10-11",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "verl",
+        "title": "verl：从算法目标到训练与 Rollout 数据流",
+        "oneSentence": "把奖励、采样、更新和基础设施逐段检查，才能定位 RL 的真实失败来源。",
+        "prerequisites": [
+          "PyTorch",
+          "PPO/GRPO",
+          "GPU/分布式训练基础"
+        ],
+        "readingOrder": [
+          "README 的 Key Features",
+          "Prepare Data / Reward Function",
+          "PPO architecture / Multi-turn rollout"
+        ],
+        "takeaways": [
+          "verl 将训练与 rollout 后端组织为可组合基础设施，README 列出 FSDP/Megatron 等训练与 vLLM/SGLang 等生成后端。",
+          "支持 SFT、PPO、GRPO 等后训练方法以及函数奖励和模型奖励；算法名称不是可直接互换的配置。",
+          "多轮工具调用、搜索工具与实验追踪有独立入口，需要追踪环境反馈和模型生成边界。",
+          "recipe 要指定所需 verl 版本或 commit，滚动配方还记录相关子模块 SHA；复现需要整套版本信息。"
+        ],
+        "pitfalls": [
+          "只看 reward 均值，不看长度、截断、错误、优势分布和工具成功率。",
+          "升级主仓库但不检查 recipe/依赖 SHA，可能改变数据路径或后端行为。",
+          "看到支持多种硬件就假设任意本地机器可完成指定训练。"
+        ],
+        "practice": [
+          "画出 prompt→rollout→reward→advantage→policy update 的数据形状与拥有者。",
+          "在已具备适配 GPU 的环境上跑最小固定配置；无 GPU 时先用合成样本验证奖励与 mask。",
+          "对一个多轮任务记录成功、超时、工具错误和截断比例，核对总奖励对应轨迹。"
+        ],
+        "selfCheck": [
+          "PPO 与 GRPO 的优势估计区别是什么？",
+          "生成引擎与训练引擎怎样保持策略版本一致？",
+          "复现实验应记录哪些 SHA、模型与数据配置？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "repo",
+            "title": "verl official repository",
+            "url": "https://github.com/verl-project/verl",
+            "section": "Key Features / Getting Started / Recipe requirements",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "支持列表来自本次 README，具体后端兼容性应按选定配置核对。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "openrlhf",
@@ -1392,7 +1999,66 @@
       "source": "Microsoft 官方仓库与作者技术报告",
       "verification": "已打开当前 README 与 v1.0 原报告摘要，核验版本和三组件架构；未训练或验证其成绩。",
       "verifiedAt": "2026-10-11",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "agent-lightning",
+        "title": "Agent Lightning：在真实 Harness 中采集训练轨迹",
+        "oneSentence": "先理清执行轨迹怎样转为策略样本，再讨论训练后的能力提升。",
+        "prerequisites": [
+          "PPO/GRPO",
+          "rollout 数据",
+          "GPU 训练"
+        ],
+        "readingOrder": [
+          "README 的 v1.0 Architecture",
+          "v1.0 technical report",
+          "官方 Quick Start 和配置"
+        ],
+        "takeaways": [
+          "v1.0 把 Agent 的工具、上下文、控制流和环境保留在 harness 内，通过模型代理接入训练。",
+          "Trainer 使用 verl/vLLM 构建样本并更新策略；API Gateway 代理请求并采集数据；Controller 启动 Agent 运行。",
+          "技术报告把 retokenization、样本合并、优势计算、损失归一化和后端调度列为训练稳定性问题。",
+          "仓库明确 v1.0 完全重构，旧版本应看 legacy branch，不能把早期接入方式直接套入当前代码。"
+        ],
+        "pitfalls": [
+          "只采集最终答案与总奖励，无法追踪哪次工具调用或哪段 token 被优化。",
+          "把代理请求文本重新分词后与原始采样 token/logprob 混用，可能产生对齐偏差。",
+          "直接引用作者 benchmark 提升作为自己的复现实验，忽略模型、任务和预算。"
+        ],
+        "practice": [
+          "先用只读计算器小任务采集一条完整轨迹，标出模型输出、工具观察和奖励关联。",
+          "对代理前后 token 序列、样本边界和请求标识做一致性检查，再接入小规模训练。",
+          "固定 harness 与环境，仅改变策略，比较成功率、调用成本和失败类型。"
+        ],
+        "selfCheck": [
+          "三组件的数据流怎样闭环？",
+          "执行 harness 为什么不能随训练配置任意改变？",
+          "样本合并和 loss normalization 怎样影响长短轨迹的权重？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "repo",
+            "title": "Agent Lightning official repository",
+            "url": "https://github.com/microsoft/agent-lightning",
+            "section": "v1.0 note / Architecture / Examples",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "report",
+            "title": "Agent Lightning v1.0 report",
+            "url": "https://arxiv.org/abs/2608.17528",
+            "section": "Harnessed agentic RL abstract",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "导读对应已核验的 v1.0 架构；GPU 环境与训练尚未执行。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "paper-ragen",
@@ -1411,7 +2077,58 @@
       "source": "Wang 等作者原论文 / arXiv",
       "verification": "已打开论文摘要与修订信息；未阅读全文或复现 StarPO 训练。",
       "verifiedAt": "2026-10-11",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "paper-ragen",
+        "title": "RAGEN：多轮 Agent RL 的轨迹与训练崩塌",
+        "oneSentence": "在长时序和随机反馈中，轨迹分布与稳定性往往比单个奖励公式更关键。",
+        "prerequisites": [
+          "策略梯度",
+          "多轮环境",
+          "PPO/优势估计"
+        ],
+        "readingOrder": [
+          "论文 Abstract 的问题与三项发现",
+          "StarPO / Echo Trap",
+          "Rollout shaping 与奖励消融"
+        ],
+        "takeaways": [
+          "研究关注长时序决策和随机环境反馈，提出轨迹层面的 StarPO 与模块化 RAGEN 系统。",
+          "作者在四个风格化环境中观察 Echo Trap：奖励方差骤降与梯度尖峰伴随训练退化。",
+          "StarPO-S 结合轨迹过滤、critic 和梯度稳定化处理上述退化现象。",
+          "论文发现初始状态多样性、适中交互粒度与更频繁采样有助于 rollout；其奖励结论限定于该实验设定。"
+        ],
+        "pitfalls": [
+          "把单轮数学 RL 的稳定配置直接用于长多轮交互，不检查有效决策数和轨迹分布。",
+          "只画平均 reward，隐藏方差、梯度、长度和重复行为。",
+          "把论文中的 reasoning-aware reward 结论当成所有 Agent RL 都必须人工奖励推理文本。"
+        ],
+        "practice": [
+          "在小型导航或状态机环境设计三种初始状态分布，观察策略是否学会可迁移行为。",
+          "画出 reward 均值/方差、动作熵、梯度范数和重复率，寻找退化同时出现的信号。",
+          "固定环境与预算比较一个稳定化组件的开关，保留每个 seed 的结果而非只挑最好曲线。"
+        ],
+        "selfCheck": [
+          "训练 reward 上升时，什么证据仍可能表明策略退化？",
+          "为什么多轮 rollout 的粒度影响探索？",
+          "论文结论能外推到你的任务的哪些部分？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "paper",
+            "title": "RAGEN original paper",
+            "url": "https://arxiv.org/abs/2504.20073",
+            "section": "Abstract / StarPO / Echo Trap / Rollout findings",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "本次以原论文摘要核验主要发现；未宣称复现全文实验或在真实生产任务确认结论。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "search-r1",
@@ -1430,7 +2147,66 @@
       "source": "Bowen Jin 等作者官方仓库",
       "verification": "已打开 README，核验搜索与推理交替设计、检索器和训练入口；未运行代码。",
       "verifiedAt": "2026-10-11",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "search-r1",
+        "title": "Search-R1：把检索交互纳入策略优化",
+        "oneSentence": "检索内容是观察，模型生成查询和答案是动作，两者需要不同训练处理。",
+        "prerequisites": [
+          "RAG",
+          "PPO/GRPO",
+          "token mask"
+        ],
+        "readingOrder": [
+          "论文 3.1 的 RL 与 loss masking",
+          "3.2 的多轮检索生成",
+          "仓库 retrieval server 与训练示例"
+        ],
+        "takeaways": [
+          "Search-R1 用 RL 优化交错推理与多轮搜索，模型决定查询，搜索结果被加入后续上下文。",
+          "论文对外部检索 token 做 loss mask，使策略梯度仅优化模型生成 token；观察仍供条件推理使用。",
+          "PPO 用学习到的 value/GAE，GRPO 用多输出奖励形成相对 baseline，不需要额外 value 模型。",
+          "实现将检索服务与训练管线分开，支持本地稀疏/稠密检索及在线搜索；检索环境是实验配置的一部分。"
+        ],
+        "pitfalls": [
+          "把检索文本当模型动作计算策略损失，使优化目标与真实采样过程不符。",
+          "改变检索语料、top-k、reranker 或在线网页后仍声称仅改变了策略。",
+          "只用终局答案匹配奖励，忽视引用、搜索成本和对证据不足的处理。"
+        ],
+        "practice": [
+          "用一条带两次检索的轨迹标出 action tokens 与 observation tokens，手动验证 mask 和损失计数。",
+          "以固定语料比较无检索、固定 RAG 与自主多轮检索，报告正确率、检索次数和支持证据。",
+          "保持检索服务版本不变，再改变策略；加入空结果与冲突结果检查恢复和拒答。"
+        ],
+        "selfCheck": [
+          "被 mask 的检索 token 还怎样影响模型？",
+          "多轮自主检索与固定一次 RAG 的决策区别是什么？",
+          "怎样避免答案奖励让模型学会刷分而不是可靠用工具？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "paper",
+            "title": "Search-R1 original paper",
+            "url": "https://arxiv.org/html/2503.09516",
+            "section": "3.1 Loss masking / PPO / GRPO / 3.2 / 5.4",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "repo",
+            "title": "Search-R1 authors' repository",
+            "url": "https://github.com/PeterGriffinJin/Search-R1",
+            "section": "Quickstart / Search engine service / Supported retrievers",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "方法导读对应原论文与作者仓库；复现需固定 Search-R1、verl、语料与检索服务版本。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "paper-deepseek-r1",
@@ -1449,7 +2225,58 @@
       "source": "DeepSeek 官方仓库与技术报告入口",
       "verification": "已打开官方 README 的 R1 / R1-Zero 与蒸馏说明；未复现模型训练。",
       "verifiedAt": "2026-10-11",
-      "priority": "explore"
+      "priority": "explore",
+      "digest": {
+        "resourceId": "paper-deepseek-r1",
+        "title": "DeepSeek-R1：区分 RL 推理、冷启动与蒸馏",
+        "oneSentence": "研究训练阶段如何塑造推理行为，并把推理模型能力与工具 Agent 系统能力分开。",
+        "prerequisites": [
+          "SFT",
+          "策略优化与奖励",
+          "LLM 推理"
+        ],
+        "readingOrder": [
+          "README 的 R1-Zero 与 R1",
+          "Model Summary 与 Distillation",
+          "Evaluation protocol 与 Usage Recommendations"
+        ],
+        "takeaways": [
+          "R1-Zero 从基础模型直接进行 RL，没有以 SFT 作初始步骤；作者报告重复、可读性与语言混合等问题。",
+          "R1 引入冷启动数据，官方描述包含两阶段 RL 和两阶段 SFT，以结合推理探索和偏好对齐。",
+          "Distill 系列使用 R1 生成的数据对 Qwen/Llama 系列较小模型微调，不能把蒸馏称为从零完整复现 R1 RL。",
+          "官方基准使用指定生成长度和采样设定，并建议多次测试取平均；推理成本与协议是评测的一部分。"
+        ],
+        "pitfalls": [
+          "从数学/代码推理成绩推断模型已可靠掌握工具选择、权限与长期任务。",
+          "只比较答案正确率而不固定 token 预算、采样次数或截断策略。",
+          "把 R1 原始报告、后续 checkpoint 与蒸馏模型的结论混在一起。"
+        ],
+        "practice": [
+          "画出 R1-Zero、R1 与 Distill 的数据/优化阶段图，逐项说明哪些环节改权重。",
+          "在固定 token 和采样预算下比较一个可运行小模型的直接回答与推理回答，统计错误和成本。",
+          "再加入检索工具，单独评估协议正确率与引用质量，判断模型与系统各自贡献。"
+        ],
+        "selfCheck": [
+          "冷启动主要要解决哪类行为问题？",
+          "蒸馏与策略 RL 的监督信号有何区别？",
+          "推理能力为何不等于 Agent 可靠性？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "repo",
+            "title": "DeepSeek-R1 official repository",
+            "url": "https://github.com/deepseek-ai/DeepSeek-R1",
+            "section": "Introduction / Model Summary / Distillation / Evaluation / Usage",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "总结原始 R1 仓库所述训练路线，不推断所有后续 DeepSeek 模型采用同样流程。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
     },
     {
       "id": "paper-dapo",
@@ -1677,7 +2504,811 @@
       "source": "Datawhale 官方 GitHub",
       "verification": "已打开官方仓库；社交平台入口关联其贡献者与视频导航，具体代码需固定仓库版本。",
       "verifiedAt": "2026-10-11",
-      "priority": "focus"
+      "priority": "focus",
+      "digest": {
+        "resourceId": "hello-agents",
+        "title": "HelloAgents：用课程骨架建立个人实验路线",
+        "oneSentence": "利用中文课程串起基础、框架、记忆、协议、RL 与项目，同时为每章保留独立实验记录。",
+        "prerequisites": [
+          "Python",
+          "LLM API 基本概念"
+        ],
+        "readingOrder": [
+          "README 的内容导航",
+          "经典范式与自研框架章节",
+          "记忆/上下文/协议/评测及毕业设计"
+        ],
+        "takeaways": [
+          "课程从 Agent/LLM 基础进入 ReAct 等范式、平台与框架，再构建自己的 Agent 框架。",
+          "高级部分明确包括记忆与检索、上下文工程、通信协议、Agentic RL 和性能评测。",
+          "综合案例包括旅行助手、深度研究和赛博小镇，之后以完整应用毕业设计检验知识组合。",
+          "仓库提供配套 code，并建议亲手运行、调试和修改；README 不证明所有案例在当前环境都可直接运行。"
+        ],
+        "pitfalls": [
+          "按章节打卡却没有保存输入、输出、失败与修改，缺少能力证据。",
+          "把社区面试题总结标成特定大厂真实题库，仓库目录不能证明招聘来源。",
+          "直接复制教材依赖，忽视上游框架版本变化与案例成本。"
+        ],
+        "practice": [
+          "对已有 ML/LLM 经验先做一份章节能力诊断，基础概念可快速略读。",
+          "选择同一个学习助手项目，把 ReAct、记忆、MCP 和评测逐章加入并做前后比较。",
+          "毕业设计提交可复现实验、架构图和失败分析，而不是只交演示截图。"
+        ],
+        "selfCheck": [
+          "框架应用和从零框架分别教会你什么？",
+          "记忆、上下文和检索的边界能否用实例解释？",
+          "如何用一个项目证明你掌握了多个章节？"
+        ],
+        "sourceLinks": [
+          {
+            "id": "repo",
+            "title": "Datawhale Hello-Agents",
+            "url": "https://github.com/datawhalechina/hello-agents",
+            "section": "Content navigation / How to learn / code / Community Blog",
+            "verification": "原始来源正文已实际打开",
+            "verifiedAt": "2026-10-11"
+          }
+        ],
+        "versionNote": "本次核验 README 的课程导航与学习指引；未宣称逐章执行所有代码。",
+        "verifiedAt": "2026-10-11",
+        "contentType": "editorial-source-grounded-digest",
+        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
+      }
+    },
+    {
+      "id": "deerflow-harness",
+      "title": "DeerFlow 2.1 Harness",
+      "url": "https://github.com/bytedance/deer-flow",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "Harness",
+        "长任务",
+        "Sandbox",
+        "Skills"
+      ],
+      "description": "研究型 Agent 的完整运行底座，包含规划、沙箱、技能、记忆和子任务协作。",
+      "why": "在工具调用、状态持久化与评测之后拆解，学习长任务产品需要哪些运行机制。",
+      "whenToLearn": "完成单 Agent 与 LangGraph 实践后，选择一个长任务做架构拆解。",
+      "source": "ByteDance 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/bytedance/deer-flow",
+          "observed": "README明确2.0是重写，未复用v1代码；1.x保留原研究框架，活跃开发转向2.x。"
+        },
+        {
+          "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0",
+          "observed": "最新发布入口指向v2.1.0；包含可插拔记忆、持久批量委派、鉴权及破坏性配置变化。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README明确2.0是重写，未复用v1代码；1.x保留原研究框架，活跃开发转向2.x。 最新发布入口指向v2.1.0；包含可插拔记忆、持久批量委派、鉴权及破坏性配置变化。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0"
+      ]
+    },
+    {
+      "id": "ms-agent-harness",
+      "title": "MS-Agent",
+      "url": "https://github.com/modelscope/ms-agent",
+      "category": "framework",
+      "level": "实战",
+      "tags": [
+        "国内生态",
+        "Harness",
+        "Context",
+        "Agent Hub"
+      ],
+      "description": "魔搭的模块化 Agent 框架，通过共享 SDK 连接 CLI、TUI 和 WebUI。",
+      "why": "比较一个国内框架如何管理规划、上下文、权限、反馈和项目记忆。",
+      "whenToLearn": "理解基础 Agent Loop 后，用中文文档实现一个生产力助手。",
+      "source": "ModelScope 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/modelscope/ms-agent",
+          "observed": "README当前定位为长任务框架与可定制harness；旧ModelScope-Agent 0.8及以前文档另设入口，不能混用API。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README当前定位为长任务框架与可定制harness；旧ModelScope-Agent 0.8及以前文档另设入口，不能混用API。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "youtu-agent",
+      "title": "Youtu-Agent",
+      "url": "https://github.com/TencentCloudADP/youtu-agent",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "国内生态",
+        "开源模型",
+        "工具调用",
+        "Agent RL"
+      ],
+      "description": "腾讯的轻量 Agent 框架，提供工具使用、研究任务和训练集成示例。",
+      "why": "用于对比开源模型的 Agent 工程路径；训练实验应区分参数更新与训练无关策略优化。",
+      "whenToLearn": "完成工具调用评测后，尝试开源模型替换与小规模训练对照。",
+      "source": "Tencent Cloud ADP 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/TencentCloudADP/youtu-agent",
+          "observed": "原Tencent/Youtu-agent实际重定向到该组织；README列出Agent-Lightning集成和Training-Free GRPO。后者保持模型参数冻结。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "原Tencent/Youtu-agent实际重定向到该组织；README列出Agent-Lightning集成和Training-Free GRPO。后者保持模型参数冻结。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "page-agent",
+      "title": "Alibaba PageAgent",
+      "url": "https://github.com/alibaba/page-agent",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "国内生态",
+        "Web Agent",
+        "DOM",
+        "前端"
+      ],
+      "description": "嵌入网页的 JavaScript Agent，使用文本 DOM 为现有界面加入自然语言操作。",
+      "why": "为学习站未来的站内 Agent 体验提供参考，但必须按客户端网页增强场景设计。",
+      "whenToLearn": "掌握网页开发和工具调用后，在本地演示页验证交互。",
+      "source": "Alibaba 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/alibaba/page-agent",
+          "observed": "README说明核心在页面内运行、采用文本DOM而非截图；多页任务有可选扩展，定位不是服务端自动化。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README说明核心在页面内运行、采用文本DOM而非截图；多页任务有可选扩展，定位不是服务端自动化。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "claude-sdk-hosting",
+      "title": "Claude Agent SDK：Hosting your agent",
+      "url": "https://platform.claude.com/cookbook/claude-agent-sdk-07-hosting-the-agent",
+      "category": "engineering",
+      "level": "实战",
+      "tags": [
+        "Harness",
+        "部署",
+        "Docker",
+        "Kubernetes"
+      ],
+      "description": "从 Docker 到托管容器和 Kubernetes，学习 Agent 的会话路由与持久化部署。",
+      "why": "把能运行的研究 Agent 改为能被产品调用的服务，补齐进程、会话、容器和生命周期管理。",
+      "whenToLearn": "已有可运行 Agent 和本地 API 后，部署一个保留会话的受控服务。",
+      "source": "Anthropic 官方 Cookbook",
+      "primaryEvidence": [
+        {
+          "url": "https://platform.claude.com/cookbook/claude-agent-sdk-07-hosting-the-agent",
+          "observed": "已读2026-05-22教程：统一镜像和HTTP接口覆盖Docker、Modal、Kubernetes；分解spawn、route、lifecycle、persist四项职责。教程示例的依赖快照不等于当前最新版。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读2026-05-22教程：统一镜像和HTTP接口覆盖Docker、Modal、Kubernetes；分解spawn、route、lifecycle、persist四项职责。教程示例的依赖快照不等于当前最新版。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "agent-client-protocol",
+      "title": "Agent Client Protocol（ACP）",
+      "url": "https://github.com/agentclientprotocol/agent-client-protocol",
+      "category": "protocol",
+      "level": "进阶",
+      "tags": [
+        "Coding Agent",
+        "编辑器",
+        "JSON-RPC",
+        "协议版本"
+      ],
+      "description": "连接代码编辑器与编码 Agent 的开放协议，明确会话、能力协商和消息边界。",
+      "why": "与MCP、A2A、AG-UI分工比较，理解编辑器连接层，避免把协议和SDK发布号混为一谈。",
+      "whenToLearn": "掌握MCP后，阅读初始化与会话消息，再做一个编辑器适配实验。",
+      "source": "Agent Client Protocol 官方组织",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/agentclientprotocol/agent-client-protocol",
+          "observed": "README明确当前稳定wire protocol为1；Rust crate与JSON Schema artifact有各自版本，应通过initialize.protocolVersion及capabilities判断兼容性。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README明确当前稳定wire protocol为1；Rust crate与JSON Schema artifact有各自版本，应通过initialize.protocolVersion及capabilities判断兼容性。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "ag-ui-protocol",
+      "title": "AG-UI：Agent-User Interaction Protocol",
+      "url": "https://github.com/ag-ui-protocol/ag-ui",
+      "category": "protocol",
+      "level": "实战",
+      "tags": [
+        "前端",
+        "流式事件",
+        "Agent UX",
+        "交互协议"
+      ],
+      "description": "用统一事件流连接 Agent 后端与产品前端，表达运行过程和交互状态。",
+      "why": "适合把步骤、工具结果、状态变化与用户操作做成清晰的Agent界面。",
+      "whenToLearn": "已有流式API后，为一个Agent项目实现可观察的交互前端。",
+      "source": "AG-UI 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/ag-ui-protocol/ag-ui",
+          "observed": "已读README：AG-UI是面向agent-human交互的事件协议，后端发出标准事件，middleware适配不同后端环境；不替代工具协议MCP。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读README：AG-UI是面向agent-human交互的事件协议，后端发出标准事件，middleware适配不同后端环境；不替代工具协议MCP。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "longmemeval-paper",
+      "title": "LongMemEval",
+      "url": "https://arxiv.org/abs/2410.10813",
+      "category": "paper",
+      "level": "进阶",
+      "tags": [
+        "长期记忆",
+        "Evaluation",
+        "跨会话",
+        "知识更新"
+      ],
+      "description": "评测聊天助手长期记忆的五种能力，包括跨会话推理、时序、更新和拒答。",
+      "why": "为学习站个人知识与学习历史建立测试集，避免仅用相似度验证记忆功能。",
+      "whenToLearn": "实现基础记忆后，对信息抽取、时序、更新和拒答分别写用例。",
+      "source": "LongMemEval 论文作者 / arXiv",
+      "primaryEvidence": [
+        {
+          "url": "https://arxiv.org/abs/2410.10813",
+          "observed": "已读摘要与版本元数据：v2于2025-03-04修订；定义信息抽取、多会话推理、时间推理、知识更新、abstention五类记忆能力。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读摘要与版本元数据：v2于2025-03-04修订；定义信息抽取、多会话推理、时间推理、知识更新、abstention五类记忆能力。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "sleep-time-compute-paper",
+      "title": "Sleep-time Compute",
+      "url": "https://arxiv.org/abs/2504.13171",
+      "category": "paper",
+      "level": "进阶",
+      "tags": [
+        "记忆",
+        "Test-time Compute",
+        "离线计算",
+        "上下文"
+      ],
+      "description": "在用户提问之前离线处理上下文，探索把部分推理计算提前完成。",
+      "why": "适合思考学习资料预处理与后台记忆整理；论文任务结果需要在自己的场景重新验证。",
+      "whenToLearn": "有记忆评测与延迟指标后，比较在线检索和预计算方案。",
+      "source": "论文作者 / arXiv",
+      "primaryEvidence": [
+        {
+          "url": "https://arxiv.org/abs/2504.13171",
+          "observed": "已读摘要：方法在查询到达前预测可能问题并预计算；主要实验为改造后的Stateful GSM-Symbolic与Stateful AIME，不应泛化为所有Agent的性能保证。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读摘要：方法在查询到达前预测可能问题并预计算；主要实验为改造后的Stateful GSM-Symbolic与Stateful AIME，不应泛化为所有Agent的性能保证。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "whenloss-memory-paper",
+      "title": "WhenLoss：记忆写入与检索诊断",
+      "url": "https://arxiv.org/abs/2605.24579",
+      "category": "paper",
+      "level": "进阶",
+      "tags": [
+        "记忆压缩",
+        "诊断评测",
+        "LongMemEval",
+        "前沿论文"
+      ],
+      "description": "把记忆写入丢失与检索遗漏分开评估，检验压缩阶段保留了哪些证据。",
+      "why": "为记忆系统建立归因方法，判断应优化写入、检索还是最终阅读器。",
+      "whenToLearn": "完成LongMemEval小样本复现后，用四条件实验诊断失败。",
+      "source": "WhenLoss 论文作者 / arXiv",
+      "primaryEvidence": [
+        {
+          "url": "https://arxiv.org/abs/2605.24579",
+          "observed": "已读2026-05-23摘要：固定reader比较TFC、OE、CSM、RM；写入侧主导结论仅适用于文中固定预算LongMemEval及已测基线；EPC在写入时保留未来问题证据。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读2026-05-23摘要：固定reader比较TFC、OE、CSM、RM；写入侧主导结论仅适用于文中固定预算LongMemEval及已测基线；EPC在写入时保留未来问题证据。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "memos",
+      "title": "MemOS",
+      "url": "https://github.com/MemTensor/MemOS",
+      "category": "project",
+      "level": "实战",
+      "tags": [
+        "记忆系统",
+        "混合检索",
+        "Skills",
+        "国内生态"
+      ],
+      "description": "提供持久记忆、混合检索与跨任务技能复用的开源记忆系统。",
+      "why": "与Mem0、Letta做功能和数据生命周期对比，用同一评测集检查效果。",
+      "whenToLearn": "有明确的长期记忆需求与基线后，再评估是否引入完整系统。",
+      "source": "MemTensor 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/MemTensor/MemOS",
+          "observed": "当前README标识MemOS 2.0 Stardust；区分本地与云插件，列出hybrid retrieval、persistent memory及技能复用。"
+        },
+        {
+          "url": "https://github.com/MemTensor/MemOS/releases/tag/v2.0.34",
+          "observed": "实际打开latest重定向的v2.0.34发布页；未将README宣传的token节省数字视为通用效果。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "当前README标识MemOS 2.0 Stardust；区分本地与云插件，列出hybrid retrieval、persistent memory及技能复用。 实际打开latest重定向的v2.0.34发布页；未将README宣传的token节省数字视为通用效果。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://github.com/MemTensor/MemOS/releases/tag/v2.0.34"
+      ]
+    },
+    {
+      "id": "openpipe-art",
+      "title": "ART：Agent Reinforcement Trainer",
+      "url": "https://github.com/OpenPipe/ART",
+      "category": "framework",
+      "level": "实战",
+      "tags": [
+        "Agent RL",
+        "GRPO",
+        "多步任务",
+        "Reward"
+      ],
+      "description": "面向真实多步任务训练 Agent，通过轨迹、环境和奖励闭环进行策略优化。",
+      "why": "衔接GRPO原理和Agent实践，先定义可验证奖励，再训练小型环境。",
+      "whenToLearn": "掌握GRPO、轨迹记录和训练验证集划分后，复现一个可计分任务。",
+      "source": "OpenPipe 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/OpenPipe/ART",
+          "observed": "README当前展示W&B ServerlessBackend，自动管理训练和推理基础设施；方法核心是多步Agent的GRPO训练。"
+        },
+        {
+          "url": "https://github.com/OpenPipe/ART/releases/tag/v0.5.19",
+          "observed": "latest发布入口实际指向v0.5.19；学习时须明确使用哪一种backend，不以旧云平台教程推断当前API。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README当前展示W&B ServerlessBackend，自动管理训练和推理基础设施；方法核心是多步Agent的GRPO训练。 latest发布入口实际指向v0.5.19；学习时须明确使用哪一种backend，不以旧云平台教程推断当前API。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://github.com/OpenPipe/ART/releases/tag/v0.5.19"
+      ]
+    },
+    {
+      "id": "rllm",
+      "title": "rLLM",
+      "url": "https://github.com/rllm-org/rllm",
+      "category": "framework",
+      "level": "实战",
+      "tags": [
+        "Agent RL",
+        "Harness",
+        "Rollout",
+        "多训练后端"
+      ],
+      "description": "在共享 Agent 流程上运行评测和训练，支持多种 Harness、沙箱与训练后端。",
+      "why": "学习如何把任务运行、轨迹采集、奖励计算与模型更新分层，连接已有verl知识。",
+      "whenToLearn": "完成一个可重复Agent评测后，用相同任务尝试训练。",
+      "source": "rLLM 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/rllm-org/rllm",
+          "observed": "已读当前README：支持Harbor任务和CLI harness；Model Gateway记录token与logprob，后端可选verl、Tinker、Fireworks；评测与训练复用agent flow。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读当前README：支持Harbor任务和CLI harness；Model Gateway记录token与logprob，后端可选verl、Tinker、Fireworks；评测与训练复用agent flow。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "tinker-training-api",
+      "title": "Tinker Training API",
+      "url": "https://tinker-docs.thinkingmachines.ai/",
+      "category": "platform",
+      "level": "进阶",
+      "tags": [
+        "后训练",
+        "LoRA",
+        "SFT",
+        "RL"
+      ],
+      "description": "在本地编写训练循环，由远程 GPU 服务执行 LoRA、SFT、RL 和偏好优化。",
+      "why": "作为训练基础设施服务与自托管verl/TRL比较，不应把托管API当成本地训练框架。",
+      "whenToLearn": "能解释SFT与RL损失并准备好小实验后，比较托管与自托管流程。",
+      "source": "Thinking Machines Lab 官方文档",
+      "primaryEvidence": [
+        {
+          "url": "https://tinker-docs.thinkingmachines.ai/",
+          "observed": "总览明确为cloud training API，提供LoRA以及SFT、GRPO/PPO、DPO、distillation；训练计算由远程GPU执行。"
+        },
+        {
+          "url": "https://tinker-docs.thinkingmachines.ai/changelog/",
+          "observed": "已读2026-10-02 SDK 0.32.0条目：ServiceClient参数改为显式keyword；旧default_headers替换为default_headers_overrides，未支持参数将逐步报错。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "总览明确为cloud training API，提供LoRA以及SFT、GRPO/PPO、DPO、distillation；训练计算由远程GPU执行。 已读2026-10-02 SDK 0.32.0条目：ServiceClient参数改为显式keyword；旧default_headers替换为default_headers_overrides，未支持参数将逐步报错。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://tinker-docs.thinkingmachines.ai/changelog/"
+      ]
+    },
+    {
+      "id": "trl-post-training",
+      "title": "Hugging Face TRL",
+      "url": "https://github.com/huggingface/trl",
+      "category": "framework",
+      "level": "进阶",
+      "tags": [
+        "后训练",
+        "SFT",
+        "DPO",
+        "GRPO"
+      ],
+      "description": "覆盖监督微调、偏好优化与强化学习的模型后训练库，适合算法到代码的学习。",
+      "why": "用一个库对照SFT、DPO、GRPO目标函数，记录数据、模板、奖励和环境版本。",
+      "whenToLearn": "理解Transformer与训练基础后，再进入模型后训练分支。",
+      "source": "Hugging Face 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/huggingface/trl",
+          "observed": "README列出SFT、DPO、GRPO等训练器，建立在Transformers生态上。"
+        },
+        {
+          "url": "https://github.com/huggingface/trl/releases/tag/v1.15.0",
+          "observed": "latest入口指向v1.15.0；fused LM head成为默认评分路径，use_liger_kernel弃用，Python3.10支持移除，添加vLLM0.31.0支持。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README列出SFT、DPO、GRPO等训练器，建立在Transformers生态上。 latest入口指向v1.15.0；fused LM head成为默认评分路径，use_liger_kernel弃用，Python3.10支持移除，添加vLLM0.31.0支持。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://github.com/huggingface/trl/releases/tag/v1.15.0"
+      ]
+    },
+    {
+      "id": "vllm-tool-serving",
+      "title": "vLLM：Tool Calling",
+      "url": "https://docs.vllm.ai/en/latest/features/tool_calling/",
+      "category": "engineering",
+      "level": "实战",
+      "tags": [
+        "模型部署",
+        "工具调用",
+        "Chat Template",
+        "Parser"
+      ],
+      "description": "学习为自托管模型配置工具调用解析器、聊天模板和自动工具选择。",
+      "why": "把开源模型接入Agent需要模型、模板与parser共同正确，不能只检查OpenAI接口兼容。",
+      "whenToLearn": "Agent评测稳定且准备自托管模型后，验证单次与并行工具调用。",
+      "source": "vLLM 官方文档 / GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://docs.vllm.ai/en/latest/features/tool_calling/",
+          "observed": "实际打开当前文档，按模型列出tool-call-parser及chat-template要求；旧.html URL重定向到目录URL。"
+        },
+        {
+          "url": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0",
+          "observed": "latest发布页重定向到v0.31.0；latest文档持续变化，实验须固定安装版本与checkpoint。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "实际打开当前文档，按模型列出tool-call-parser及chat-template要求；旧.html URL重定向到目录URL。 latest发布页重定向到v0.31.0；latest文档持续变化，实验须固定安装版本与checkpoint。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://github.com/vllm-project/vllm/releases/tag/v0.31.0"
+      ]
+    },
+    {
+      "id": "sglang-tool-serving",
+      "title": "SGLang：Tool Parser",
+      "url": "https://docs.sglang.io/docs/advanced_features/tool_parser",
+      "category": "engineering",
+      "level": "实战",
+      "tags": [
+        "模型部署",
+        "工具调用",
+        "结构化输出",
+        "Grammar"
+      ],
+      "description": "通过模型专用解析器与语法约束服务工具调用，验证流式与强制工具选择。",
+      "why": "作为vLLM的工程对照，检验相同模型和工具schema在不同推理服务中的行为。",
+      "whenToLearn": "了解parser与模板后，用同一Agent测试集比较推理引擎。",
+      "source": "SGLang 官方文档 / GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://docs.sglang.io/docs/advanced_features/tool_parser",
+          "observed": "原docs.sglang.ai页面实际重定向至此；文档使用--tool-call-parser并说明required/named工具选择及Xgrammar兼容条件。"
+        },
+        {
+          "url": "https://github.com/sgl-project/sglang/releases/tag/v0.5.21",
+          "observed": "实际打开latest重定向的v0.5.21发布页；旧function_calling.html地址无法获取，未使用失效URL。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "原docs.sglang.ai页面实际重定向至此；文档使用--tool-call-parser并说明required/named工具选择及Xgrammar兼容条件。 实际打开latest重定向的v0.5.21发布页；旧function_calling.html地址无法获取，未使用失效URL。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://github.com/sgl-project/sglang/releases/tag/v0.5.21"
+      ]
+    },
+    {
+      "id": "ray-serve-llm",
+      "title": "Ray Serve LLM",
+      "url": "https://docs.ray.io/en/latest/serve/llm/index.html",
+      "category": "engineering",
+      "level": "实战",
+      "tags": [
+        "部署",
+        "Autoscaling",
+        "多模型",
+        "推理服务"
+      ],
+      "description": "为模型服务加入多节点部署、负载均衡、自动扩缩容与请求路由。",
+      "why": "在单模型服务跑通后处理产品负载；框架支持能力需要通过自身流量与延迟测试确认。",
+      "whenToLearn": "已有自托管推理服务和负载基线后，再做多节点与扩缩容实验。",
+      "source": "Ray 官方文档",
+      "primaryEvidence": [
+        {
+          "url": "https://docs.ray.io/en/latest/serve/llm/index.html",
+          "observed": "已读Ray2.59.0文档：OpenAI-compatible API、多模型多节点autoscaling、prefill/decode分离、prefix-aware routing与multi-LoRA。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读Ray2.59.0文档：OpenAI-compatible API、多模型多节点autoscaling、prefill/decode分离、prefix-aware routing与multi-LoRA。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "harbor-eval-harness",
+      "title": "Harbor Agent Evaluation Harness",
+      "url": "https://github.com/harbor-framework/harbor",
+      "category": "evaluation",
+      "level": "实战",
+      "tags": [
+        "Harness",
+        "Terminal-Bench",
+        "Sandbox",
+        "RL Rollout"
+      ],
+      "description": "用容器化任务评测不同 Agent，并复用环境和轨迹开展优化实验。",
+      "why": "把Agent比较从截图和排行榜转为可运行的任务、verifier与完整trajectory。",
+      "whenToLearn": "掌握Agent轨迹和评测指标后，选少量任务建立可重复基线。",
+      "source": "Harbor / Terminal-Bench 作者",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/harbor-framework/harbor",
+          "observed": "README明确是Terminal-Bench2.0官方harness；支持任意agent、任务环境、Docker/cloud sandbox和RL rollout生成。"
+        },
+        {
+          "url": "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0",
+          "observed": "latest入口指向2026-10-05的v0.24.0；包含MCP/skills能力声明、轨迹与verifier修复。不要与同名容器镜像仓库Harbor混淆。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README明确是Terminal-Bench2.0官方harness；支持任意agent、任务环境、Docker/cloud sandbox和RL rollout生成。 latest入口指向2026-10-05的v0.24.0；包含MCP/skills能力声明、轨迹与verifier修复。不要与同名容器镜像仓库Harbor混淆。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0"
+      ]
+    },
+    {
+      "id": "swe-bench-pro-v2",
+      "title": "SWE-bench Pro V2",
+      "url": "https://github.com/scaleapi/SWE-bench_Pro-os/blob/main/v2/README.md",
+      "category": "evaluation",
+      "level": "实战",
+      "tags": [
+        "Coding Agent",
+        "Harbor",
+        "长任务",
+        "评测协议"
+      ],
+      "description": "以独立容器任务和固定评测协议测试长程软件修复能力。",
+      "why": "与SWE-bench Verified分别记录数据版本、任务集合、环境与计分协议，避免直接混比分数。",
+      "whenToLearn": "掌握Harbor后，先复现oracle/nop sanity check，再评测编码Agent。",
+      "source": "Scale AI 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/scaleapi/SWE-bench_Pro-os/blob/main/v2/README.md",
+          "observed": "已读V2：validated public split共642任务/11仓库，每项是Harbor任务；HuggingFace default为V2，v1仍是原731任务，另有HARD-51及locked protocol。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读V2：validated public split共642任务/11仓库，每项是Harbor任务；HuggingFace default为V2，v1仍是原731任务，另有HARD-51及locked protocol。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "lhaw-clarification-eval",
+      "title": "LHAW：Long-Horizon Augmented Workflows",
+      "url": "https://github.com/scaleapi/lhaw",
+      "category": "evaluation",
+      "level": "进阶",
+      "tags": [
+        "澄清能力",
+        "长任务",
+        "MCP",
+        "Evaluation"
+      ],
+      "description": "评测 Agent 在需求信息不足时能否识别关键缺口并有效澄清。",
+      "why": "为产品Agent加入“何时问用户”的评测，覆盖最终成功之外的交互行为。",
+      "whenToLearn": "已有任务成功率基线后，再测试信息删减与用户模拟器。",
+      "source": "Scale AI 官方 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/scaleapi/lhaw",
+          "observed": "README说明从Goals、Constraints、Inputs、Context四个维度删减信息；基于TheAgentCompany、SWE-bench Pro、MCP-Atlas生成变体，用ask_user与模拟用户对照。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "README说明从Goals、Constraints、Inputs、Context四个维度删减信息；基于TheAgentCompany、SWE-bench Pro、MCP-Atlas生成变体，用ask_user与模拟用户对照。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "datawhale-all-in-rag",
+      "title": "Datawhale All-in-RAG",
+      "url": "https://github.com/datawhalechina/all-in-rag",
+      "category": "course",
+      "level": "基础",
+      "tags": [
+        "中文社区",
+        "RAG",
+        "系统评测",
+        "Graph RAG"
+      ],
+      "description": "中文开源 RAG 全栈教程，覆盖数据准备、索引、混合检索、评测和项目实践。",
+      "why": "补齐Agent知识检索基础；可选Graph RAG与多模态章节用于扩展学习站知识库。",
+      "whenToLearn": "具备Python基础后，作为中文主线完成一个可评测的检索项目。",
+      "source": "Datawhale 官方社区 GitHub",
+      "primaryEvidence": [
+        {
+          "url": "https://github.com/datawhalechina/all-in-rag",
+          "observed": "已读课程目录与前置要求，包含系统评估、Graph RAG优化及社区Extra Chapter；第十章项目二仍标规划中，不能承诺课程全部完结。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "已读课程目录与前置要求，包含系统评估、Graph RAG优化及社区Extra Chapter；第十章项目二仍标规划中，不能承诺课程全部完结。",
+      "priority": "explore",
+      "relatedUrls": []
+    },
+    {
+      "id": "openai-deprecation-watch",
+      "title": "OpenAI API：Deprecations",
+      "url": "https://developers.openai.com/api/docs/deprecations",
+      "category": "engineering",
+      "level": "基础",
+      "tags": [
+        "迁移",
+        "API 生命周期",
+        "Agent Builder",
+        "Evals"
+      ],
+      "description": "核对服务退役与迁移时间，避免学习已关闭或即将关闭的 Agent 接口。",
+      "why": "这是资源目录当前性检查入口，应据此调整OpenAI Evals、Agent Builder和Assistants旧教程。",
+      "whenToLearn": "开始OpenAI项目及依赖升级前阅读；给项目记录当前SDK与API路径。",
+      "source": "OpenAI 官方文档",
+      "primaryEvidence": [
+        {
+          "url": "https://developers.openai.com/api/docs/deprecations",
+          "observed": "Evals平台2026-10-31转只读、11-30关闭；Agent Builder11-30关闭；Assistants API退役日期2026-08-26。"
+        },
+        {
+          "url": "https://developers.openai.com/api/docs/changelog",
+          "observed": "2026-08-26条目确认Assistants API已经关闭，迁移到Responses API和Conversations API。以上退役范围不能泛化为Agents SDK也退役。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "access": "readable",
+      "verification": "Evals平台2026-10-31转只读、11-30关闭；Agent Builder11-30关闭；Assistants API退役日期2026-08-26。 2026-08-26条目确认Assistants API已经关闭，迁移到Responses API和Conversations API。以上退役范围不能泛化为Agents SDK也退役。",
+      "priority": "explore",
+      "relatedUrls": [
+        "https://developers.openai.com/api/docs/changelog"
+      ]
+    },
+    {
+      "id": "xiaohongshu-harness-career-lead",
+      "title": "小红书 Harness 岗位线索（待人工核实）",
+      "url": "https://job.xiaohongshu.com/campus/position/21899",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "岗位线索",
+        "Harness",
+        "待核实"
+      ],
+      "description": "搜索发现小红书 Harness 相关岗位入口，页面正文当前无法直接读取。",
+      "why": "可用于后续人工核实岗位需求；不能把搜索摘要变成已核实的面试或技能结论。",
+      "whenToLearn": "求职阶段人工打开原页确认职位名称、状态与职责后再纳入计划。",
+      "source": "小红书官方招聘域名 / 搜索线索",
+      "access": "discovery-only",
+      "primaryEvidence": [
+        {
+          "url": "https://job.xiaohongshu.com/campus/position/21899",
+          "observed": "已尝试直接打开，工具只返回“小红书”和0行正文；仅发现链接，未读到职位内容，也未核实招聘是否仍开放。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "verification": "已尝试直接打开，工具只返回“小红书”和0行正文；仅发现链接，未读到职位内容，也未核实招聘是否仍开放。",
+      "priority": "discovery",
+      "relatedUrls": []
+    },
+    {
+      "id": "xiaohongshu-agent-career-lead",
+      "title": "小红书 Agent 岗位线索（待人工核实）",
+      "url": "https://job.xiaohongshu.com/campus/position/22018",
+      "category": "discovery",
+      "level": "进阶",
+      "tags": [
+        "小红书",
+        "岗位线索",
+        "Agent",
+        "待核实"
+      ],
+      "description": "搜索发现 Agent 相关官方招聘页，动态正文未能读取，保留为待核实入口。",
+      "why": "扩展国内求职调研范围；职位要求、面试题与在招状态均待人工读取确认。",
+      "whenToLearn": "求职阶段在可访问浏览器中核实原文后使用。",
+      "source": "小红书官方招聘域名 / 搜索线索",
+      "access": "discovery-only",
+      "primaryEvidence": [
+        {
+          "url": "https://job.xiaohongshu.com/campus/position/22018",
+          "observed": "已尝试直接打开，返回0行可读正文；没有将检索摘要当作已读原文。"
+        }
+      ],
+      "verifiedAt": "2026-10-11",
+      "verification": "已尝试直接打开，返回0行可读正文；没有将检索摘要当作已读原文。",
+      "priority": "discovery",
+      "relatedUrls": []
     }
   ],
   "curriculum": [
@@ -2636,6 +4267,7 @@
     }
   ],
   "findings": [
+    "OpenAI Evals 已公布退役计划：2026-10-31 转只读，11-30 关闭。Agent Builder 11-30 关闭；新项目以 SDK、可版本化评测代码和轨迹为主。",
     "AutoGen 官方 README 已明确维护模式，并建议新用户采用 Microsoft Agent Framework。",
     "SWE-agent 官方 README 已明确主要开发转向 mini-SWE-agent，并建议默认选用后者。",
     "LangChain 提供 create_agent 高层入口；LangGraph 提供底层有状态编排；Deep Agents 在其上增加文件系统、上下文管理和子 Agent 等能力。",
@@ -2769,6 +4401,1617 @@
       "title": "Hello World",
       "url": "/glSu/4a17b156.html",
       "tag": "博客搭建"
+    }
+  ],
+  "researchRounds": {
+    "verifiedAt": "2026-10-11",
+    "scope": "网站产品化第三轮有界研究；仅资料建议，未修改网站或发布。",
+    "method": "实际打开官方文档、作者论文、官方GitHub及发布页；与content/workspace.json资源主URL去重。readable表示取到正文；discovery-only表示仅发现入口，不能生成阅读结论。没有依赖stars、排名或营销效果数字。",
+    "counts": {
+      "items": 25,
+      "readable": 23,
+      "discoveryOnly": 2,
+      "updatesSources": 15
+    },
+    "keyFindings": [
+      "学习路线应从工具调用与状态、轨迹评测进入Harness，再分支长期记忆、部署和模型后训练。",
+      "DeerFlow2.0重写，当前latest为2.1.0；MS-Agent旧0.8及以前教程分离；Youtu-agent组织URL迁移。",
+      "协议分工可教学为MCP工具连接、A2A agent协作、ACP编辑器连接、AG-UI用户界面事件；ACP wire version不能由SDK/schema版本推断。",
+      "长期记忆除检索召回外，需评测写入压缩丢失、时序、更新、拒答；WhenLoss结论只代表特定实验，不是通用规律。",
+      "Harbor衔接评测与RL rollout；SWE-bench ProV2与原V1任务集合不同，成绩必须注明数据和协议。",
+      "模型后训练路线可补充TRL、ART、rLLM和Tinker；训练框架、harness、托管GPU API各层职责需要区分。",
+      "OpenAI Evals和Agent Builder在2026年已有官方关闭计划；Agents SDK不在该退役范围。Assistants API已经关闭。",
+      "社交内容必须与官方主源交叉验证。小红书本轮可找到官方招聘线索，但原文不可读；社交搜索页获取失败。"
+    ],
+    "accessLimits": [
+      {
+        "url": "https://www.xiaohongshu.com/search_result?keyword=Agent%20Harness",
+        "platform": "小红书社区",
+        "access": "unreadable",
+        "observed": "已尝试打开社交搜索页，工具返回获取错误。没有读取任何笔记，不能声称广泛读过站内内容；这仅是人工调研入口。"
+      },
+      {
+        "url": "https://job.xiaohongshu.com/campus/position/21899",
+        "platform": "小红书招聘",
+        "access": "discovery-only",
+        "observed": "动态页面仅返回空壳，记录为岗位线索。"
+      },
+      {
+        "url": "https://job.xiaohongshu.com/campus/position/22018",
+        "platform": "小红书招聘",
+        "access": "discovery-only",
+        "observed": "动态页面仅返回空壳，记录为岗位线索。"
+      },
+      {
+        "url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md",
+        "platform": "GitHub",
+        "access": "metadata-only",
+        "observed": "页面打开成功但没有解析出changelog条目；已改用实际可读的官方release页面。"
+      }
+    ],
+    "items": [
+      {
+        "id": "deerflow-harness",
+        "title": "DeerFlow 2.1 Harness",
+        "url": "https://github.com/bytedance/deer-flow",
+        "category": "project",
+        "level": "实战",
+        "tags": [
+          "Harness",
+          "长任务",
+          "Sandbox",
+          "Skills"
+        ],
+        "description": "研究型 Agent 的完整运行底座，包含规划、沙箱、技能、记忆和子任务协作。",
+        "why": "在工具调用、状态持久化与评测之后拆解，学习长任务产品需要哪些运行机制。",
+        "whenToLearn": "完成单 Agent 与 LangGraph 实践后，选择一个长任务做架构拆解。",
+        "source": "ByteDance 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/bytedance/deer-flow",
+            "observed": "README明确2.0是重写，未复用v1代码；1.x保留原研究框架，活跃开发转向2.x。"
+          },
+          {
+            "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0",
+            "observed": "最新发布入口指向v2.1.0；包含可插拔记忆、持久批量委派、鉴权及破坏性配置变化。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README明确2.0是重写，未复用v1代码；1.x保留原研究框架，活跃开发转向2.x。 最新发布入口指向v2.1.0；包含可插拔记忆、持久批量委派、鉴权及破坏性配置变化。"
+      },
+      {
+        "id": "ms-agent-harness",
+        "title": "MS-Agent",
+        "url": "https://github.com/modelscope/ms-agent",
+        "category": "framework",
+        "level": "实战",
+        "tags": [
+          "国内生态",
+          "Harness",
+          "Context",
+          "Agent Hub"
+        ],
+        "description": "魔搭的模块化 Agent 框架，通过共享 SDK 连接 CLI、TUI 和 WebUI。",
+        "why": "比较一个国内框架如何管理规划、上下文、权限、反馈和项目记忆。",
+        "whenToLearn": "理解基础 Agent Loop 后，用中文文档实现一个生产力助手。",
+        "source": "ModelScope 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/modelscope/ms-agent",
+            "observed": "README当前定位为长任务框架与可定制harness；旧ModelScope-Agent 0.8及以前文档另设入口，不能混用API。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README当前定位为长任务框架与可定制harness；旧ModelScope-Agent 0.8及以前文档另设入口，不能混用API。"
+      },
+      {
+        "id": "youtu-agent",
+        "title": "Youtu-Agent",
+        "url": "https://github.com/TencentCloudADP/youtu-agent",
+        "category": "framework",
+        "level": "进阶",
+        "tags": [
+          "国内生态",
+          "开源模型",
+          "工具调用",
+          "Agent RL"
+        ],
+        "description": "腾讯的轻量 Agent 框架，提供工具使用、研究任务和训练集成示例。",
+        "why": "用于对比开源模型的 Agent 工程路径；训练实验应区分参数更新与训练无关策略优化。",
+        "whenToLearn": "完成工具调用评测后，尝试开源模型替换与小规模训练对照。",
+        "source": "Tencent Cloud ADP 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/TencentCloudADP/youtu-agent",
+            "observed": "原Tencent/Youtu-agent实际重定向到该组织；README列出Agent-Lightning集成和Training-Free GRPO。后者保持模型参数冻结。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "原Tencent/Youtu-agent实际重定向到该组织；README列出Agent-Lightning集成和Training-Free GRPO。后者保持模型参数冻结。"
+      },
+      {
+        "id": "page-agent",
+        "title": "Alibaba PageAgent",
+        "url": "https://github.com/alibaba/page-agent",
+        "category": "project",
+        "level": "实战",
+        "tags": [
+          "国内生态",
+          "Web Agent",
+          "DOM",
+          "前端"
+        ],
+        "description": "嵌入网页的 JavaScript Agent，使用文本 DOM 为现有界面加入自然语言操作。",
+        "why": "为学习站未来的站内 Agent 体验提供参考，但必须按客户端网页增强场景设计。",
+        "whenToLearn": "掌握网页开发和工具调用后，在本地演示页验证交互。",
+        "source": "Alibaba 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/alibaba/page-agent",
+            "observed": "README说明核心在页面内运行、采用文本DOM而非截图；多页任务有可选扩展，定位不是服务端自动化。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README说明核心在页面内运行、采用文本DOM而非截图；多页任务有可选扩展，定位不是服务端自动化。"
+      },
+      {
+        "id": "claude-sdk-hosting",
+        "title": "Claude Agent SDK：Hosting your agent",
+        "url": "https://platform.claude.com/cookbook/claude-agent-sdk-07-hosting-the-agent",
+        "category": "engineering",
+        "level": "实战",
+        "tags": [
+          "Harness",
+          "部署",
+          "Docker",
+          "Kubernetes"
+        ],
+        "description": "从 Docker 到托管容器和 Kubernetes，学习 Agent 的会话路由与持久化部署。",
+        "why": "把能运行的研究 Agent 改为能被产品调用的服务，补齐进程、会话、容器和生命周期管理。",
+        "whenToLearn": "已有可运行 Agent 和本地 API 后，部署一个保留会话的受控服务。",
+        "source": "Anthropic 官方 Cookbook",
+        "primaryEvidence": [
+          {
+            "url": "https://platform.claude.com/cookbook/claude-agent-sdk-07-hosting-the-agent",
+            "observed": "已读2026-05-22教程：统一镜像和HTTP接口覆盖Docker、Modal、Kubernetes；分解spawn、route、lifecycle、persist四项职责。教程示例的依赖快照不等于当前最新版。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读2026-05-22教程：统一镜像和HTTP接口覆盖Docker、Modal、Kubernetes；分解spawn、route、lifecycle、persist四项职责。教程示例的依赖快照不等于当前最新版。"
+      },
+      {
+        "id": "agent-client-protocol",
+        "title": "Agent Client Protocol（ACP）",
+        "url": "https://github.com/agentclientprotocol/agent-client-protocol",
+        "category": "protocol",
+        "level": "进阶",
+        "tags": [
+          "Coding Agent",
+          "编辑器",
+          "JSON-RPC",
+          "协议版本"
+        ],
+        "description": "连接代码编辑器与编码 Agent 的开放协议，明确会话、能力协商和消息边界。",
+        "why": "与MCP、A2A、AG-UI分工比较，理解编辑器连接层，避免把协议和SDK发布号混为一谈。",
+        "whenToLearn": "掌握MCP后，阅读初始化与会话消息，再做一个编辑器适配实验。",
+        "source": "Agent Client Protocol 官方组织",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/agentclientprotocol/agent-client-protocol",
+            "observed": "README明确当前稳定wire protocol为1；Rust crate与JSON Schema artifact有各自版本，应通过initialize.protocolVersion及capabilities判断兼容性。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README明确当前稳定wire protocol为1；Rust crate与JSON Schema artifact有各自版本，应通过initialize.protocolVersion及capabilities判断兼容性。"
+      },
+      {
+        "id": "ag-ui-protocol",
+        "title": "AG-UI：Agent-User Interaction Protocol",
+        "url": "https://github.com/ag-ui-protocol/ag-ui",
+        "category": "protocol",
+        "level": "实战",
+        "tags": [
+          "前端",
+          "流式事件",
+          "Agent UX",
+          "交互协议"
+        ],
+        "description": "用统一事件流连接 Agent 后端与产品前端，表达运行过程和交互状态。",
+        "why": "适合把步骤、工具结果、状态变化与用户操作做成清晰的Agent界面。",
+        "whenToLearn": "已有流式API后，为一个Agent项目实现可观察的交互前端。",
+        "source": "AG-UI 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/ag-ui-protocol/ag-ui",
+            "observed": "已读README：AG-UI是面向agent-human交互的事件协议，后端发出标准事件，middleware适配不同后端环境；不替代工具协议MCP。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读README：AG-UI是面向agent-human交互的事件协议，后端发出标准事件，middleware适配不同后端环境；不替代工具协议MCP。"
+      },
+      {
+        "id": "longmemeval-paper",
+        "title": "LongMemEval",
+        "url": "https://arxiv.org/abs/2410.10813",
+        "category": "paper",
+        "level": "进阶",
+        "tags": [
+          "长期记忆",
+          "Evaluation",
+          "跨会话",
+          "知识更新"
+        ],
+        "description": "评测聊天助手长期记忆的五种能力，包括跨会话推理、时序、更新和拒答。",
+        "why": "为学习站个人知识与学习历史建立测试集，避免仅用相似度验证记忆功能。",
+        "whenToLearn": "实现基础记忆后，对信息抽取、时序、更新和拒答分别写用例。",
+        "source": "LongMemEval 论文作者 / arXiv",
+        "primaryEvidence": [
+          {
+            "url": "https://arxiv.org/abs/2410.10813",
+            "observed": "已读摘要与版本元数据：v2于2025-03-04修订；定义信息抽取、多会话推理、时间推理、知识更新、abstention五类记忆能力。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读摘要与版本元数据：v2于2025-03-04修订；定义信息抽取、多会话推理、时间推理、知识更新、abstention五类记忆能力。"
+      },
+      {
+        "id": "sleep-time-compute-paper",
+        "title": "Sleep-time Compute",
+        "url": "https://arxiv.org/abs/2504.13171",
+        "category": "paper",
+        "level": "进阶",
+        "tags": [
+          "记忆",
+          "Test-time Compute",
+          "离线计算",
+          "上下文"
+        ],
+        "description": "在用户提问之前离线处理上下文，探索把部分推理计算提前完成。",
+        "why": "适合思考学习资料预处理与后台记忆整理；论文任务结果需要在自己的场景重新验证。",
+        "whenToLearn": "有记忆评测与延迟指标后，比较在线检索和预计算方案。",
+        "source": "论文作者 / arXiv",
+        "primaryEvidence": [
+          {
+            "url": "https://arxiv.org/abs/2504.13171",
+            "observed": "已读摘要：方法在查询到达前预测可能问题并预计算；主要实验为改造后的Stateful GSM-Symbolic与Stateful AIME，不应泛化为所有Agent的性能保证。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读摘要：方法在查询到达前预测可能问题并预计算；主要实验为改造后的Stateful GSM-Symbolic与Stateful AIME，不应泛化为所有Agent的性能保证。"
+      },
+      {
+        "id": "whenloss-memory-paper",
+        "title": "WhenLoss：记忆写入与检索诊断",
+        "url": "https://arxiv.org/abs/2605.24579",
+        "category": "paper",
+        "level": "进阶",
+        "tags": [
+          "记忆压缩",
+          "诊断评测",
+          "LongMemEval",
+          "前沿论文"
+        ],
+        "description": "把记忆写入丢失与检索遗漏分开评估，检验压缩阶段保留了哪些证据。",
+        "why": "为记忆系统建立归因方法，判断应优化写入、检索还是最终阅读器。",
+        "whenToLearn": "完成LongMemEval小样本复现后，用四条件实验诊断失败。",
+        "source": "WhenLoss 论文作者 / arXiv",
+        "primaryEvidence": [
+          {
+            "url": "https://arxiv.org/abs/2605.24579",
+            "observed": "已读2026-05-23摘要：固定reader比较TFC、OE、CSM、RM；写入侧主导结论仅适用于文中固定预算LongMemEval及已测基线；EPC在写入时保留未来问题证据。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读2026-05-23摘要：固定reader比较TFC、OE、CSM、RM；写入侧主导结论仅适用于文中固定预算LongMemEval及已测基线；EPC在写入时保留未来问题证据。"
+      },
+      {
+        "id": "memos",
+        "title": "MemOS",
+        "url": "https://github.com/MemTensor/MemOS",
+        "category": "project",
+        "level": "实战",
+        "tags": [
+          "记忆系统",
+          "混合检索",
+          "Skills",
+          "国内生态"
+        ],
+        "description": "提供持久记忆、混合检索与跨任务技能复用的开源记忆系统。",
+        "why": "与Mem0、Letta做功能和数据生命周期对比，用同一评测集检查效果。",
+        "whenToLearn": "有明确的长期记忆需求与基线后，再评估是否引入完整系统。",
+        "source": "MemTensor 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/MemTensor/MemOS",
+            "observed": "当前README标识MemOS 2.0 Stardust；区分本地与云插件，列出hybrid retrieval、persistent memory及技能复用。"
+          },
+          {
+            "url": "https://github.com/MemTensor/MemOS/releases/tag/v2.0.34",
+            "observed": "实际打开latest重定向的v2.0.34发布页；未将README宣传的token节省数字视为通用效果。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "当前README标识MemOS 2.0 Stardust；区分本地与云插件，列出hybrid retrieval、persistent memory及技能复用。 实际打开latest重定向的v2.0.34发布页；未将README宣传的token节省数字视为通用效果。"
+      },
+      {
+        "id": "openpipe-art",
+        "title": "ART：Agent Reinforcement Trainer",
+        "url": "https://github.com/OpenPipe/ART",
+        "category": "framework",
+        "level": "实战",
+        "tags": [
+          "Agent RL",
+          "GRPO",
+          "多步任务",
+          "Reward"
+        ],
+        "description": "面向真实多步任务训练 Agent，通过轨迹、环境和奖励闭环进行策略优化。",
+        "why": "衔接GRPO原理和Agent实践，先定义可验证奖励，再训练小型环境。",
+        "whenToLearn": "掌握GRPO、轨迹记录和训练验证集划分后，复现一个可计分任务。",
+        "source": "OpenPipe 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/OpenPipe/ART",
+            "observed": "README当前展示W&B ServerlessBackend，自动管理训练和推理基础设施；方法核心是多步Agent的GRPO训练。"
+          },
+          {
+            "url": "https://github.com/OpenPipe/ART/releases/tag/v0.5.19",
+            "observed": "latest发布入口实际指向v0.5.19；学习时须明确使用哪一种backend，不以旧云平台教程推断当前API。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README当前展示W&B ServerlessBackend，自动管理训练和推理基础设施；方法核心是多步Agent的GRPO训练。 latest发布入口实际指向v0.5.19；学习时须明确使用哪一种backend，不以旧云平台教程推断当前API。"
+      },
+      {
+        "id": "rllm",
+        "title": "rLLM",
+        "url": "https://github.com/rllm-org/rllm",
+        "category": "framework",
+        "level": "实战",
+        "tags": [
+          "Agent RL",
+          "Harness",
+          "Rollout",
+          "多训练后端"
+        ],
+        "description": "在共享 Agent 流程上运行评测和训练，支持多种 Harness、沙箱与训练后端。",
+        "why": "学习如何把任务运行、轨迹采集、奖励计算与模型更新分层，连接已有verl知识。",
+        "whenToLearn": "完成一个可重复Agent评测后，用相同任务尝试训练。",
+        "source": "rLLM 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/rllm-org/rllm",
+            "observed": "已读当前README：支持Harbor任务和CLI harness；Model Gateway记录token与logprob，后端可选verl、Tinker、Fireworks；评测与训练复用agent flow。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读当前README：支持Harbor任务和CLI harness；Model Gateway记录token与logprob，后端可选verl、Tinker、Fireworks；评测与训练复用agent flow。"
+      },
+      {
+        "id": "tinker-training-api",
+        "title": "Tinker Training API",
+        "url": "https://tinker-docs.thinkingmachines.ai/",
+        "category": "platform",
+        "level": "进阶",
+        "tags": [
+          "后训练",
+          "LoRA",
+          "SFT",
+          "RL"
+        ],
+        "description": "在本地编写训练循环，由远程 GPU 服务执行 LoRA、SFT、RL 和偏好优化。",
+        "why": "作为训练基础设施服务与自托管verl/TRL比较，不应把托管API当成本地训练框架。",
+        "whenToLearn": "能解释SFT与RL损失并准备好小实验后，比较托管与自托管流程。",
+        "source": "Thinking Machines Lab 官方文档",
+        "primaryEvidence": [
+          {
+            "url": "https://tinker-docs.thinkingmachines.ai/",
+            "observed": "总览明确为cloud training API，提供LoRA以及SFT、GRPO/PPO、DPO、distillation；训练计算由远程GPU执行。"
+          },
+          {
+            "url": "https://tinker-docs.thinkingmachines.ai/changelog/",
+            "observed": "已读2026-10-02 SDK 0.32.0条目：ServiceClient参数改为显式keyword；旧default_headers替换为default_headers_overrides，未支持参数将逐步报错。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "总览明确为cloud training API，提供LoRA以及SFT、GRPO/PPO、DPO、distillation；训练计算由远程GPU执行。 已读2026-10-02 SDK 0.32.0条目：ServiceClient参数改为显式keyword；旧default_headers替换为default_headers_overrides，未支持参数将逐步报错。"
+      },
+      {
+        "id": "trl-post-training",
+        "title": "Hugging Face TRL",
+        "url": "https://github.com/huggingface/trl",
+        "category": "framework",
+        "level": "进阶",
+        "tags": [
+          "后训练",
+          "SFT",
+          "DPO",
+          "GRPO"
+        ],
+        "description": "覆盖监督微调、偏好优化与强化学习的模型后训练库，适合算法到代码的学习。",
+        "why": "用一个库对照SFT、DPO、GRPO目标函数，记录数据、模板、奖励和环境版本。",
+        "whenToLearn": "理解Transformer与训练基础后，再进入模型后训练分支。",
+        "source": "Hugging Face 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/huggingface/trl",
+            "observed": "README列出SFT、DPO、GRPO等训练器，建立在Transformers生态上。"
+          },
+          {
+            "url": "https://github.com/huggingface/trl/releases/tag/v1.15.0",
+            "observed": "latest入口指向v1.15.0；fused LM head成为默认评分路径，use_liger_kernel弃用，Python3.10支持移除，添加vLLM0.31.0支持。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README列出SFT、DPO、GRPO等训练器，建立在Transformers生态上。 latest入口指向v1.15.0；fused LM head成为默认评分路径，use_liger_kernel弃用，Python3.10支持移除，添加vLLM0.31.0支持。"
+      },
+      {
+        "id": "vllm-tool-serving",
+        "title": "vLLM：Tool Calling",
+        "url": "https://docs.vllm.ai/en/latest/features/tool_calling/",
+        "category": "engineering",
+        "level": "实战",
+        "tags": [
+          "模型部署",
+          "工具调用",
+          "Chat Template",
+          "Parser"
+        ],
+        "description": "学习为自托管模型配置工具调用解析器、聊天模板和自动工具选择。",
+        "why": "把开源模型接入Agent需要模型、模板与parser共同正确，不能只检查OpenAI接口兼容。",
+        "whenToLearn": "Agent评测稳定且准备自托管模型后，验证单次与并行工具调用。",
+        "source": "vLLM 官方文档 / GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://docs.vllm.ai/en/latest/features/tool_calling/",
+            "observed": "实际打开当前文档，按模型列出tool-call-parser及chat-template要求；旧.html URL重定向到目录URL。"
+          },
+          {
+            "url": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0",
+            "observed": "latest发布页重定向到v0.31.0；latest文档持续变化，实验须固定安装版本与checkpoint。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "实际打开当前文档，按模型列出tool-call-parser及chat-template要求；旧.html URL重定向到目录URL。 latest发布页重定向到v0.31.0；latest文档持续变化，实验须固定安装版本与checkpoint。"
+      },
+      {
+        "id": "sglang-tool-serving",
+        "title": "SGLang：Tool Parser",
+        "url": "https://docs.sglang.io/docs/advanced_features/tool_parser",
+        "category": "engineering",
+        "level": "实战",
+        "tags": [
+          "模型部署",
+          "工具调用",
+          "结构化输出",
+          "Grammar"
+        ],
+        "description": "通过模型专用解析器与语法约束服务工具调用，验证流式与强制工具选择。",
+        "why": "作为vLLM的工程对照，检验相同模型和工具schema在不同推理服务中的行为。",
+        "whenToLearn": "了解parser与模板后，用同一Agent测试集比较推理引擎。",
+        "source": "SGLang 官方文档 / GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://docs.sglang.io/docs/advanced_features/tool_parser",
+            "observed": "原docs.sglang.ai页面实际重定向至此；文档使用--tool-call-parser并说明required/named工具选择及Xgrammar兼容条件。"
+          },
+          {
+            "url": "https://github.com/sgl-project/sglang/releases/tag/v0.5.21",
+            "observed": "实际打开latest重定向的v0.5.21发布页；旧function_calling.html地址无法获取，未使用失效URL。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "原docs.sglang.ai页面实际重定向至此；文档使用--tool-call-parser并说明required/named工具选择及Xgrammar兼容条件。 实际打开latest重定向的v0.5.21发布页；旧function_calling.html地址无法获取，未使用失效URL。"
+      },
+      {
+        "id": "ray-serve-llm",
+        "title": "Ray Serve LLM",
+        "url": "https://docs.ray.io/en/latest/serve/llm/index.html",
+        "category": "engineering",
+        "level": "实战",
+        "tags": [
+          "部署",
+          "Autoscaling",
+          "多模型",
+          "推理服务"
+        ],
+        "description": "为模型服务加入多节点部署、负载均衡、自动扩缩容与请求路由。",
+        "why": "在单模型服务跑通后处理产品负载；框架支持能力需要通过自身流量与延迟测试确认。",
+        "whenToLearn": "已有自托管推理服务和负载基线后，再做多节点与扩缩容实验。",
+        "source": "Ray 官方文档",
+        "primaryEvidence": [
+          {
+            "url": "https://docs.ray.io/en/latest/serve/llm/index.html",
+            "observed": "已读Ray2.59.0文档：OpenAI-compatible API、多模型多节点autoscaling、prefill/decode分离、prefix-aware routing与multi-LoRA。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读Ray2.59.0文档：OpenAI-compatible API、多模型多节点autoscaling、prefill/decode分离、prefix-aware routing与multi-LoRA。"
+      },
+      {
+        "id": "harbor-eval-harness",
+        "title": "Harbor Agent Evaluation Harness",
+        "url": "https://github.com/harbor-framework/harbor",
+        "category": "evaluation",
+        "level": "实战",
+        "tags": [
+          "Harness",
+          "Terminal-Bench",
+          "Sandbox",
+          "RL Rollout"
+        ],
+        "description": "用容器化任务评测不同 Agent，并复用环境和轨迹开展优化实验。",
+        "why": "把Agent比较从截图和排行榜转为可运行的任务、verifier与完整trajectory。",
+        "whenToLearn": "掌握Agent轨迹和评测指标后，选少量任务建立可重复基线。",
+        "source": "Harbor / Terminal-Bench 作者",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/harbor-framework/harbor",
+            "observed": "README明确是Terminal-Bench2.0官方harness；支持任意agent、任务环境、Docker/cloud sandbox和RL rollout生成。"
+          },
+          {
+            "url": "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0",
+            "observed": "latest入口指向2026-10-05的v0.24.0；包含MCP/skills能力声明、轨迹与verifier修复。不要与同名容器镜像仓库Harbor混淆。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README明确是Terminal-Bench2.0官方harness；支持任意agent、任务环境、Docker/cloud sandbox和RL rollout生成。 latest入口指向2026-10-05的v0.24.0；包含MCP/skills能力声明、轨迹与verifier修复。不要与同名容器镜像仓库Harbor混淆。"
+      },
+      {
+        "id": "swe-bench-pro-v2",
+        "title": "SWE-bench Pro V2",
+        "url": "https://github.com/scaleapi/SWE-bench_Pro-os/blob/main/v2/README.md",
+        "category": "evaluation",
+        "level": "实战",
+        "tags": [
+          "Coding Agent",
+          "Harbor",
+          "长任务",
+          "评测协议"
+        ],
+        "description": "以独立容器任务和固定评测协议测试长程软件修复能力。",
+        "why": "与SWE-bench Verified分别记录数据版本、任务集合、环境与计分协议，避免直接混比分数。",
+        "whenToLearn": "掌握Harbor后，先复现oracle/nop sanity check，再评测编码Agent。",
+        "source": "Scale AI 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/scaleapi/SWE-bench_Pro-os/blob/main/v2/README.md",
+            "observed": "已读V2：validated public split共642任务/11仓库，每项是Harbor任务；HuggingFace default为V2，v1仍是原731任务，另有HARD-51及locked protocol。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读V2：validated public split共642任务/11仓库，每项是Harbor任务；HuggingFace default为V2，v1仍是原731任务，另有HARD-51及locked protocol。"
+      },
+      {
+        "id": "lhaw-clarification-eval",
+        "title": "LHAW：Long-Horizon Augmented Workflows",
+        "url": "https://github.com/scaleapi/lhaw",
+        "category": "evaluation",
+        "level": "进阶",
+        "tags": [
+          "澄清能力",
+          "长任务",
+          "MCP",
+          "Evaluation"
+        ],
+        "description": "评测 Agent 在需求信息不足时能否识别关键缺口并有效澄清。",
+        "why": "为产品Agent加入“何时问用户”的评测，覆盖最终成功之外的交互行为。",
+        "whenToLearn": "已有任务成功率基线后，再测试信息删减与用户模拟器。",
+        "source": "Scale AI 官方 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/scaleapi/lhaw",
+            "observed": "README说明从Goals、Constraints、Inputs、Context四个维度删减信息；基于TheAgentCompany、SWE-bench Pro、MCP-Atlas生成变体，用ask_user与模拟用户对照。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "README说明从Goals、Constraints、Inputs、Context四个维度删减信息；基于TheAgentCompany、SWE-bench Pro、MCP-Atlas生成变体，用ask_user与模拟用户对照。"
+      },
+      {
+        "id": "datawhale-all-in-rag",
+        "title": "Datawhale All-in-RAG",
+        "url": "https://github.com/datawhalechina/all-in-rag",
+        "category": "course",
+        "level": "基础",
+        "tags": [
+          "中文社区",
+          "RAG",
+          "系统评测",
+          "Graph RAG"
+        ],
+        "description": "中文开源 RAG 全栈教程，覆盖数据准备、索引、混合检索、评测和项目实践。",
+        "why": "补齐Agent知识检索基础；可选Graph RAG与多模态章节用于扩展学习站知识库。",
+        "whenToLearn": "具备Python基础后，作为中文主线完成一个可评测的检索项目。",
+        "source": "Datawhale 官方社区 GitHub",
+        "primaryEvidence": [
+          {
+            "url": "https://github.com/datawhalechina/all-in-rag",
+            "observed": "已读课程目录与前置要求，包含系统评估、Graph RAG优化及社区Extra Chapter；第十章项目二仍标规划中，不能承诺课程全部完结。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "已读课程目录与前置要求，包含系统评估、Graph RAG优化及社区Extra Chapter；第十章项目二仍标规划中，不能承诺课程全部完结。"
+      },
+      {
+        "id": "openai-deprecation-watch",
+        "title": "OpenAI API：Deprecations",
+        "url": "https://developers.openai.com/api/docs/deprecations",
+        "category": "engineering",
+        "level": "基础",
+        "tags": [
+          "迁移",
+          "API 生命周期",
+          "Agent Builder",
+          "Evals"
+        ],
+        "description": "核对服务退役与迁移时间，避免学习已关闭或即将关闭的 Agent 接口。",
+        "why": "这是资源目录当前性检查入口，应据此调整OpenAI Evals、Agent Builder和Assistants旧教程。",
+        "whenToLearn": "开始OpenAI项目及依赖升级前阅读；给项目记录当前SDK与API路径。",
+        "source": "OpenAI 官方文档",
+        "primaryEvidence": [
+          {
+            "url": "https://developers.openai.com/api/docs/deprecations",
+            "observed": "Evals平台2026-10-31转只读、11-30关闭；Agent Builder11-30关闭；Assistants API退役日期2026-08-26。"
+          },
+          {
+            "url": "https://developers.openai.com/api/docs/changelog",
+            "observed": "2026-08-26条目确认Assistants API已经关闭，迁移到Responses API和Conversations API。以上退役范围不能泛化为Agents SDK也退役。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "access": "readable",
+        "verification": "Evals平台2026-10-31转只读、11-30关闭；Agent Builder11-30关闭；Assistants API退役日期2026-08-26。 2026-08-26条目确认Assistants API已经关闭，迁移到Responses API和Conversations API。以上退役范围不能泛化为Agents SDK也退役。"
+      },
+      {
+        "id": "xiaohongshu-harness-career-lead",
+        "title": "小红书 Harness 岗位线索（待人工核实）",
+        "url": "https://job.xiaohongshu.com/campus/position/21899",
+        "category": "discovery",
+        "level": "进阶",
+        "tags": [
+          "小红书",
+          "岗位线索",
+          "Harness",
+          "待核实"
+        ],
+        "description": "搜索发现小红书 Harness 相关岗位入口，页面正文当前无法直接读取。",
+        "why": "可用于后续人工核实岗位需求；不能把搜索摘要变成已核实的面试或技能结论。",
+        "whenToLearn": "求职阶段人工打开原页确认职位名称、状态与职责后再纳入计划。",
+        "source": "小红书官方招聘域名 / 搜索线索",
+        "access": "discovery-only",
+        "primaryEvidence": [
+          {
+            "url": "https://job.xiaohongshu.com/campus/position/21899",
+            "observed": "已尝试直接打开，工具只返回“小红书”和0行正文；仅发现链接，未读到职位内容，也未核实招聘是否仍开放。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "verification": "已尝试直接打开，工具只返回“小红书”和0行正文；仅发现链接，未读到职位内容，也未核实招聘是否仍开放。"
+      },
+      {
+        "id": "xiaohongshu-agent-career-lead",
+        "title": "小红书 Agent 岗位线索（待人工核实）",
+        "url": "https://job.xiaohongshu.com/campus/position/22018",
+        "category": "discovery",
+        "level": "进阶",
+        "tags": [
+          "小红书",
+          "岗位线索",
+          "Agent",
+          "待核实"
+        ],
+        "description": "搜索发现 Agent 相关官方招聘页，动态正文未能读取，保留为待核实入口。",
+        "why": "扩展国内求职调研范围；职位要求、面试题与在招状态均待人工读取确认。",
+        "whenToLearn": "求职阶段在可访问浏览器中核实原文后使用。",
+        "source": "小红书官方招聘域名 / 搜索线索",
+        "access": "discovery-only",
+        "primaryEvidence": [
+          {
+            "url": "https://job.xiaohongshu.com/campus/position/22018",
+            "observed": "已尝试直接打开，返回0行可读正文；没有将检索摘要当作已读原文。"
+          }
+        ],
+        "verifiedAt": "2026-10-11",
+        "verification": "已尝试直接打开，返回0行可读正文；没有将检索摘要当作已读原文。"
+      }
+    ],
+    "updatesSources": [
+      {
+        "id": "openai-api-changelog",
+        "title": "OpenAI API Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "kind": "official-changelog",
+        "source": "OpenAI",
+        "focus": [
+          "API变化",
+          "模型接口",
+          "Agent工具",
+          "退役迁移"
+        ],
+        "note": "已实际打开，含截至2026-10的日期条目；模型快照与功能需继续按条目核验。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "openai-deprecations",
+        "title": "OpenAI Deprecations",
+        "url": "https://developers.openai.com/api/docs/deprecations",
+        "kind": "official-lifecycle-page",
+        "source": "OpenAI",
+        "focus": [
+          "关闭日期",
+          "迁移指引"
+        ],
+        "note": "已实际打开；作为更新阅读清单前的退役检查源。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "codex-cli-releases",
+        "title": "Codex CLI Releases",
+        "url": "https://github.com/openai/codex/releases",
+        "kind": "official-release-page",
+        "source": "OpenAI",
+        "focus": [
+          "Coding Harness",
+          "CLI变化"
+        ],
+        "note": "已实际打开；Rust/CLI版本不等于Codex桌面应用版本，发布页可能包含预发布。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "claude-code-releases",
+        "title": "Claude Code Releases",
+        "url": "https://github.com/anthropics/claude-code/releases/latest",
+        "kind": "official-release-page",
+        "source": "Anthropic",
+        "focus": [
+          "Coding Harness",
+          "CLI变化"
+        ],
+        "note": "已实际打开latest，核验时重定向v2.1.296；仓库CHANGELOG网页正文未成功解析，优先发布页。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "langchain-python-releases",
+        "title": "LangChain Releases",
+        "url": "https://github.com/langchain-ai/langchain/releases",
+        "kind": "official-release-page",
+        "source": "LangChain",
+        "focus": [
+          "Agent API",
+          "Middleware",
+          "集成包"
+        ],
+        "note": "已实际打开；多包仓库，应按实际使用的package/tag过滤，不能用单个数字代表全部生态。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "langgraph-releases",
+        "title": "LangGraph Releases",
+        "url": "https://github.com/langchain-ai/langgraph/releases",
+        "kind": "official-release-page",
+        "source": "LangChain",
+        "focus": [
+          "运行时",
+          "持久化",
+          "状态图"
+        ],
+        "note": "已实际打开；区分LangGraph核心、checkpoint与SDK包。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "deepagents-releases",
+        "title": "Deep Agents Releases",
+        "url": "https://github.com/langchain-ai/deepagents/releases",
+        "kind": "official-release-page",
+        "source": "LangChain",
+        "focus": [
+          "Harness",
+          "CLI",
+          "Skills"
+        ],
+        "note": "已实际打开；学习实验记录实际深度Agent与CLI包的tag。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "langsmith-cloud-changelog",
+        "title": "LangSmith Cloud Changelog",
+        "url": "https://docs.langchain.com/langsmith/changelog",
+        "kind": "official-changelog",
+        "source": "LangChain",
+        "focus": [
+          "托管产品",
+          "观测",
+          "部署"
+        ],
+        "note": "原changelog.langchain.com实际重定向到此；该页是Cloud产品更新，不能替代开源库releases。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "mcp-spec-releases",
+        "title": "MCP Specification Releases",
+        "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/releases",
+        "kind": "official-release-page",
+        "source": "Model Context Protocol",
+        "focus": [
+          "协议",
+          "规范变化"
+        ],
+        "note": "已实际打开；规范版本和SDK版本应分别保存。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "deerflow-releases",
+        "title": "DeerFlow Releases",
+        "url": "https://github.com/bytedance/deer-flow/releases/latest",
+        "kind": "official-release-page",
+        "source": "ByteDance",
+        "focus": [
+          "Harness",
+          "破坏性变更",
+          "记忆与沙箱"
+        ],
+        "note": "已实际打开latest，核验时为v2.1.0。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "harbor-releases",
+        "title": "Harbor Releases",
+        "url": "https://github.com/harbor-framework/harbor/releases/latest",
+        "kind": "official-release-page",
+        "source": "Harbor",
+        "focus": [
+          "评测环境",
+          "Verifier",
+          "任务协议"
+        ],
+        "note": "已实际打开latest，核验时为v0.24.0。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "trl-releases",
+        "title": "TRL Releases",
+        "url": "https://github.com/huggingface/trl/releases/latest",
+        "kind": "official-release-page",
+        "source": "Hugging Face",
+        "focus": [
+          "后训练",
+          "训练器",
+          "依赖兼容"
+        ],
+        "note": "已实际打开latest，核验时为v1.15.0，包含环境与训练配置变化。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "tinker-changelog",
+        "title": "Tinker Changelog",
+        "url": "https://tinker-docs.thinkingmachines.ai/changelog/",
+        "kind": "official-changelog",
+        "source": "Thinking Machines Lab",
+        "focus": [
+          "训练API",
+          "SDK",
+          "模型生命周期"
+        ],
+        "note": "已实际打开，区分SDK、Cookbook、Console和Docs更新，SDK当前条目0.32.0。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "vllm-releases",
+        "title": "vLLM Releases",
+        "url": "https://github.com/vllm-project/vllm/releases/latest",
+        "kind": "official-release-page",
+        "source": "vLLM",
+        "focus": [
+          "推理",
+          "工具解析",
+          "模型支持"
+        ],
+        "note": "已实际打开latest，核验时为v0.31.0；部署实验需锁版本。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      },
+      {
+        "id": "sglang-releases",
+        "title": "SGLang Releases",
+        "url": "https://github.com/sgl-project/sglang/releases/latest",
+        "kind": "official-release-page",
+        "source": "SGLang",
+        "focus": [
+          "推理",
+          "工具解析",
+          "模型支持"
+        ],
+        "note": "已实际打开latest，核验时为v0.5.21；当前官方文档域名为docs.sglang.io。",
+        "verifiedAt": "2026-10-11",
+        "access": "readable"
+      }
+    ],
+    "maintenanceSuggestion": {
+      "cadence": "学习者每周手动查看主线依赖的官方更新；每次做实验前记录实际package、model checkpoint、dataset、harness、评测协议与日期。未创建定时任务。",
+      "promotionRule": "新条目先保存发现来源与访问状态，打开主源后再加入推荐阅读；原文不可读时只列线索。",
+      "rssStatus": "本轮核验的是官方更新/发布网页，未宣称验证任何RSS或Atom订阅端点。"
+    }
+  },
+  "learningProductResearch": {
+    "metadata": {
+      "title": "Agent 学习导读与成熟产品机制核验",
+      "verifiedAt": "2026-10-11",
+      "audience": "具备 Python、ML、LLM 基础的开发者",
+      "scope": "6 个成熟学习产品公开资料；15 条当前 workspace 核心资源。",
+      "method": "实际打开官方文档、作者论文或原始 GitHub README；个别页面访问结果单独注明。",
+      "editorialBoundary": "takeaways 是来源支持的编辑摘要；pitfalls 包含工程归纳；practice 和 selfCheck 为本站原创教学设计。没有运行模型、完成课程或复现训练/评测。",
+      "accessBoundary": "未登录第三方产品、未操作付费功能、未接受 GAIA gate、未发布或修改仓库。公开文档只能证明机制说明，不能证明全部当前账号体验或学习效果。",
+      "versionPolicy": "verifiedAt 表示本次来源核验日期，不是论文发布日期；当前文档、原始论文与后续仓库版本分开注明。"
+    },
+    "products": [
+      {
+        "id": "notebooklm",
+        "name": "NotebookLM",
+        "url": "https://blog.google/innovation-and-ai/models-and-research/google-labs/notebooklm-student-features/",
+        "preview": "先从用户指定的来源生成 Study Guide、Briefing Doc 与术语解释，帮助判断要学什么。",
+        "concepts": "Learning Guide 通过开放问题和分步解释，引导学习者参与推理。",
+        "practice": "可按主题和难度生成闪卡、测验；点击解释可理解概念或错误答案。",
+        "summary": "导读和错题解释关联原始来源；摘要、概念卡、练习共享同一个资料范围。",
+        "transferToWebsite": [
+          "资源进入学习前展示 4 个关键问题与导读，而不是只给外链。",
+          "每条要点、概念解释和错题答案提供可点击的来源；标明人工编辑与核验日期。",
+          "用户先作答再展开解析，并能从错题跳回对应概念。"
+        ],
+        "publicEvidence": "已实际打开 Google 官方功能说明，证明公开宣称的来源导读、Learning Guide、可定制测验及解释引用机制。",
+        "notProven": "未登录 NotebookLM 或运行生成；无法证明每道生成题正确、当前账号可用额度、真实学习提升或引用完整性。",
+        "sourceLinks": [
+          {
+            "title": "Google：6 ways to use NotebookLM to master any subject",
+            "url": "https://blog.google/innovation-and-ai/models-and-research/google-labs/notebooklm-student-features/",
+            "section": "Flashcards and quizzes / Reports / Learning Guide",
+            "verification": "官方页面正文已打开"
+          }
+        ],
+        "verifiedAt": "2026-10-11"
+      },
+      {
+        "id": "brilliant",
+        "name": "Brilliant",
+        "url": "https://brilliant.org/faq/",
+        "preview": "Learning Paths 将相关课程组织为建议顺序，支持按兴趣和进度选择内容。",
+        "concepts": "视觉模型和交互问题与解释同时呈现；Koji 可围绕正在做的题给分步提示。",
+        "practice": "做题过程中提供即时反馈，练习与概念学习结合。",
+        "summary": "公开帮助页说明进度跟踪与练习记录；本次未核验具体课末总结界面。",
+        "transferToWebsite": [
+          "把工具调用、检索路由、状态转换做成可操作的小实验，控制输入即可观察后果。",
+          "错题先提供提示，再提供推导和答案，降低直接复制答案的诱因。",
+          "将阅读进度、实验提交和概念掌握分开显示。"
+        ],
+        "publicEvidence": "已打开官方 FAQ 与功能帮助页，证明其公开描述的交互题、视觉模型、即时反馈、路径和提示机制。",
+        "notProven": "未登录完整课程，未验证付费功能、推荐算法与学习效率；不采纳 FAQ 中的倍数效果宣传作为独立证据。",
+        "sourceLinks": [
+          {
+            "title": "Brilliant FAQ",
+            "url": "https://brilliant.org/faq/",
+            "section": "How does learning work / Koji / Learning Paths",
+            "verification": "官方页面正文已打开"
+          },
+          {
+            "title": "Brilliant Product Features",
+            "url": "https://brilliant.org/help/features/",
+            "section": "Learning Paths / Koji / Progress",
+            "verification": "官方帮助目录已打开"
+          }
+        ],
+        "verifiedAt": "2026-10-11"
+      },
+      {
+        "id": "exercism",
+        "name": "Exercism",
+        "url": "https://exercism.org/docs/building/product/concept-exercises",
+        "preview": "Concept Exercise 有明确学习目标与概念先修关系，并提供代码骨架，减少无关配置负担。",
+        "concepts": "概念按练习及先修关系组织，完成相关练习可解锁后续概念。",
+        "practice": "提交代码迭代后接受自动分析反馈；合适的练习可请求导师或指定同伴反馈。",
+        "summary": "反馈围绕具体提交迭代展开，形成修改记录；概念练习文档明确说明这类练习不提供导师辅导。",
+        "transferToWebsite": [
+          "每个实验写清目标、已有脚手架、输入数据和验收条件。",
+          "允许记录第一版、失败原因、改进版和最终解释，而不是只标完成。",
+          "将自动测试通过与解释清楚、迁移成功分别验收。"
+        ],
+        "publicEvidence": "已打开官方 Concept Exercises 和 Getting Feedback，验证先修解锁、代码骨架、测试/分析、迭代与反馈类型。",
+        "notProven": "未提交解答或申请导师；不能把所有练习都描述为人工辅导，不能保证任何语言轨道有即时人工反馈。",
+        "sourceLinks": [
+          {
+            "title": "Exercism Concept Exercises",
+            "url": "https://exercism.org/docs/building/product/concept-exercises",
+            "section": "Characteristics / Concepts / Feedback",
+            "verification": "官方页面正文已打开"
+          },
+          {
+            "title": "Exercism Getting Feedback",
+            "url": "https://exercism.org/docs/using/feedback",
+            "section": "Automated Feedback / Mentor Feedback",
+            "verification": "官方页面正文已打开"
+          }
+        ],
+        "verifiedAt": "2026-10-11"
+      },
+      {
+        "id": "deeplearning-ai",
+        "name": "DeepLearning.AI",
+        "url": "https://info.deeplearning.ai/knowledge-base/how-can-i-access-and-download-short-course-files-and-notebooks",
+        "preview": "公开课程目录展示学习目标、先修水平、课时和视频/代码组成；LangGraph 课程按从零实现、框架、搜索、持久化、人工介入和案例排序。",
+        "concepts": "视频解释与 notebook 代码例子围绕同一主题配对。",
+        "practice": "官方帮助页说明可以打开 helper 文件、下载 ipynb、上传数据；公开课程目录列有 Quiz。",
+        "summary": "帮助页说明 My Learning 与课内进度入口，并建议笔记、总结、解释给别人及项目应用；本次没有证明每个课程均有自动总结。",
+        "transferToWebsite": [
+          "为每节课列出目标、先修、耗时与最终产物，进入后即可开始。",
+          "教材、可下载的练习与配套数据使用同一版本号。",
+          "知识小结与一次小项目结合，避免看完视频即视为掌握。"
+        ],
+        "publicEvidence": "已实际打开官方 notebook 帮助页；LangGraph 课程目录从官方搜索索引读取，直接打开课程页两次返回 Internal Error。",
+        "notProven": "未进入登录课程或运行 notebook；课程页面当前完整渲染和测验权限没有实际验证，不保证所有测验免费。",
+        "sourceLinks": [
+          {
+            "title": "DeepLearning.AI Short Course files and notebooks",
+            "url": "https://info.deeplearning.ai/knowledge-base/how-can-i-access-and-download-short-course-files-and-notebooks",
+            "section": "Downloading / Progress / Active Learning",
+            "verification": "官方帮助正文已实际打开"
+          },
+          {
+            "title": "AI Agents in LangGraph",
+            "url": "https://www.deeplearning.ai/courses/ai-agents-in-langgraph",
+            "section": "Learning objectives / Course Outline",
+            "verification": "官方搜索索引可读；直接打开返回 Internal Error"
+          }
+        ],
+        "verifiedAt": "2026-10-11"
+      },
+      {
+        "id": "d2l",
+        "name": "Dive into Deep Learning",
+        "url": "https://d2l.ai/chapter_recurrent-neural-networks/rnn-scratch.html",
+        "preview": "编号章节及小节目录定位概念、实现、训练和解码；从理论推进到可运行实现。",
+        "concepts": "正文交错公式、解释与代码，提供不同深度学习框架的实现切换。",
+        "practice": "章末实验要求更换超参数、表示或采样方法，并测试不同文本域；有 notebook 和讨论入口。",
+        "summary": "Summary 提炼实现链路与技术边界，例如梯度裁剪能缓解梯度爆炸，不能解决梯度消失。",
+        "transferToWebsite": [
+          "教材保留公式→伪代码→实验→边界的小节节奏和锚点目录。",
+          "每节课的总结写清适用条件和反例，不只有概念词。",
+          "练习要求改变一个变量并记录现象、指标和解释，培养消融意识。"
+        ],
+        "publicEvidence": "已打开 RNN 从零实现章节，读取代码、Summary、Exercises 和讨论链接，验证真实公开教材结构。",
+        "notProven": "未执行 notebook、切换运行环境或完成实验；此章结构不能证明所有章节有相同互动或自动判分。",
+        "sourceLinks": [
+          {
+            "title": "D2L 9.5 Recurrent Neural Network Implementation from Scratch",
+            "url": "https://d2l.ai/chapter_recurrent-neural-networks/rnn-scratch.html",
+            "section": "9.5.6 Summary / 9.5.7 Exercises",
+            "verification": "公开章节正文已实际打开"
+          }
+        ],
+        "verifiedAt": "2026-10-11"
+      },
+      {
+        "id": "hf-agents-course",
+        "name": "Hugging Face Agents Course",
+        "url": "https://huggingface.co/learn/agents-course/en/unit1/what-are-agents",
+        "preview": "章节开头有学习目标，左侧课程导航列出基础、框架、Agentic RAG 和最终项目。",
+        "concepts": "用类比、图解、概念定义和代码片段解释 Agent 与工具，再进入运行循环。",
+        "practice": "课程路径安排 Quick Quiz、单元测验、首次构建和最终项目；公开章节末提示进入一个不计分的快测。",
+        "summary": "当前章节末逐条总结理解指令、推理规划、与环境交互，并连接下一节/快测。",
+        "transferToWebsite": [
+          "章节末放 3 个复述问题和下一步实践，保持学习连续性。",
+          "基础概念与同一学习助手项目的实现阶段对应。",
+          "课程导航允许直接跳进阶章节，兼顾已有 Python/ML 经验。"
+        ],
+        "publicEvidence": "已打开 Agent 定义章节，读取学习目标、概念代码、章节小结和测验/项目导航。",
+        "notProven": "未登录获得证书或提交最终项目；不能把章节测验通过当作实际系统能力或面试保证。",
+        "sourceLinks": [
+          {
+            "title": "HF Agents Course: What is an Agent?",
+            "url": "https://huggingface.co/learn/agents-course/en/unit1/what-are-agents",
+            "section": "Learning objective / To summarize / Quick Quiz / Course navigation",
+            "verification": "公开课程章节已实际打开"
+          }
+        ],
+        "verifiedAt": "2026-10-11"
+      }
+    ]
+  },
+  "interviewReports": [
+    {
+      "id": "byte-context",
+      "title": "Coding Agent：上下文与协作",
+      "company": "字节跳动",
+      "author": "随波逐牛",
+      "dateText": "08-18；文内自述面试 8.13 / 8.16，页面未显示年份",
+      "url": "https://www.nowcoder.com/feed/main/detail/8a553bb6ea8445d0b0abe11e87614cea",
+      "platform": "牛客",
+      "evidence": "作者自述面经",
+      "verifiedAt": "2026-10-11",
+      "verification": "已打开原帖正文；公司、轮次与题目来自作者自述，未获企业独立确认。",
+      "topics": [
+        "Context",
+        "Memory",
+        "MCP",
+        "Multi-Agent"
+      ],
+      "questions": [
+        "怎样选择自主工具循环或分阶段计划？",
+        "压缩历史时，如何保住用户约束与关键证据？",
+        "并行子任务同时改文件，怎样处理通信与冲突？"
+      ],
+      "practice": "用同一组长任务比较原文、摘要和结构化状态，记录需求遗漏、成本与成功率。",
+      "questionRefs": [
+        "q3",
+        "q4",
+        "q5",
+        "q25"
+      ]
+    },
+    {
+      "id": "byte-engineering",
+      "title": "Agent 开发：工程基础与代码质量",
+      "company": "字节跳动",
+      "author": "最喜欢春天的哈士奇很想潜水",
+      "dateText": "08-24；文内自述面试 8.12，页面未显示年份",
+      "url": "https://www.nowcoder.com/discuss/921444774287003648",
+      "platform": "牛客",
+      "evidence": "作者自述面经",
+      "verifiedAt": "2026-10-11",
+      "verification": "已打开原帖正文；公司、轮次与题目来自作者自述，未获企业独立确认。",
+      "topics": [
+        "AI Coding",
+        "SSE",
+        "数据库",
+        "算法"
+      ],
+      "questions": [
+        "生成的代码如何经过质量验证？",
+        "实时输出适合 SSE 还是 WebSocket，为什么？",
+        "热点榜单如何更新与承受并发？"
+      ],
+      "practice": "手写双栈队列并补并发测试，再用自动生成的实现做同一组性质检查。",
+      "questionRefs": [
+        "q16",
+        "q18",
+        "q26"
+      ]
+    },
+    {
+      "id": "byte-rag",
+      "title": "Agent / RAG 项目：选型要有证据",
+      "company": "字节跳动",
+      "author": "溯洄之洲",
+      "dateText": "09-24；文内自述面试 0923，页面未显示年份",
+      "url": "https://www.nowcoder.com/discuss/932295617999622144",
+      "platform": "牛客",
+      "evidence": "作者自述面经",
+      "verifiedAt": "2026-10-11",
+      "verification": "已打开原帖正文；公司、轮次与题目来自作者自述，未获企业独立确认。",
+      "topics": [
+        "LangGraph",
+        "混合检索",
+        "Rerank",
+        "评测"
+      ],
+      "questions": [
+        "为什么需要图编排，替代方案如何比较？",
+        "合成的评测任务怎样检查质量和覆盖？",
+        "关键词与向量结果如何融合，重排的收益怎样验证？"
+      ],
+      "practice": "固定一批任务，对比 BM25、向量、RRF 和 Cross-Encoder；保存失败分布与成本。",
+      "questionRefs": [
+        "q7",
+        "q8",
+        "q19",
+        "q28"
+      ]
+    },
+    {
+      "id": "ali-agent",
+      "title": "Agent 算法：中断、安全与历史管理",
+      "company": "阿里淘宝闪购",
+      "author": "孤飞onefly",
+      "dateText": "04-30；标题为 27 届实习，页面未显示年份",
+      "url": "https://www.nowcoder.com/discuss/879393838081597440",
+      "platform": "牛客",
+      "evidence": "作者自述面经",
+      "verifiedAt": "2026-10-11",
+      "verification": "已打开原帖正文；公司、轮次与题目来自作者自述，未获企业独立确认。",
+      "topics": [
+        "框架选型",
+        "HITL",
+        "安全",
+        "长期记忆"
+      ],
+      "questions": [
+        "Agent SDK 与其他运行时的取舍是什么？",
+        "人工中断和恢复应放在什么执行边界？",
+        "间隔数周的对话如何检索与恢复历史？"
+      ],
+      "practice": "给一个写入工具加入审核、中断、恢复和幂等，注入超时后检查副作用。",
+      "questionRefs": [
+        "q14",
+        "q15",
+        "q17",
+        "q28"
+      ]
+    },
+    {
+      "id": "tencent-agent",
+      "title": "应用开发：产品差异与算法深挖",
+      "company": "腾讯",
+      "author": "千程",
+      "dateText": "04-04；页面未显示年份",
+      "url": "https://www.nowcoder.com/feed/main/detail/28edcddf0c204c08b6562a3e6e6b73ae",
+      "platform": "牛客",
+      "evidence": "作者自述面经",
+      "verifiedAt": "2026-10-11",
+      "verification": "已打开原帖正文；公司、轮次与题目来自作者自述，未获企业独立确认。",
+      "topics": [
+        "Context",
+        "Subagent",
+        "GRPO / PPO",
+        "QLoRA"
+      ],
+      "questions": [
+        "自研 Coding Agent 与成熟产品的差异在哪？",
+        "分层上下文与摘要的质量如何测量？",
+        "后训练目标、KL 约束和量化训练各有什么取舍？"
+      ],
+      "practice": "给自己的项目写一页竞品取舍，并用压缩回放实验和训练消融支撑结论。",
+      "questionRefs": [
+        "q4",
+        "q9",
+        "q25",
+        "q29"
+      ]
+    },
+    {
+      "id": "baidu-agent",
+      "title": "文心方向：奖励、验证器与控制系统",
+      "company": "百度",
+      "author": "OC快来通知我",
+      "dateText": "07-07；文内自述面试 7.2 / 7.3，页面未显示年份",
+      "url": "https://www.nowcoder.com/feed/main/detail/681c33aafac84af0a70b6fd5e663a04c",
+      "platform": "牛客",
+      "evidence": "作者自述面经",
+      "verifiedAt": "2026-10-11",
+      "verification": "已打开原帖正文；公司、轮次与题目来自作者自述，未获企业独立确认。",
+      "topics": [
+        "Agent RL",
+        "Reward Hacking",
+        "Harness",
+        "评测"
+      ],
+      "questions": [
+        "怎样确认进入 RL 前的 SFT 已满足目标？",
+        "奖励和验证器如何识别取巧与错误完成？",
+        "系统如何处理长文本和相互冲突的要求？"
+      ],
+      "practice": "准备三个可能骗过评分器的轨迹，再增加产物验真与约束检查，记录评分差异。",
+      "questionRefs": [
+        "q2",
+        "q9",
+        "q17",
+        "q19"
+      ]
+    }
+  ],
+  "interviewPracticeSources": [
+    {
+      "title": "大模型面试面经合集",
+      "platform": "GitHub",
+      "url": "https://github.com/Imironman123/llm-interview-notes",
+      "scope": "应用、算法、Infra 主题与面经复盘",
+      "verification": "已打开仓库 README；题源为维护者整理，未逐题验证公司归属。"
+    },
+    {
+      "title": "AgentGuide · Agent 核心题库",
+      "platform": "GitHub",
+      "url": "https://github.com/adongwanai/AgentGuide/blob/main/docs/04-interview/03-agent-questions.md",
+      "scope": "架构、工具、记忆与衍生追问",
+      "verification": "已打开题库正文；其中真题标签为维护者声明。"
+    },
+    {
+      "title": "AI Agent 核心面试题详解",
+      "platform": "掘金",
+      "url": "https://juejin.cn/post/7649642398536220699",
+      "scope": "架构、反思、多 Agent 与工程场景",
+      "verification": "已打开正文；作为作者整理的练习，不作为企业确认题目。"
+    },
+    {
+      "title": "AI 智能体与大模型应用开发题库",
+      "platform": "GitHub",
+      "url": "https://github.com/lyh-docs/ai-interview",
+      "scope": "应用工程与系统设计主题索引",
+      "verification": "搜索索引可见，当前原仓库直接打开失败；未核实全部答案。"
+    },
+    {
+      "title": "大模型开发面试专题视频",
+      "platform": "B 站",
+      "url": "https://www.bilibili.com/video/BV1eRbr6mEJE/",
+      "scope": "RAG、Agent、微调与场景题的发现入口",
+      "verification": "仅搜索索引可见；页面直接访问失败，未观看视频或核实题目。"
+    }
+  ],
+  "interviewDiscovery": [
+    {
+      "platform": "小红书",
+      "url": "https://www.xiaohongshu.com/search_result?keyword=Agent%20%E9%9D%A2%E7%BB%8F",
+      "status": "已实际打开搜索页，显示登录后查看搜索结果。本轮未读取笔记正文，不生成或声称收录小红书真题。",
+      "queries": [
+        "Agent 面经",
+        "大模型 算法 面经",
+        "字节 Agent",
+        "阿里 Agent 面试",
+        "RAG 项目追问"
+      ]
+    },
+    {
+      "platform": "知乎",
+      "url": "https://www.zhihu.com/search?type=content&q=Agent%20%E9%9D%A2%E7%BB%8F",
+      "status": "搜索结果含课程推广与二次整理，本轮未找到可确认的一手技术面经，未采纳为真题。",
+      "queries": [
+        "大模型 面经",
+        "Agent 项目追问"
+      ]
+    }
+  ],
+  "updateSources": [
+    {
+      "id": "openai-api-changelog",
+      "title": "OpenAI API Changelog",
+      "url": "https://developers.openai.com/api/docs/changelog",
+      "kind": "official-changelog",
+      "source": "OpenAI",
+      "focus": [
+        "API变化",
+        "模型接口",
+        "Agent工具",
+        "退役迁移"
+      ],
+      "note": "已实际打开，含截至2026-10的日期条目；模型快照与功能需继续按条目核验。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "openai-deprecations",
+      "title": "OpenAI Deprecations",
+      "url": "https://developers.openai.com/api/docs/deprecations",
+      "kind": "official-lifecycle-page",
+      "source": "OpenAI",
+      "focus": [
+        "关闭日期",
+        "迁移指引"
+      ],
+      "note": "已实际打开；作为更新阅读清单前的退役检查源。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "codex-cli-releases",
+      "title": "Codex CLI Releases",
+      "url": "https://github.com/openai/codex/releases",
+      "kind": "official-release-page",
+      "source": "OpenAI",
+      "focus": [
+        "Coding Harness",
+        "CLI变化"
+      ],
+      "note": "已实际打开；Rust/CLI版本不等于Codex桌面应用版本，发布页可能包含预发布。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "claude-code-releases",
+      "title": "Claude Code Releases",
+      "url": "https://github.com/anthropics/claude-code/releases/latest",
+      "kind": "official-release-page",
+      "source": "Anthropic",
+      "focus": [
+        "Coding Harness",
+        "CLI变化"
+      ],
+      "note": "已实际打开latest，核验时重定向v2.1.296；仓库CHANGELOG网页正文未成功解析，优先发布页。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "langchain-python-releases",
+      "title": "LangChain Releases",
+      "url": "https://github.com/langchain-ai/langchain/releases",
+      "kind": "official-release-page",
+      "source": "LangChain",
+      "focus": [
+        "Agent API",
+        "Middleware",
+        "集成包"
+      ],
+      "note": "已实际打开；多包仓库，应按实际使用的package/tag过滤，不能用单个数字代表全部生态。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "langgraph-releases",
+      "title": "LangGraph Releases",
+      "url": "https://github.com/langchain-ai/langgraph/releases",
+      "kind": "official-release-page",
+      "source": "LangChain",
+      "focus": [
+        "运行时",
+        "持久化",
+        "状态图"
+      ],
+      "note": "已实际打开；区分LangGraph核心、checkpoint与SDK包。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "deepagents-releases",
+      "title": "Deep Agents Releases",
+      "url": "https://github.com/langchain-ai/deepagents/releases",
+      "kind": "official-release-page",
+      "source": "LangChain",
+      "focus": [
+        "Harness",
+        "CLI",
+        "Skills"
+      ],
+      "note": "已实际打开；学习实验记录实际深度Agent与CLI包的tag。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "langsmith-cloud-changelog",
+      "title": "LangSmith Cloud Changelog",
+      "url": "https://docs.langchain.com/langsmith/changelog",
+      "kind": "official-changelog",
+      "source": "LangChain",
+      "focus": [
+        "托管产品",
+        "观测",
+        "部署"
+      ],
+      "note": "原changelog.langchain.com实际重定向到此；该页是Cloud产品更新，不能替代开源库releases。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "mcp-spec-releases",
+      "title": "MCP Specification Releases",
+      "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/releases",
+      "kind": "official-release-page",
+      "source": "Model Context Protocol",
+      "focus": [
+        "协议",
+        "规范变化"
+      ],
+      "note": "已实际打开；规范版本和SDK版本应分别保存。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "deerflow-releases",
+      "title": "DeerFlow Releases",
+      "url": "https://github.com/bytedance/deer-flow/releases/latest",
+      "kind": "official-release-page",
+      "source": "ByteDance",
+      "focus": [
+        "Harness",
+        "破坏性变更",
+        "记忆与沙箱"
+      ],
+      "note": "已实际打开latest，核验时为v2.1.0。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "harbor-releases",
+      "title": "Harbor Releases",
+      "url": "https://github.com/harbor-framework/harbor/releases/latest",
+      "kind": "official-release-page",
+      "source": "Harbor",
+      "focus": [
+        "评测环境",
+        "Verifier",
+        "任务协议"
+      ],
+      "note": "已实际打开latest，核验时为v0.24.0。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "trl-releases",
+      "title": "TRL Releases",
+      "url": "https://github.com/huggingface/trl/releases/latest",
+      "kind": "official-release-page",
+      "source": "Hugging Face",
+      "focus": [
+        "后训练",
+        "训练器",
+        "依赖兼容"
+      ],
+      "note": "已实际打开latest，核验时为v1.15.0，包含环境与训练配置变化。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "tinker-changelog",
+      "title": "Tinker Changelog",
+      "url": "https://tinker-docs.thinkingmachines.ai/changelog/",
+      "kind": "official-changelog",
+      "source": "Thinking Machines Lab",
+      "focus": [
+        "训练API",
+        "SDK",
+        "模型生命周期"
+      ],
+      "note": "已实际打开，区分SDK、Cookbook、Console和Docs更新，SDK当前条目0.32.0。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "vllm-releases",
+      "title": "vLLM Releases",
+      "url": "https://github.com/vllm-project/vllm/releases/latest",
+      "kind": "official-release-page",
+      "source": "vLLM",
+      "focus": [
+        "推理",
+        "工具解析",
+        "模型支持"
+      ],
+      "note": "已实际打开latest，核验时为v0.31.0；部署实验需锁版本。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
+    },
+    {
+      "id": "sglang-releases",
+      "title": "SGLang Releases",
+      "url": "https://github.com/sgl-project/sglang/releases/latest",
+      "kind": "official-release-page",
+      "source": "SGLang",
+      "focus": [
+        "推理",
+        "工具解析",
+        "模型支持"
+      ],
+      "note": "已实际打开latest，核验时为v0.5.21；当前官方文档域名为docs.sglang.io。",
+      "verifiedAt": "2026-10-11",
+      "access": "readable"
     }
   ]
 }

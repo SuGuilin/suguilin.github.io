@@ -1,0 +1,11 @@
+{
+  "name": "suguilin-learning-platform",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/vendor.mjs && node scripts/knowledge.mjs && node scripts/build.mjs",
+    "test": "node --test scripts/*.test.mjs && node scripts/verify.mjs"
+  },
+  "dependencies": {"@supabase/supabase-js": "^2.95.3"},
+  "devDependencies": {"esbuild": "^0.25.12"}
+}

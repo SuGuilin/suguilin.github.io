@@ -1,0 +1,415 @@
+{
+  "metadata": {
+    "title": "Agent 深入教材草稿 v2",
+    "audience": "有 Python、机器学习及 LLM 应用经验的学习者",
+    "createdAt": "2026-10-11",
+    "format": "每篇 content 为可直接渲染的中文 Markdown，sources 为一手来源及核验范围。",
+    "scope": "机制说明来自已打开的一手资料；伪代码、案例、实验规模与验收阈值为课程原创设计。实验尚未运行，资料核验不等于代码或成绩复现。",
+    "versionPolicy": "固定模型、框架、工具、数据与评分器版本后再复现；不把托管平台成绩作为开源实现成绩，也不推断未核验的最新默认行为。",
+    "reviewNotes": [
+      "六篇都提供目标、机制、伪代码、实验、验收与面试追问。",
+      "幂等示例仅覆盖同库事务；跨服务情况另说明结果未知和对账。",
+      "评测按任务/问题族处理相关性，区分测试总体与固定题集目标。",
+      "RL loss 为数据流示意，省略完整训练引擎；要求先验证 mask 和奖励。",
+      "界面参考只核验公开内容结构；浏览器截图与账户内交互本轮未核验。"
+    ]
+  },
+  "lessons": [
+    {
+      "id": "lesson-harness",
+      "title": "Harness：把模型决策变成可恢复的执行系统",
+      "level": "进阶",
+      "readingMinutes": 12,
+      "labMinutes": 120,
+      "prerequisites": [
+        "Python 异步调用",
+        "结构化输出和工具调用",
+        "有限状态机"
+      ],
+      "objectives": [
+        "分离模型决策与运行时责任",
+        "构建可恢复的状态和事件记录",
+        "用故障实验检验上下文与停止条件"
+      ],
+      "sources": [
+        {
+          "title": "Deep Agents overview",
+          "url": "https://docs.langchain.com/oss/python/deepagents/overview",
+          "supports": "Harness 的执行、上下文、委派和引导职责；具体默认行为以所用版本为准。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "LangGraph Persistence",
+          "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "supports": "检查点与跨线程 Store 的职责区别。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "LangGraph Interrupts",
+          "url": "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "supports": "中断恢复可能重跑节点，副作用需要幂等处理。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "Anthropic Context Engineering",
+          "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+          "supports": "按需加载、压缩与外部笔记的机制和取舍。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        }
+      ],
+      "content": "## 学习目标\n\n实现一个能暂停、恢复、限额和验真的 Agent，解释哪些决策交给模型，哪些必须由代码保证。实验与阈值是本课设计，尚未运行；伪代码表达接口职责，不对应某个 SDK 的完整实现。\n\n## 从闭环到运行时契约\n\n假设任务是“读三篇论文，比较方法并生成笔记”。模型负责提出下一步；Harness 负责保存任务、构造上下文、调度工具和检查结果。[Deep Agents 官方说明](https://docs.langchain.com/oss/python/deepagents/overview)将这些能力组织为执行环境、上下文管理、委派和引导。采用这个划分，可以更换模型而保留执行约束。\n\n把状态定义为目标、约束、证据引用、产物、待执行动作和剩余预算。状态机至少区分运行、等待审批、结果待确认、成功与失败。“模型说完成”只触发验证，文件存在、引用可追溯、要求满足才允许进入成功状态。工具返回的文本属于观察，不能直接改变权限。审批应绑定具体动作与参数摘要，修改参数后重新判断。\n\n事件记录保存决策、动作标识、输入摘要、结果引用和预算变化；检查点保存可恢复快照。两者用途不同。模型调用可以重做，外部写入可能已经生效；检查点无法消除这段不确定窗口。[LangGraph 中断文档](https://docs.langchain.com/oss/python/langgraph/interrupts)也提醒恢复可能重跑节点，因此副作用仍需下一课的幂等协议。\n\n## 核心伪代码\n\n~~~python\nstate = load_checkpoint(task_id)\nwhile state.status == RUNNING:\n    ensure_budget(state)\n    context = select_context(state, token_budget)\n    decision = model(context)\n    validate_schema_and_policy(decision, state)\n    persist_intent(decision.action_id, decision.args)\n    if needs_approval(decision):\n        checkpoint_and_pause(state, decision)\n        break\n    result = execute_or_reconcile(decision)\n    state = reduce_event(state, result)\n    state.status = verify_outcome_or_continue(state)\n    save_checkpoint(state)\n~~~\n\n这里 execute_or_reconcile 同时处理新动作与未确认旧动作；reduce_event 是确定性的状态转换。不要让模型自行生成可信租户身份或递增预算。为每个终止原因给出明确结果，例如预算耗尽、用户取消、不可恢复错误，防止失败被包装成成功。\n\n## 上下文选择实验\n\n固定模型与任务集，对比全量历史、滚动摘要、摘要加按需证据三种策略。摘要保留任务目的、已确定事实、未解决冲突和下一步，长工具结果保存为带版本的产物引用。用同一引用重新加载，避免恢复后读到已变化的网页却仍把它当原证据。[上下文工程文章](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)提供压缩与按需加载思路，本课的字段设计则需自己验证。\n\n准备二十个跨文档任务，分别在工具调用前、返回后和检查点提交前注入崩溃，再恢复。记录目标遗失、证据误归因、重复写入、调用数、总耗时及 token。保留正常路径作为对照，不只测崩溃案例。\n\n## 验收标准\n\n每次恢复都能重建目标与待确认动作；所有完成声明有产物验证证据；取消和预算耗尽能停止新增调用。每个故障位置重复三次，出现重复写入必须先修复；不能用更高平均成功率抵消这一缺陷。报告三种上下文策略的质量与成本，允许结果显示某种“高级”策略没有收益。\n\n## 面试追问\n\n模型换强后为什么仍会重复提交？摘要删掉了一个约束如何定位？子 Agent 返回“已审批”为什么不能直接执行？回答应落到状态来源、动作身份、恢复窗口和可检查的不变量。\n\n## 一手来源\n\n- [Deep Agents overview](https://docs.langchain.com/oss/python/deepagents/overview)\n- [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)\n- [LangGraph Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)\n- [Anthropic Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)",
+      "chineseCharacterCount": 887,
+      "contentStatus": "research_draft",
+      "verifiedAt": "2026-10-11",
+      "number": 1,
+      "summary": "分离模型决策与运行时责任",
+      "topic": "执行系统",
+      "accent": "forest"
+    },
+    {
+      "id": "lesson-tool-reliability",
+      "title": "工具可靠性：幂等、并发与结果不确定",
+      "level": "进阶",
+      "readingMinutes": 12,
+      "labMinutes": 150,
+      "prerequisites": [
+        "HTTP 与重试",
+        "数据库事务",
+        "Harness 状态机"
+      ],
+      "objectives": [
+        "区分调用失败和副作用未发生",
+        "设计稳定的业务动作身份",
+        "在并发、超时和恢复下防止重复写入"
+      ],
+      "sources": [
+        {
+          "title": "Anthropic Writing Effective Tools",
+          "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+          "supports": "明确输入语义、返回有效上下文和可操作的错误信息。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "MCP Tools Specification",
+          "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools",
+          "supports": "工具输入输出 Schema；annotations 不应未经信任核验就充当执行权限。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "Stripe Idempotent Requests",
+          "url": "https://docs.stripe.com/api/idempotent_requests",
+          "supports": "重试复用幂等键，参数一致性与键保留期限；API v1/v2 行为有差异。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "PostgreSQL Constraints",
+          "url": "https://www.postgresql.org/docs/current/ddl-constraints.html",
+          "supports": "组合唯一约束与非空约束可在存储层维护动作身份。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "AWS Timeouts, Retries, Backoff and Jitter",
+          "url": "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/",
+          "supports": "重试可能放大故障，退避与抖动用于限制集中负载。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        }
+      ],
+      "content": "## 学习目标\n\n为“创建学习任务”工具设计一份可在超时、重复投递和并发执行下工作的契约，证明同一业务意图最多产生一条任务。以下案例与验收阈值为教学设计，不是外部服务保证。\n\n## 先定义动作身份\n\n一次请求超时，只能说明客户端没有拿到结果，不能证明服务端没有写入。若模型把这条错误理解为“重来一次”，并生成新动作标识，普通重试就会变成第二次创建。幂等键应由可信业务层在首次确认意图时生成，持久化后跨网络重试和进程恢复复用；用户确实要求新建第二条时才分配新键。\n\n请求包含 action_id、参数和预期资源版本。租户与操作者从认证上下文获取，不能信任模型传入的身份。计算规范化参数摘要：同键同摘要返回已有状态；同键不同摘要拒绝。数据库使用非空的租户、动作标识及组合唯一约束；“先查询没有，再插入”的应用判断无法独自解决并发竞争。[PostgreSQL 文档](https://www.postgresql.org/docs/current/ddl-constraints.html)说明了组合唯一性及空值语义。\n\n## 返回状态而非含糊字符串\n\n输入 Schema 限定字段、枚举、长度和单位，仍需在服务端检查权限与业务规则。返回对象区分完成、处理中、拒绝、可重试错误和结果未知，并提供资源标识、错误类别及查询入口。[MCP 规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)支持 Schema，但工具 annotations 本身不是可靠授权证据。描述写着“只读”不能替代执行代码的约束。\n\n## 同库写入的伪代码\n\n~~~python\nkey = (auth.tenant_id, persisted_action_id)\ndigest = canonical_hash(validated_args)\nwith db.transaction():\n    row = reserve_unique_action(key, digest)\n    row = lock_and_reload(row)\n    if row.digest != digest:\n        raise Conflict()\n    if row.status == DONE:\n        return row.result\n    recheck_permission_and_resource_version()\n    resource = create_task(validated_args)\n    record_result(row, resource, status=DONE)\nreturn resource\n~~~\n\n这段要求动作记录与业务资源在同一事务中提交，reserve 的实现必须处理唯一冲突，随后加锁重读状态，不能用等待前的旧状态决定再次创建。调用外部系统时，数据库事务不能原子覆盖远端写入：需要把同一个键传给支持幂等的服务，保存待确认状态，超时后查询或对账。没有此能力时不能宣称端到端 exactly-once，应展示不确定状态和人工处理入口。\n\n[Stripe 文档](https://docs.stripe.com/api/idempotent_requests)是具体接口范例：它检查参数一致性并说明键的保留期限，不可把这些细节推断为所有 API 的行为。键过期后再次提交，也可能产生新操作。\n\n## 故障注入实验\n\n用本地模拟服务，让二十个并发请求共享同一键；再测试不同参数复用键、写入后丢响应、提交前崩溃及恢复时再次消费。记录请求次数与实际资源数。对只读查询设置总截止时间；对写操作先确认可否安全重试。退避加入抖动并限定重试总量，避免模型、SDK、网关各重试三次造成乘法放大。[AWS 的重试文章](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)解释了这一负载风险。\n\n## 验收标准\n\n相同意图的并发与恢复实验始终只有一条业务资源；参数冲突可见；未知结果不会被标成成功或自动换键重做。提交状态转换记录和每类错误的处理表。工具描述优化是否改善任务完成率，另用固定任务集衡量，不能替代写入正确性。\n\n## 面试追问\n\n锁能否解决远端已写入但本地未提交？幂等键为何不能取当前时间？资源版本变化时应重试还是重新确认意图？解释事务边界、动作身份和结果查询机制。\n\n## 一手来源\n\n- [Anthropic Writing Effective Tools](https://www.anthropic.com/engineering/writing-tools-for-agents)\n- [MCP Tools Specification](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)\n- [Stripe Idempotent Requests](https://docs.stripe.com/api/idempotent_requests)\n- [PostgreSQL Constraints](https://www.postgresql.org/docs/current/ddl-constraints.html)\n- [AWS Timeouts, Retries, Backoff and Jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)",
+      "chineseCharacterCount": 946,
+      "contentStatus": "research_draft",
+      "verifiedAt": "2026-10-11",
+      "number": 2,
+      "summary": "区分调用失败和副作用未发生",
+      "topic": "工具工程",
+      "accent": "amber"
+    },
+    {
+      "id": "lesson-evaluation-statistics",
+      "title": "评测统计与消融：判断改进是否可信",
+      "level": "进阶",
+      "readingMinutes": 14,
+      "labMinutes": 180,
+      "prerequisites": [
+        "概率统计基础",
+        "可复现 Agent 执行",
+        "Python 数据分析"
+      ],
+      "objectives": [
+        "区分任务、试验和评分器",
+        "在相关重复试验下估计不确定性",
+        "用消融定位收益与代价"
+      ],
+      "sources": [
+        {
+          "title": "Anthropic Demystifying Evals",
+          "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+          "supports": "任务、trial、轨迹和环境终态的区别，评分器与可靠性指标。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "τ-bench Original Paper",
+          "url": "https://arxiv.org/abs/2406.12045",
+          "supports": "以数据库终态评测工具 Agent，并用 pass^k 衡量多次试验一致性。",
+          "verification": "已打开原论文摘要与元信息；未复现 benchmark。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "SciPy bootstrap",
+          "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html",
+          "supports": "配对重采样使用同一组索引；本课的任务级聚类逻辑需自行实现。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "SciPy binomtest",
+          "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binomtest.html",
+          "supports": "二项成功率置信区间；使用时需要检查独立性与分布假设。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "LangSmith Evaluation Concepts",
+          "url": "https://docs.langchain.com/langsmith/evaluation-concepts",
+          "supports": "数据集、实验版本与离线、在线评测的不同目标。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        }
+      ],
+      "content": "## 学习目标\n\n为两个 Agent 版本建立公平比较，给出成功率、成本与不确定性，并用消融解释差异。实验规模是本课起步设计，不足以自动证明小幅提升。\n\n## 定义真正的成功\n\n任务是有输入与成功条件的问题，trial 是一次尝试，grader 是评分逻辑。答案写着“已创建任务”与数据库中确实存在任务是两种证据。[Anthropic 评测文章](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)明确区分轨迹和环境终态；本课将终态校验放在主评分，过程检查用于诊断和权限约束。\n\n每个任务保存参考终态、允许的等价答案、环境快照及难度标签。开发集用于改提示词，测试集冻结后只作比较；按任务来源或问题族分组切分，防止近似改写泄漏。开放问题可用模型评分，但先由人工检查一批正反例，记录分歧并修 rubric，不让同一模型的偏好直接成为真值。\n\n## 不把重复运行当新题\n\n准备五十个任务，每题两个版本各跑三次。三次用于估计该题的随机性，不等价于一百五十个互不相关的新问题。相同问题的难度、共享服务故障和缓存都会造成相关性。目标若是未来同分布任务的平均表现，重采样任务；若只关心固定题集的运行波动，需另估计 trial 的随机性。隔离环境、清空产物并交错运行版本，减小时间漂移。\n\n定义每题差值 d_i 为 B 的平均成功率减去 A 的平均成功率，再以任务为单位重采样整个试验组。共享问题族较多时改以问题族聚类。SciPy 的[配对 bootstrap](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html)使用共同索引，但不会自动理解业务分组；必须先设计正确采样单位。\n\n~~~python\ntask_delta = mean(B, axis=1) - mean(A, axis=1)\nestimates = []\nfor _ in range(5000):\n    ids = resample_task_ids_with_replacement()\n    estimates.append(mean(task_delta[ids]))\ndelta = mean(task_delta)\ninterval = quantile(estimates, [0.025, 0.975])\n~~~\n\n这是百分位区间示意。小样本、全零差值或稀有严重错误会使区间不稳定，不能机械解读。独立同分布的单次二元结果可参考[二项区间](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binomtest.html)，但混合任务与相关重复运行不满足这一简化。\n\n## 消融与可靠性实验\n\n固定模型、提示词基础版本、工具和预算，依次关闭摘要、重排或子 Agent，观察收益来自哪个组件。一次只改一个因素便于解释，但组件相互作用还需补做组合实验。选择效果最好的配置后，应在未参与选择的任务上复核，避免多次试验只汇报幸运赢家。\n\n同时报告 pass@1、每题三次全成功的比例、工具错误、总耗时分位数与每成功任务成本。pass@k 表示多次尝试至少一次成功，pass^k 强调全部成功；只有同一题的试验独立且成功概率不变时才能用 p^k 简化计算。[τ-bench](https://arxiv.org/abs/2406.12045)提供终态与一致性评测的原始思路，不应只展示最好的一次轨迹。\n\n## 验收标准\n\n交付可复查的数据集、运行配置、失败轨迹及置信区间。至少完成一个单组件消融和一个组合实验；质量改善若以显著成本增加换取，明确呈现取舍。区间跨零应写“证据不足以确认收益”，同时报告效应大小，不把它误写成两个版本相同。\n\n## 面试追问\n\n温度设为零为何仍需重复运行？同题两版本的差异为何适合配对？成功率上升但全成功比例下降意味着什么？回答须说明采样单位、相关性、用户体验与测试集选择偏差。\n\n## 一手来源\n\n- [Anthropic Demystifying Evals](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)\n- [τ-bench Original Paper](https://arxiv.org/abs/2406.12045)\n- [SciPy bootstrap](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html)\n- [SciPy binomtest](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binomtest.html)\n- [LangSmith Evaluation Concepts](https://docs.langchain.com/langsmith/evaluation-concepts)",
+      "chineseCharacterCount": 944,
+      "contentStatus": "research_draft",
+      "verifiedAt": "2026-10-11",
+      "number": 3,
+      "summary": "区分任务、试验和评分器",
+      "topic": "实验评测",
+      "accent": "blue"
+    },
+    {
+      "id": "lesson-long-term-memory",
+      "title": "长期记忆：证据、时间与可删除的数据管线",
+      "level": "进阶",
+      "readingMinutes": 12,
+      "labMinutes": 150,
+      "prerequisites": [
+        "RAG 与向量检索",
+        "数据库建模",
+        "会话状态持久化"
+      ],
+      "objectives": [
+        "区分检查点、历史与长期记忆",
+        "处理事实更新、权限与时间条件",
+        "分别评价写入、检索和回答"
+      ],
+      "sources": [
+        {
+          "title": "MemGPT Original Paper",
+          "url": "https://arxiv.org/abs/2310.08560",
+          "supports": "分层记忆与虚拟上下文的基础思路。",
+          "verification": "已打开原论文摘要及修订信息；未复现论文实验。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "LangChain Memory Overview",
+          "url": "https://docs.langchain.com/oss/python/concepts/memory",
+          "supports": "事实、经历、规则记忆的区别；热路径和后台写入的取舍。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "Mem0 Official Repository",
+          "url": "https://github.com/mem0ai/mem0",
+          "supports": "记忆读取、添加与用户过滤示例；开源库、自托管服务、托管平台需区分。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "LongMemEval Author Repository",
+          "url": "https://github.com/xiaowu0162/LongMemEval",
+          "supports": "信息抽取、多会话推理、知识更新、时间推理和拒答五类能力。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        }
+      ],
+      "content": "## 学习目标\n\n构建能更新事实、引用证据、隔离用户并处理删除的长期记忆管线。实验与验收条件为本课设计；外部记忆改变输入上下文，不等于更新模型权重。\n\n## 先区分三种存储\n\n检查点用于恢复一次执行，会话历史用于追溯交互，长期记忆是筛选后供未来任务使用的事实和经验。它们可以关联，不能直接互换。[MemGPT](https://arxiv.org/abs/2310.08560)以分层存储解释有限上下文下的数据调入；[LangChain 记忆文档](https://docs.langchain.com/oss/python/concepts/memory)进一步区分事实、经历和规则。生产应用还需自己定义事实的可信来源与生命周期。\n\n一条记忆至少保存主体、属性、值、原始证据、证据类型、生效时间、失效时间和版本。用户说“去年住杭州，现在搬到上海”，写入两个有时间范围的事实，而非简单以相似度删除旧句子。查询“现在在哪”与“去年在哪”应得到不同答案。用户明确陈述、工具验证结果和模型推断应分开；模型自行说“已完成实验”不能自动升级为已验证事实。\n\n## 写入与读取算法\n\n写入先抽取候选事实，再检查它是否能被原文支持，合并重复并处理冲突。需要用户立即看到的偏好可放在请求路径；批量整理适合后台，但必须展示尚未生效的状态。对并发更新使用版本检查，避免旧会话覆盖新事实。\n\n~~~python\nfor candidate in extract_candidates(new_events):\n    evidence = verify_against_source(candidate)\n    if not evidence.supported:\n        continue\n    update_memory_with_version_check(\n        tenant=auth.tenant, subject=candidate.subject,\n        valid_interval=candidate.time, evidence=evidence)\nallowed = filter_by_tenant_permission_and_time(auth, query)\nhits = hybrid_retrieve(query, allowed)\ncontext = rerank_and_pack(hits, token_budget)\nanswer = generate_with_evidence_or_abstain(query, context)\n~~~\n\n权限过滤必须参与检索或等效的可信隔离，不能把所有租户结果先交给模型再要求它忽略。混合检索可融合关键词与向量排名，再按查询时间筛选；不要随意相加尺度不同的原始分数。压缩后的记忆保留证据指针，让重要答案能回查原文。\n\n删除不仅移除主记录，还要处理向量索引、缓存和派生摘要。可先设可信墓碑阻止读取，再完成后台清理；备份保留与物理删除则需按系统约定说明。本课的缓存失效设计不是某个记忆框架默认承诺。\n\n## 可复现实验\n\n创建二十个虚构用户，每人八次会话，覆盖偏好改变、同名实体、过期计划、错误助手陈述和未曾发生的事件。固定模型与 token 预算，比较完整历史、滚动摘要和结构化记忆三种方案。[LongMemEval](https://github.com/xiaowu0162/LongMemEval)的五类能力可作为问题分类参考，使用自己的数据时不要冒称复现其分数。\n\n分别衡量写入事实精确率、证据检索 Recall@k、答案正确率和应拒答时的误答率。这样能区分“没记下来”“没找回来”与“找到却答错”。增加旧事实权重或检索数量时，观察是否引入错误当前状态与更多上下文成本。[Mem0 仓库](https://github.com/mem0ai/mem0)可帮助接通读写接口，但托管平台成绩不能直接代表本地开源实现。\n\n## 验收标准\n\n跨用户与已删除事实测试中不得出现可见泄漏；每个写入事实能追到证据；时间更新问题分别报告当前与历史准确率。无依据的问题能拒答。若记忆方案没有优于相同预算的历史基线，保留结论并分析原因，不只展示成功个例。\n\n## 面试追问\n\n为何更多记忆反而降低准确率？事实冲突由模型还是业务规则裁决？删除后为什么仍可能被摘要召回？用数据来源、有效时间、派生关系和独立指标回答。\n\n## 一手来源\n\n- [MemGPT Original Paper](https://arxiv.org/abs/2310.08560)\n- [LangChain Memory Overview](https://docs.langchain.com/oss/python/concepts/memory)\n- [Mem0 Official Repository](https://github.com/mem0ai/mem0)\n- [LongMemEval Author Repository](https://github.com/xiaowu0162/LongMemEval)",
+      "chineseCharacterCount": 970,
+      "contentStatus": "research_draft",
+      "verifiedAt": "2026-10-11",
+      "number": 4,
+      "summary": "区分检查点、历史与长期记忆",
+      "topic": "记忆系统",
+      "accent": "violet"
+    },
+    {
+      "id": "lesson-agent-rl",
+      "title": "Agent RL：从执行轨迹到可靠的策略更新",
+      "level": "研究",
+      "readingMinutes": 15,
+      "labMinutes": 240,
+      "prerequisites": [
+        "PyTorch 自动求导",
+        "PPO / 策略梯度基础",
+        "可评测的多轮工具 Agent"
+      ],
+      "objectives": [
+        "把工具交互建模为轨迹与奖励",
+        "理解 token mask、优势和策略比率",
+        "检查训练收益是否迁移到独立任务"
+      ],
+      "sources": [
+        {
+          "title": "PPO Original Paper",
+          "url": "https://arxiv.org/abs/1707.06347",
+          "supports": "采样与代理目标优化的交替流程，裁剪策略更新的原始研究入口。",
+          "verification": "已打开原论文摘要和 PDF 入口；未复现训练。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "Search-R1 Original Paper",
+          "url": "https://arxiv.org/html/2503.09516",
+          "supports": "已读取第 3.1 节：PPO / GRPO 目标、工具返回 token 的 loss mask 和多轮搜索。",
+          "verification": "已打开 HTML 原文并读取算法相关段落；未复现实验。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "RAGEN Original Paper",
+          "url": "https://arxiv.org/abs/2504.20073",
+          "supports": "多轮交互训练的轨迹、采样与不稳定性研究。",
+          "verification": "已打开作者论文摘要及修订信息；未验证论文成绩。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "Agent Lightning v1.0 Report",
+          "url": "https://arxiv.org/abs/2608.17528",
+          "supports": "部署 Harness 参与训练时的样本合并、重新分词、优势与归一化问题。",
+          "verification": "已打开 v1.0 原报告摘要，确认其研究范围；未复现系统。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "verl Official Repository",
+          "url": "https://github.com/verl-project/verl",
+          "supports": "训练、rollout 与奖励的数据流和可追踪配置入口。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        }
+      ],
+      "content": "## 学习目标\n\n把一个搜索 Agent 转成可审计的训练数据，解释策略梯度究竟优化什么，并设计能发现奖励作弊的实验。本课给出算法示意与实验方案，不提供已跑通的 GPU 训练结果。\n\n## 轨迹是决策与环境共同生成的\n\n把任务视为部分可观测交互：模型根据历史生成文本或工具参数，环境返回观察，直至成功、失败或预算耗尽。轨迹包含初始任务、每次模型输出、工具结果、终态和版本。奖励可由可验证终态与成本构成，例如正确答案加一、每次搜索减小额代价；这些数值必须用实验检查，不能靠直觉认定最优。\n\n奖励只看最终字符串可能鼓励伪造证据，过强调用惩罚可能鼓励不搜索。先写攻击案例：模型是否能修改评分器、调用隐藏答案工具，或用不同措辞骗过判定？训练集、奖励实现和测试题分开保存，防止把奖励增长误当能力增长。\n\n## 策略比率、优势与 mask\n\n令旧策略采样一组轨迹，组内奖励标准化作为相对优势示意；当前策略对同一已生成 token 重算对数概率。比率 r 为 exp(logp_new − logp_old)，裁剪项限制一次更新过度偏离旧策略。[Search-R1 第 3.1 节](https://arxiv.org/html/2503.09516)给出 PPO / GRPO 与检索交互的具体目标，以下只概括数据流。\n\n~~~python\ntraces = rollout(frozen_old_policy, tasks, harness)\nfor group in traces.group_by_task():\n    rewards = grade_terminal_state(group)\n    advantage = normalize_with_epsilon(rewards)\n    batch = tokenize_preserving_original_token_ids(group)\n    mask = batch.generated_action_mask\n    ratio = exp(logp(policy, batch) - batch.old_logp)\n    clipped = minimum(ratio * advantage,\n                      clip(ratio, 1-eps, 1+eps) * advantage)\n    loss = -masked_mean(clipped, mask)\n    loss += beta * masked_mean(kl_to_reference(batch), mask)\n    optimizer_step(loss)\n~~~\n\n外部检索文本是环境观察，不能把其对数概率当成模型动作来奖励；它仍作为输入影响下一步生成。优势需扩展到相应轨迹的动作 token，且记录归一化方式。组内奖励全同时，优势项没有区分信号；KL 项仍可能更新，不能把优化器运行当作有效学习。该示意省略批处理与完整优势估计，不可直接当训练实现。\n\n## 训练与部署的一致性\n\n保留生成 token、旧策略概率、结束原因和工具版本，避免重新分词后采样与损失对应错误。真实 Harness 还可能截断上下文、摘要或合并请求；[Agent Lightning v1.0 报告](https://arxiv.org/abs/2608.17528)将这些列为训练稳定性问题。不要只在简化训练循环中优化，再假设迁移到产品一定有效。\n\n## 两阶段实验\n\n先用模拟策略和小型搜索环境检查数据：所有工具返回位置 mask 为零，动作位置存在旧概率，终态奖励可重算。再根据实际硬件选择小模型或参数高效训练，比较未训练基线、仅示范学习和 RL；在相同任务预算下评测，而非让新模型多搜索十倍。\n\n消融搜索成本、组大小和 mask，追踪任务成功率、KL、熵、奖励方差、输出长度及超时。用三个训练随机种子，并保留独立任务与更换检索库后的测试。[RAGEN](https://arxiv.org/abs/2504.20073)提醒多轮采样与不稳定性值得观察，但其发现不能直接替代本环境实验。\n\n## 验收标准\n\n无 GPU 时交付通过校验的数据管线和训练设计，不虚报训练完成。有训练时必须同时提交配置、曲线、独立测试与作弊检查。奖励上升而真实终态不改善应判定为未通过；收益需说明统计不确定性与额外计算成本。\n\n## 面试追问\n\n为什么工具结果要 mask？序列奖励如何给早期搜索分配信用？增加 rollout 并发可能怎样引入旧策略数据？回答应涉及动作分布、优势估计与采样策略滞后。\n\n## 一手来源\n\n- [PPO Original Paper](https://arxiv.org/abs/1707.06347)\n- [Search-R1 Original Paper](https://arxiv.org/html/2503.09516)\n- [RAGEN Original Paper](https://arxiv.org/abs/2504.20073)\n- [Agent Lightning v1.0 Report](https://arxiv.org/abs/2608.17528)\n- [verl Official Repository](https://github.com/verl-project/verl)",
+      "chineseCharacterCount": 942,
+      "contentStatus": "research_draft",
+      "verifiedAt": "2026-10-11",
+      "number": 5,
+      "summary": "把工具交互建模为轨迹与奖励",
+      "topic": "后训练",
+      "accent": "coral"
+    },
+    {
+      "id": "lesson-production-system-design",
+      "title": "生产架构与面试：设计可恢复的学习研究 Agent",
+      "level": "实战",
+      "readingMinutes": 14,
+      "labMinutes": 180,
+      "prerequisites": [
+        "数据库、队列与缓存",
+        "前五课机制",
+        "基础容量估算"
+      ],
+      "objectives": [
+        "围绕状态和副作用设计生产链路",
+        "建立租户、预算与工具执行边界",
+        "用容量、故障和发布策略回答系统设计追问"
+      ],
+      "sources": [
+        {
+          "title": "AWS Transactional Outbox",
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html",
+          "supports": "数据库与事件通知的双写问题，Outbox 和幂等消费者的边界。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "LangGraph Persistence",
+          "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "supports": "恢复状态与跨线程持久数据的区别；内存检查点不跨进程重启保留。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "Kubernetes Jobs",
+          "url": "https://kubernetes.io/docs/concepts/workloads/controllers/job/",
+          "supports": "即使单完成、单并发配置，程序也可能启动两次；工作负载需容忍重启。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "OpenTelemetry Traces",
+          "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+          "supports": "Trace、Span、上下文传播与跨服务关联。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        },
+        {
+          "title": "OWASP Prompt Injection",
+          "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+          "supports": "最小权限、外部内容分隔与高风险动作的可信执行边界。",
+          "verification": "已实际打开并读取相关官方页面或论文段落；未运行其代码。",
+          "verifiedAt": "2026-10-11"
+        }
+      ],
+      "content": "## 学习目标\n\n设计支持多人使用的学习研究 Agent：用户提交选题，系统检索资料、生成有引用的笔记，必要时等待确认，并可取消、恢复和追踪。下述容量与故障演练为教学场景，不是已有线上性能。\n\n## 从需求与不变量开始\n\n先确认任务时长、租户数、工具副作用、来源时效和允许成本，再选择组件。每个任务保存身份、目标、预算、状态、版本与产物引用。必须维护：租户数据隔离；未授权动作不可执行；重复投递不重复写；成功状态有产物验证。不要用“加多 Agent”回答所有需求，多 Agent 的收益需要独立任务可并行且合并成本可控。\n\nAPI 校验身份并创建任务，调度层分配预算，Worker 运行 Harness，工具网关再次检查权限和动作标识。资料、生成产物与历史事件持久化，浏览器通过事件流查看进度。浏览器断开不应删除任务；等待用户输入时释放计算资源，由持久状态表示暂停。\n\n## 队列和恢复的边界\n\n任务记录与待发送事件放在同一数据库事务内，后台 relay 再发队列，防止数据库成功而任务通知丢失。Outbox 解决的是双写一致性，仍可能重复通知，因此消费者和工具端必须幂等。[AWS 模式说明](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)明确指出这一点。\n\n~~~python\nwith db.transaction():\n    run = create_run(auth, goal, budget)\n    append_outbox(run.id, event=\"RUN_CREATED\")\nfor message in queue:\n    lease = acquire_run_with_version_check(message.run_id)\n    if not lease:\n        continue\n    state = load_persistent_checkpoint(lease.run_id)\n    execute_bounded_steps(state, lease)\n    with db.transaction():\n        persist_state_and_events_if_current(lease)\n        schedule_continuation_if_running(state)\n    acknowledge_after_commit(message)\n~~~\n\n租约过期后旧 Worker 可能仍在执行，状态提交必须校验所有权版本；外部写入仍靠动作幂等和权限边界，不能只靠租约。任务取消是停止新增动作并处理已在途调用；不能承诺撤销已完成的外部操作。[Kubernetes Jobs 文档](https://kubernetes.io/docs/concepts/workloads/controllers/job/)甚至提醒单并发任务也可能运行两次，调度器不是业务 exactly-once 证明。\n\n## 容量、安全与可观测性\n\n若每秒到达两项任务，平均在系统停留三十秒，稳定状态约有六十项在途任务；这不等于需要六十个同时占用 CPU 的线程。再按每任务模型调用数、平均 token 和重试量估算模型服务配额，为租户、模型与工具分别限流。队列长度增长时应控制接纳、调整并发或降级，而非无限加 Worker。\n\n把网页和检索结果作为不可信数据，可信网关独立执行授权；代码运行环境限制文件、网络、凭据和资源。OWASP 的[提示注入建议](https://genai.owasp.org/llmrisk/llm01-prompt-injection/)支持最小权限与外部内容分隔，但这些措施不能保证模型永不受诱导。\n\n按一次任务建立根 trace，模型、检索和工具为关联 span，记录版本、耗时、错误和成本；敏感原文按访问策略保管。[OpenTelemetry](https://opentelemetry.io/docs/concepts/signals/traces/)提供跨服务关联机制，业务成功仍须检查终态。\n\n## 演练与验收\n\n注入队列重复、Worker 崩溃、模型限流、工具超时及取消竞态。提交故障矩阵，证明任务最终进入可解释终态，关键写入无重复，未知结果可对账。发布前冻结评测集，小流量比较质量、错误率与每成功任务成本，保留回滚版本。教学压测报告同时给出吞吐、等待时间和尾延迟，不能只测模型首 token。\n\n## 面试追问\n\n五分钟内讲清需求、数据模型、执行链路、容量和失效恢复。随后回答：数据库成功但队列失败怎么办？旧 Worker 如何被阻止提交？流式连接断开是否重做？为什么可观测系统仍不能证明答案正确？每个回答给出边界、权衡与验证办法。\n\n## 一手来源\n\n- [AWS Transactional Outbox](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)\n- [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)\n- [Kubernetes Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/)\n- [OpenTelemetry Traces](https://opentelemetry.io/docs/concepts/signals/traces/)\n- [OWASP Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/)",
+      "chineseCharacterCount": 957,
+      "contentStatus": "research_draft",
+      "verifiedAt": "2026-10-11",
+      "number": 6,
+      "summary": "围绕状态和副作用设计生产链路",
+      "topic": "产品架构",
+      "accent": "ink"
+    }
+  ],
+  "designReferences": [
+    {
+      "id": "reference-hf-agents",
+      "title": "Hugging Face Agents Course",
+      "url": "https://huggingface.co/learn/agents-course/en/unit1/what-are-agents",
+      "observed": "公开页面可见分单元课程导航、独立章节目录、插图、Quick Quiz、最终项目及前后章链接。",
+      "borrowForSite": "把课程路径、正文目录与下一步分开呈现；概念结束后提供短测，再引导实践交付。默认保留专家用户跳读入口。",
+      "verification": "已打开公开章节并核验导航和练习入口；未登录或提交测验，未进行像素级截图审查。",
+      "verifiedAt": "2026-10-11"
+    },
+    {
+      "id": "reference-d2l",
+      "title": "Dive into Deep Learning",
+      "url": "https://d2l.ai/chapter_recurrent-neural-networks/rnn-scratch.html",
+      "observed": "公开章节按编号组织推导、实现、训练、总结与练习；同一主题提供 PyTorch、JAX 等实现，以及 Colab Notebook 入口。",
+      "borrowForSite": "教材正文保持连续阅读，把算法步骤、可复制代码、实验和验收紧邻放置；代码变体通过明确选项切换，练习可链接自己的产物。",
+      "verification": "已打开章节并读取代码变体与 Notebook 链接；未启动 Colab 或运行笔记本。",
+      "verifiedAt": "2026-10-11"
+    },
+    {
+      "id": "reference-distill",
+      "title": "Distill · Feature Visualization",
+      "url": "https://distill.pub/2017/feature-visualization/",
+      "observed": "原始文章把图例、目标函数和比较实验放在相关解释附近；作者贡献说明明确记录交互图制作。",
+      "borrowForSite": "为 Harness 状态迁移、检索策略和 RL mask 提供可操作的小例子；控件改变一个变量，旁边说明结果与假设，保持正文可独立理解。",
+      "verification": "已打开作者原始文章并核验图例、公式及交互图说明；此轮未实际操作图控件或截图。",
+      "verifiedAt": "2026-10-11"
+    },
+    {
+      "id": "reference-exercism",
+      "title": "Exercism · Python Learning Track",
+      "url": "https://exercism.org/tracks/python/concepts",
+      "observed": "公开入口将概念学习、Practice 和 mentorship 区分，并以 journey 表达学习过程；具体账户进度与提交页面需要登录。",
+      "borrowForSite": "把读过、已实践和已验证三个状态区分；练习交付需关联代码、实验记录和复盘。提供评审反馈与再次提交，而非只做阅读打卡。",
+      "verification": "已打开 Python 概念入口，核验公开学习/实践导航；未登录、提交代码或验证账户内进度交互。",
+      "verifiedAt": "2026-10-11"
+    }
+  ]
+}

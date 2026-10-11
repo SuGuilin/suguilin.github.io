@@ -2,6 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>https://suguilin.github.io/</loc></url>
 <url><loc>https://suguilin.github.io/about/</loc></url>
+<url><loc>https://suguilin.github.io/account/</loc></url>
+<url><loc>https://suguilin.github.io/assistant/</loc></url>
 <url><loc>https://suguilin.github.io/blog/</loc></url>
 <url><loc>https://suguilin.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</loc></url>
 <url><loc>https://suguilin.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/</loc></url>
@@ -20,6 +22,7 @@
 <url><loc>https://suguilin.github.io/interview/</loc></url>
 <url><loc>https://suguilin.github.io/journal/</loc></url>
 <url><loc>https://suguilin.github.io/lab/</loc></url>
+<url><loc>https://suguilin.github.io/learn/</loc></url>
 <url><loc>https://suguilin.github.io/library/</loc></url>
 <url><loc>https://suguilin.github.io/link/index-1.html</loc></url>
 <url><loc>https://suguilin.github.io/link/index.html</loc></url>
