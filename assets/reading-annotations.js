@@ -2,6 +2,7 @@ import {escapeHTML as esc} from './state.js';
 import {normalizeQuote,readAnnotation,saveAnnotation} from './learning-signals.js';
 import {validReadingSection} from './study-model.js';
 const excluded='button,textarea,select,input,summary,.code-caption,.annotation-tools,.reading-selection-bar';
+export function annotationThought(note){const body=note?.body||'',heading=/^## (?:我的思考|我的疑问)\r?\n/m.exec(body);return heading?body.slice(heading.index+heading[0].length).split(/^\[回到标注位置\]/m)[0].trim():'';}
 export class ReadingAnnotations{
   constructor(study){
     this.study=study;this.selection=null;
@@ -10,8 +11,8 @@ export class ReadingAnnotations{
     document.addEventListener('click',e=>{const b=e.target.closest('[data-annotation]');if(b){e.preventDefault();try{this.action(b);}catch(error){study.notify(error.message);}}});
   }
   records(unit){return this.study.getState().notes.map(readAnnotation).filter(a=>a?.unitId===unit.id);}
-  markup(unit){const records=this.records(unit);return `<section id="study-marks" class="reading-marks"><div class="section-heading"><h2>我的标注与思考</h2>${records.length?'<span><span data-annotation-count>'+records.length+'</span> 条</span>':''}</div><p class="small-note">选中正文可标注、记笔记或提问。</p><div data-annotation-list>${this.list(records)}</div></section><div class="reading-selection-bar" role="region" aria-label="选文操作" hidden><span data-selected-quote></span><div><button data-annotation="mark">标注重点</button><button data-annotation="note">记笔记</button><button data-annotation="ask">选文提问</button><button data-annotation="dismiss" aria-label="关闭选文操作">×</button></div></div>`;}
-  list(records){return records.length?records.map(a=>`<article class="annotation-row"><span>${esc(a.note.kind)} · <span data-mark-status="${a.note.id}">已保存</span></span><p>${esc(a.quote)}</p><div><a href="#${a.section}" data-reading-link>回到正文 ↑</a><a href="/journal/?id=${a.note.id}" data-nav>查看笔记 ↗</a><button data-annotation="discuss" data-note="${a.note.id}">继续讨论 ↗</button></div></article>`).join(''):'';}
+  markup(unit){const records=this.records(unit);return `<section id="study-marks" class="reading-marks"><div class="section-heading"><h2>我的标注与思考</h2>${records.length?'<span><span data-annotation-count>'+records.length+'</span> 条</span>':''}</div>${records.length?'':'<p class="small-note">选中正文可标注、记笔记或提问。</p>'}<div data-annotation-list>${this.list(records)}</div></section><div class="reading-selection-bar" role="region" aria-label="选文操作" hidden><span data-selected-quote></span><div><button data-annotation="mark">标注重点</button><button data-annotation="note">记笔记</button><button data-annotation="ask">选文提问</button><button data-annotation="dismiss" aria-label="关闭选文操作">×</button></div></div>`;}
+  list(records){return records.length?records.map(a=>`<article class="annotation-row"><span>${esc(a.note.kind)} · <span data-mark-status="${a.note.id}">已保存</span></span><blockquote>${esc(a.quote)}</blockquote>${annotationThought(a.note)?`<p class="annotation-thought">${esc(annotationThought(a.note))}</p>`:''}<div><a href="#${a.section}" data-reading-link>回到正文 ↑</a><a href="/journal/?id=${a.note.id}&edit=1" data-nav>编辑笔记 ↗</a><button data-annotation="discuss" data-note="${a.note.id}">继续讨论 ↗</button></div></article>`).join(''):'';}
   sectionFor(node){for(let el=node.nodeType===1?node:node.parentElement;el?.closest('.study-reader');el=el.parentElement)if(validReadingSection(el.id)&&el.id!=='study-marks'&&el.id!=='study-reflection')return el;return null;}
   capture(){
     if(document.querySelector('dialog[open]'))return;
@@ -21,7 +22,7 @@ export class ReadingAnnotations{
     if(!start||start!==end||range.startContainer.parentElement?.closest(excluded)||range.endContainer.parentElement?.closest(excluded)||quote.length<2||quote.length>3000){bar.hidden=true;return;}
     this.selection={section:start.id,quote};bar.querySelector('[data-selected-quote]').textContent=quote.slice(0,100)+(quote.length>100?'…':'');bar.hidden=false;
   }
-  discuss(unit,selection){this.study.platform.openAssistant({title:unit.title,studyUnit:unit,section:selection.section,selectionKey:selection.section+':'+selection.quote.slice(0,100),question:`我正在学习「${unit.title}」。\n\n读到这段：\n「${selection.quote}」\n\n我的疑问：\n\n请先帮助我澄清这段内容的机制、假设与边界，再给一个追问或最小验证方法。`});}
+  discuss(unit,selection){const thought=annotationThought(selection.note);this.study.platform.openAssistant({title:unit.title,studyUnit:unit,journalNoteId:selection.note?.id,section:selection.section,selectionKey:selection.section+':'+selection.quote.slice(0,100),question:`我正在学习「${unit.title}」。\n\n读到这段：\n「${selection.quote}」\n\n${thought?'我的笔记与疑问：\n'+thought:'我的疑问：'}\n\n请先帮助我澄清这段内容的机制、假设与边界，再给一个追问或最小验证方法。`});}
   action(button){
     const unit=this.study.unit(document.querySelector('.study-reader')?.dataset.unit);if(!unit)return;
     if(button.dataset.annotation==='dismiss'){document.querySelector('.reading-selection-bar').hidden=true;window.getSelection()?.removeAllRanges();return;}
@@ -56,6 +57,6 @@ export class ReadingAnnotations{
       }
       const status=article.querySelector('[data-mark-status="'+a.note.id+'"]');if(status)status.textContent=matched?'正文已标注':'正文已变化，选文仍保留';
     }
-    for(const count of document.querySelectorAll('[data-annotation-count]'))count.textContent=records.length;
+    for(const count of document.querySelectorAll('[data-annotation-count]'))count.textContent=records.length||'';
   }
 }

@@ -13,6 +13,7 @@ export function questionNoteParts(note){
   return {body:body.slice(0,match.index)+body.slice(match.index+match[0].length),context:match[0].replace(/^\n\n---\n/,''),question};
 }
 export function journalTitle(note){
+  if(note.kind==='学习复盘'&&/ · 学习复盘$/.test(note.title)&&note.body.includes('[回到学习单元](/study/'))return note.title.replace(/ · 学习复盘$/,'')+' · '+(/(?:^## 上次作答|\[对照上次作答\])/m.test(note.body)?'独立回忆':'学习自检');
   return /^## 待解答的问题\n/.test(note.body)&&/ · 待解答问题$/.test(note.title)&&['待解答问题','已解决问题'].includes(note.kind)
     ? notePreview(questionNoteParts(note).question,110)||note.title : note.title;
 }
