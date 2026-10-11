@@ -10,6 +10,7 @@ export const mechanismDiagrams={
 };
 export function questionTitle(unit){return mechanismDiagrams[unit.id]?.title||unit.title;}
 export const learningNotebooks={
+ 'digest-jev':[['decision-calibration.ipynb','概率、错误与回退阈值','合成数据 · 15 分钟']],
  'lesson-harness':[['langgraph-interrupts.ipynb','LangGraph 审批暂停与恢复','真实 SDK · 15 分钟'],['durable-agent.ipynb','检查点与远端副作用','模拟服务 · 20 分钟']],
  'lesson-tool-reliability':[['durable-agent.ipynb','超时、幂等与查询恢复','模拟服务 · 20 分钟']],
  'lesson-evaluation-statistics':[['paired-agent-evaluation.ipynb','配对评测与伪重复','合成数据 · 20 分钟']],

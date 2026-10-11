@@ -20,12 +20,12 @@ for(const route of ['','study','plan','roadmap','radar','lab','journal','intervi
 }
 const lessons=JSON.parse(await readFile(path.join(root,'content/lessons.json'),'utf8'));
 const study=JSON.parse(await readFile(path.join(root,'content/study-units.json'),'utf8'));
-assert.equal(study.units.length,21);assert.equal(new Set(study.units.map(u=>u.id)).size,21);
+assert.equal(study.units.length,22);assert.equal(new Set(study.units.map(u=>u.id)).size,22);
 for(const unit of study.units){validateUnit(unit);assert.ok(unit.id.startsWith('lesson-')?lessons.lessons.some(l=>l.id===unit.id):ids.has(unit.id.replace(/^digest-/,'')),`Missing study reference ${unit.id}`);}
-for(const file of ['study-model.js','source-reader.js'])assert.equal(await readFile(path.join(root,'assets',file),'utf8'),await readFile(path.join(root,'supabase/functions/_shared',file),'utf8'),`Stale backend ${file}`);
+for(const file of ['study-model.js','source-reader.js','learning-signals.js'])assert.equal(await readFile(path.join(root,'assets',file),'utf8'),await readFile(path.join(root,'supabase/functions/_shared',file),'utf8'),`Stale backend ${file}`);
 assert.equal(lessons.lessons.length,6);
 for(const l of lessons.lessons){assert.ok(l.content.length>700);assert.ok(l.sources.length>=3);for(const source of l.sources)assert.equal(new URL(source.url).protocol,'https:');}
-assert.equal(data.resources.filter(r=>r.digest).length,15);
+assert.equal(data.resources.filter(r=>r.digest).length,16);
 for(const r of data.interviewReports){assert.ok(r.author&&r.verification&&r.dateText);for(const id of r.questionRefs)assert.ok(data.questions.some(q=>q.id===id));}
 const config=JSON.parse(await readFile(path.join(root,'assets/public-config.json'),'utf8'));assert.ok(!JSON.stringify(config).includes('sb_secret_'));assert.ok(!Object.keys(config).some(k=>/service.?role|openai|access.?token/i.test(k)));
-console.log(`Verified ${ids.size} unique resources, 21 study units, all curriculum/project/guide references, shared backend modules, legacy routes and 15 page shells.`);
+console.log(`Verified ${ids.size} unique resources, 22 study units, all curriculum/project/guide references, shared backend modules, legacy routes and 15 page shells.`);

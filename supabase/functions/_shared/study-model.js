@@ -1,4 +1,5 @@
-export const validReadingSection = value => typeof value === 'string' && /^(study-(body|essentials|boundaries|practice|reflection|sources)|chapter-\d{1,2}|exercise-e[1-5])$/.test(value);
+import {learningRecommendations} from './learning-signals.js';
+export const validReadingSection = value => typeof value === 'string' && /^(study-(body|essentials|boundaries|practice|marks|reflection|sources)|chapter-\d{1,2}|exercise-e[1-5])$/.test(value);
 // Shared by the browser and the Edge Function. Never accept a title-only pack.
 const idPattern=/^[a-zA-Z0-9_-]{1,100}$/;
 const string=(v,max)=>{if(typeof v!=='string'||!v.trim()||v.length>max)throw new Error('学习内容格式或长度不正确');return v;};
@@ -43,11 +44,11 @@ export function scheduleUnit(state,unit,now=new Date(),{today=false}={}){
   if(!today)for(let n=0;n<366;n++){selected=shiftDay(day,n);const used=state.studyProgress.filter(p=>p.history.length?p.nextReview===selected:p.scheduledFor===selected).reduce((n,p)=>n+(p.history.length?10:state.studyUnits.find(u=>u.id===p.id)?.minutes??30),0);if(used+unit.minutes<=state.dailyMinutes||used===0)break;}
   return {...state,studyProgress:[...state.studyProgress,newProgress(unit,selected)]};
 }
-export function dailyQueue(state,units,now=new Date()){
+export function dailyQueue(state,units,now=new Date(),resources=[]){
   const day=dayKey(now),lookup=new Map(units.map(u=>[u.id,u]));
   const due=state.studyProgress.filter(p=>lookup.has(p.id)&&(p.history.length?p.nextReview&&p.nextReview<=day:p.scheduledFor<=day)).sort((a,b)=>(a.history.length?0:1)-(b.history.length?0:1)||(a.nextReview||a.scheduledFor).localeCompare(b.nextReview||b.scheduledFor));
   let minutes=0;const selected=[];for(const progress of due){const unit=lookup.get(progress.id),cost=Math.min(state.dailyMinutes,progress.history.length?10:unit.minutes);if(minutes+cost>state.dailyMinutes&&selected.length)continue;selected.push({unit,progress,minutes:cost,review:!!progress.history.length});minutes+=cost;}
-  if(!selected.length){const unit=units.find(u=>!state.studyProgress.some(p=>p.id===u.id));if(unit)selected.push({unit,minutes:Math.min(state.dailyMinutes,unit.minutes),review:false,recommended:true});}
+  if(!selected.length){const unit=learningRecommendations(state,units,resources,{limit:units.length}).map(r=>r.unit).find(u=>!state.studyProgress.some(p=>p.id===u.id));if(unit)selected.push({unit,minutes:Math.min(state.dailyMinutes,unit.minutes),review:false,recommended:true});}
   return selected;
 }
 export function recordReview(progress,rating,minutes,now=new Date()){

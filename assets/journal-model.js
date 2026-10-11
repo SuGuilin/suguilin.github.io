@@ -1,4 +1,4 @@
-const kinds=['实验记录','源码研究','论文精读','学习复盘','学习笔记','待解答问题','面试复盘','项目记录','资料收件箱'];
+const kinds=['实验记录','源码研究','论文精读','学习复盘','学习笔记','待解答问题','已解决问题','重点标注','作者观点','面试复盘','项目记录','资料收件箱'];
 export function journalScope(params){
   for(const field of ['id','source','lesson','week','project','guide']){
     const value=params.get(field);if(value&&/^[a-zA-Z0-9_-]{1,100}$/.test(value))return field+':'+value;
