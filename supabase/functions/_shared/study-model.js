@@ -1,3 +1,4 @@
+export const validReadingSection = value => typeof value === 'string' && /^(study-(body|essentials|boundaries|practice|reflection|sources)|chapter-\d{1,2}|exercise-e[1-5])$/.test(value);
 // Shared by the browser and the Edge Function. Never accept a title-only pack.
 const idPattern=/^[a-zA-Z0-9_-]{1,100}$/;
 const string=(v,max)=>{if(typeof v!=='string'||!v.trim()||v.length>max)throw new Error('学习内容格式或长度不正确');return v;};
@@ -26,11 +27,13 @@ export function validateProgress(raw){
   if(new Set(answers.map(a=>a.id)).size!==answers.length)throw new Error('重复练习记录');
   const history=raw.history.map(h=>{if(!Number.isFinite(Date.parse(h.at))||!['again','hard','good'].includes(h.rating)||!Number.isInteger(h.minutes)||h.minutes<1||h.minutes>240)throw new Error('复习记录无效');return {at:new Date(h.at).toISOString(),rating:h.rating,minutes:h.minutes};});
   if(typeof raw.reflection!=='string'||raw.reflection.length>6000)throw new Error('复盘内容无效');
-  return {id:raw.id,title:string(raw.title,200),scheduledFor:raw.scheduledFor,nextReview:raw.nextReview||'',stage:Number.isInteger(raw.stage)&&raw.stage>=0&&raw.stage<=4?raw.stage:0,answers,reflection:raw.reflection,history,updatedAt:new Date(raw.updatedAt).toISOString()};
+  if(raw.readingSection!==undefined&&!validReadingSection(raw.readingSection))throw new Error('阅读位置无效');
+  return {...(raw.readingSection?{readingSection:raw.readingSection}:{}),id:raw.id,title:string(raw.title,200),scheduledFor:raw.scheduledFor,nextReview:raw.nextReview||'',stage:Number.isInteger(raw.stage)&&raw.stage>=0&&raw.stage<=4?raw.stage:0,answers,reflection:raw.reflection,history,updatedAt:new Date(raw.updatedAt).toISOString()};
 }
 export function newProgress(unit,day=dayKey()){return {id:unit.id,title:unit.title,scheduledFor:day,nextReview:'',stage:0,answers:[],reflection:'',history:[],updatedAt:new Date().toISOString()};}
 export function scheduleUnit(state,unit,now=new Date(),{today=false}={}){
   if(state.studyProgress.some(p=>p.id===unit.id))return state;
+  if(state.studyProgress.length>=300)throw new Error('学习计划已满，请先导出备份并整理旧计划');
   const day=dayKey(now);let selected=day;
   if(!today)for(let n=0;n<366;n++){selected=shiftDay(day,n);const used=state.studyProgress.filter(p=>p.history.length?p.nextReview===selected:p.scheduledFor===selected).reduce((n,p)=>n+(p.history.length?10:state.studyUnits.find(u=>u.id===p.id)?.minutes??30),0);if(used+unit.minutes<=state.dailyMinutes||used===0)break;}
   return {...state,studyProgress:[...state.studyProgress,newProgress(unit,selected)]};

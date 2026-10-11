@@ -31,7 +31,8 @@ export function validateState(raw) {
     if (!Array.isArray(chat.messages) || chat.messages.length > 120) throw new Error('会话消息格式不正确');
     const updatedAt=text(chat.updatedAt,40,'会话日期');
     if (!Number.isFinite(Date.parse(updatedAt))) throw new Error('会话日期无效');
-    return {id:text(chat.id,100,'会话 ID'),title:text(chat.title,200,'会话标题'),updatedAt:new Date(updatedAt).toISOString(),messages:chat.messages.map(m=>{
+    if(chat.studyUnitId!==undefined&&!/^[a-zA-Z0-9_-]{1,100}$/.test(chat.studyUnitId))throw new Error('会话学习单元无效');
+    return {...(chat.studyUnitId?{studyUnitId:chat.studyUnitId}:{}),id:text(chat.id,100,'会话 ID'),title:text(chat.title,200,'会话标题'),updatedAt:new Date(updatedAt).toISOString(),messages:chat.messages.map(m=>{
       if (!m || !['user','assistant'].includes(m.role)) throw new Error('消息角色无效');
       return {role:m.role,content:text(m.content,40000,'消息正文'),status:['complete','interrupted','error'].includes(m.status)?m.status:'complete'};
     })};
@@ -62,14 +63,14 @@ export function mergeStates(current, incoming) {
 export function mergeBackupStates(current,incoming){
   const a=validateState(current),b=validateState(incoming),state=mergeStates(a,b);let conflicts=0;
   const fingerprint=value=>{let x=2166136261,y=5381;for(const char of value){x=Math.imul(x^char.charCodeAt(0),16777619);y=Math.imul(y,33)^char.charCodeAt(0);}return (x>>>0).toString(16)+(y>>>0).toString(16);};
-  const content=record=>JSON.stringify(Object.fromEntries(Object.entries(record).filter(([key])=>!['id','updatedAt'].includes(key))));
+  const content=(record,kind)=>JSON.stringify(Object.fromEntries(Object.entries(record).filter(([key])=>!['id','updatedAt',...(kind==='studyProgress'?['readingSection']:[])].includes(key))));
   for(const kind of ['notes','conversations','studyUnits','studyProgress'])for(const imported of b[kind]){
     const existing=a[kind].find(r=>r.id===imported.id);
-    if(!existing||content(existing)===content(imported))continue;
+    if(!existing||content(existing,kind)===content(imported,kind))continue;
     const winner=state[kind].find(r=>r.id===imported.id);
     // validateState returns new objects, so compare the content of the winner.
-    const losing=content(winner)===content(imported)?existing:imported;
-    if(kind==='studyProgress'){const id='backup-progress-'+fingerprint(content(losing));if(!state.notes.some(n=>n.id===id)){state.notes.push({id,title:losing.title.slice(0,170)+'（备份作答保留）',kind:'学习复盘',tags:'备份冲突',createdAt:losing.updatedAt,updatedAt:losing.updatedAt,body:`## 备份中保留的作答与计划\n\n${losing.answers.map(a=>'### '+a.id+'\n\n'+a.text).join('\n\n')}\n\n复盘：${losing.reflection}\n计划日期：${losing.scheduledFor}\n下次复习：${losing.nextReview}\n\n历史：\n${losing.history.map(h=>h.at+' · '+h.rating+' · '+h.minutes+' 分钟').join('\n')}`});conflicts++;}continue;}
+    const losing=content(winner,kind)===content(imported,kind)?existing:imported;
+    if(kind==='studyProgress'){const id='backup-progress-'+fingerprint(content(losing,kind));if(!state.notes.some(n=>n.id===id)){state.notes.push({id,title:losing.title.slice(0,170)+'（备份作答保留）',kind:'学习复盘',tags:'备份冲突',createdAt:losing.updatedAt,updatedAt:losing.updatedAt,body:`## 备份中保留的作答与计划\n\n${losing.answers.map(a=>'### '+a.id+'\n\n'+a.text).join('\n\n')}\n\n复盘：${losing.reflection}\n计划日期：${losing.scheduledFor}\n下次复习：${losing.nextReview}\n\n历史：\n${losing.history.map(h=>h.at+' · '+h.rating+' · '+h.minutes+' 分钟').join('\n')}`});conflicts++;}continue;}
     const base=imported.id.slice(0,55)+'-backup-'+fingerprint(content(losing));
     let id=base,index=1;
     while(state[kind].some(r=>r.id===id&&content({...r,title:losing.title})!==content(losing)))id=base+'-'+index++;

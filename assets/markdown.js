@@ -11,7 +11,7 @@ export function renderMarkdown(text, options={}) {
       if(match[1])html+='<code>'+esc(match[1])+'</code>';
       else if(match[2])html+='<strong>'+esc(match[2])+'</strong>';
       else if(match[5]){const url=match[5].replace(/[.,。，；]+$/g,'');html+=`<a href="${esc(safeURL(url))}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>`+esc(match[5].slice(url.length));}
-      else {const url=safeURL(match[4]);html+=url==='#'?esc(match[3]):`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(match[3])}</a>`;}
+      else {const url=safeURL(match[4]),internal=/^\/(study|journal)\/(?:[?#]|$)/.test(url);html+=url==='#'?esc(match[3]):`<a href="${esc(url)}" ${internal?'data-nav':'target="_blank" rel="noopener noreferrer"'}>${esc(match[3])}</a>`;}
       offset=match.index+match[0].length;
     }
     return html+esc(value.slice(offset));
