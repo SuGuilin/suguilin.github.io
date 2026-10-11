@@ -1,5 +1,6 @@
+import {validateUnit,validateProgress} from './study-model.js';
 export const STORAGE_KEY = 'suguilin.agent-workspace.v1';
-export const defaultState = () => ({version:1, saved:[], completed:[], milestones:[], mastered:[], reading:[], notes:[], conversations:[], pace:10});
+export const defaultState = () => ({version:1, saved:[], completed:[], milestones:[], mastered:[], reading:[], notes:[], conversations:[],studyUnits:[],studyProgress:[],dailyMinutes:45, pace:10});
 const text = (value, max, field) => {
   if (typeof value !== 'string' || value.length > max) throw new Error(`${field} 格式或长度不正确`);
   return value;
@@ -36,7 +37,10 @@ export function validateState(raw) {
     })};
   });
   if (new Set(chats.map(c=>c.id)).size !== chats.length) throw new Error('重复会话 ID');
-  return {version:1,saved:list(raw.saved,'收藏'),completed:list(raw.completed,'学习任务'),milestones:list(raw.milestones,'项目里程碑'),mastered:list(raw.mastered,'面试进度'),reading:list(raw.reading??[],'课程进度'),notes,conversations:chats,pace:raw.pace};
+  const studyUnits=raw.studyUnits??[],studyProgress=raw.studyProgress??[];
+  for(const records of [studyUnits,studyProgress])if(!Array.isArray(records)||records.length>300||new Set(records.map(r=>r?.id)).size!==records.length)throw new Error('学习单元或计划列表无效');
+  const dailyMinutes=raw.dailyMinutes??45;if(![15,30,45,60,90].includes(dailyMinutes))throw new Error('每日学习时间无效');
+  return {version:1,saved:list(raw.saved,'收藏'),completed:list(raw.completed,'学习任务'),milestones:list(raw.milestones,'项目里程碑'),mastered:list(raw.mastered,'面试进度'),reading:list(raw.reading??[],'课程进度'),notes,conversations:chats,studyUnits:studyUnits.map(validateUnit),studyProgress:studyProgress.map(validateProgress),dailyMinutes,pace:raw.pace};
 }
 export function mergeStates(current, incoming) {
   const a = validateState(current), b = validateState(incoming);
@@ -50,7 +54,8 @@ export function mergeStates(current, incoming) {
     const old=chats.get(chat.id);
     if (!old || Date.parse(chat.updatedAt)>Date.parse(old.updatedAt)) chats.set(chat.id,chat);
   }
-  return validateState({...a, saved:[...new Set([...a.saved,...b.saved])],completed:[...new Set([...a.completed,...b.completed])],milestones:[...new Set([...a.milestones,...b.milestones])],mastered:[...new Set([...a.mastered,...b.mastered])],reading:[...new Set([...a.reading,...b.reading])],notes:[...notes.values()],conversations:[...chats.values()]});
+  const records=kind=>{const map=new Map(a[kind].map(r=>[r.id,r]));for(const r of b[kind])if(!map.has(r.id)||r.updatedAt>map.get(r.id).updatedAt)map.set(r.id,r);return [...map.values()];};
+  return validateState({...a, saved:[...new Set([...a.saved,...b.saved])],completed:[...new Set([...a.completed,...b.completed])],milestones:[...new Set([...a.milestones,...b.milestones])],mastered:[...new Set([...a.mastered,...b.mastered])],reading:[...new Set([...a.reading,...b.reading])],notes:[...notes.values()],conversations:[...chats.values()],studyUnits:records('studyUnits'),studyProgress:records('studyProgress')});
 }
 // A backup is recovery material: preserve both edited contents even when their
 // IDs overlap. Stable copy IDs make repeated imports idempotent.
@@ -58,12 +63,13 @@ export function mergeBackupStates(current,incoming){
   const a=validateState(current),b=validateState(incoming),state=mergeStates(a,b);let conflicts=0;
   const fingerprint=value=>{let x=2166136261,y=5381;for(const char of value){x=Math.imul(x^char.charCodeAt(0),16777619);y=Math.imul(y,33)^char.charCodeAt(0);}return (x>>>0).toString(16)+(y>>>0).toString(16);};
   const content=record=>JSON.stringify(Object.fromEntries(Object.entries(record).filter(([key])=>!['id','updatedAt'].includes(key))));
-  for(const kind of ['notes','conversations'])for(const imported of b[kind]){
+  for(const kind of ['notes','conversations','studyUnits','studyProgress'])for(const imported of b[kind]){
     const existing=a[kind].find(r=>r.id===imported.id);
     if(!existing||content(existing)===content(imported))continue;
     const winner=state[kind].find(r=>r.id===imported.id);
     // validateState returns new objects, so compare the content of the winner.
     const losing=content(winner)===content(imported)?existing:imported;
+    if(kind==='studyProgress'){const id='backup-progress-'+fingerprint(content(losing));if(!state.notes.some(n=>n.id===id)){state.notes.push({id,title:losing.title.slice(0,170)+'（备份作答保留）',kind:'学习复盘',tags:'备份冲突',createdAt:losing.updatedAt,updatedAt:losing.updatedAt,body:`## 备份中保留的作答与计划\n\n${losing.answers.map(a=>'### '+a.id+'\n\n'+a.text).join('\n\n')}\n\n复盘：${losing.reflection}\n计划日期：${losing.scheduledFor}\n下次复习：${losing.nextReview}\n\n历史：\n${losing.history.map(h=>h.at+' · '+h.rating+' · '+h.minutes+' 分钟').join('\n')}`});conflicts++;}continue;}
     const base=imported.id.slice(0,55)+'-backup-'+fingerprint(content(losing));
     let id=base,index=1;
     while(state[kind].some(r=>r.id===id&&content({...r,title:losing.title})!==content(losing)))id=base+'-'+index++;

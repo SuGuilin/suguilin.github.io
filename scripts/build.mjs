@@ -5,11 +5,13 @@ import {createHash} from 'node:crypto';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceTemplate = await readFile(path.join(root, 'src/shell.html'), 'utf8');
-const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json'].map(file=>readFile(path.join(root,file))));
+const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json','content/study-units.json','assets/experience.css'].map(file=>readFile(path.join(root,file))));
 const assetVersion=createHash('sha256').update(Buffer.concat(versionFiles)).digest('hex').slice(0,12);
 const template=sourceTemplate.replaceAll('{{assetVersion}}',assetVersion);
 const data = JSON.parse(await readFile(path.join(root, 'content/workspace.json'), 'utf8'));
 const routes = [
+  ['/study/', 'study', '学习单元', '从正文要点到练习、自评与复习，持续建立自己的知识体系。', 'file'],
+  ['/plan/', 'plan', '每日计划', '按每日预算安排新内容与到期复习，保留作答与实践证据。', 'route'],
   ['/', 'home', '总览', '从前沿机制到工程实践，建立持续深化的 Agent 学习与作品体系。', 'grid'],
   ['/roadmap/', 'roadmap', '深化路线', '12 个深化阶段：机制、算法、框架、评测、研究与产品交付。', 'route'],
   ['/radar/', 'radar', '技术雷达', '核实官方资料，按问题选择框架、协议与 Agent 产品。', 'radar'],
@@ -24,7 +26,7 @@ const routes = [
   ['/about/', 'about', '关于工作台', 'SuGuilin 的个人 Agent 学习工作台：持续研究，记录过程，构建产品。', 'info'],
   ['/guide/', 'guide', '学习手记', '围绕 Agent 核心问题的原创实践导读与一手资料。', 'file']
 ];
-const navigation = [routes[0],routes.find(r=>r[1]==='learn'),...routes.slice(1,6),routes.find(r=>r[1]==='assistant')].map(([url, id, title, , icon]) => `<a href="${url}" data-nav data-route="${id}"><span data-icon="${icon}"></span>${title}${id === 'radar' ? '<span class="new-dot" title="资料已核实"></span>' : ''}</a>`).join('\n');
+const navigation = ['home','study','plan','roadmap','radar','lab','journal','interview','assistant'].map(id=>routes.find(r=>r[1]===id)).map(([url, id, title, , icon]) => `<a href="${url}" data-nav data-route="${id}"><span data-icon="${icon}"></span>${title}${id === 'radar' ? '<span class="new-dot" title="资料已核实"></span>' : ''}</a>`).join('\n');
 for (const [url, id, title, description] of routes) {
   const dir = path.join(root, url);
   await mkdir(dir, {recursive: true});

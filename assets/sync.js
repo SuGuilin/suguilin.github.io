@@ -4,8 +4,9 @@ const lists=['saved','completed','milestones','mastered','reading'];
 export function toDocuments(state) {
   const s=validateState(state),docs=new Map();
   for(const kind of lists) for(const id of s[kind]) docs.set(kind+':'+id,{kind,id,value:true,deleted:false});
-  for(const kind of ['notes','conversations']) for(const value of s[kind]) docs.set(kind+':'+value.id,{kind,id:value.id,value,deleted:false});
+  for(const kind of ['notes','conversations','studyUnits','studyProgress']) for(const value of s[kind]) docs.set(kind+':'+value.id,{kind,id:value.id,value,deleted:false});
   docs.set('settings:pace',{kind:'settings',id:'pace',value:s.pace,deleted:false});
+  docs.set('settings:dailyMinutes',{kind:'settings',id:'dailyMinutes',value:s.dailyMinutes,deleted:false});
   return docs;
 }
 export function fromDocuments(documents) {
@@ -13,8 +14,9 @@ export function fromDocuments(documents) {
   for(const d of documents) {
     if(d.deleted)continue;
     if(lists.includes(d.kind)&&d.value===true)state[d.kind].push(d.id);
-    if(['notes','conversations'].includes(d.kind))state[d.kind].push(d.value);
+    if(['notes','conversations','studyUnits','studyProgress'].includes(d.kind))state[d.kind].push(d.value);
     if(d.kind==='settings'&&d.id==='pace')state.pace=d.value;
+    if(d.kind==='settings'&&d.id==='dailyMinutes')state.dailyMinutes=d.value;
   }
   return validateState(state);
 }

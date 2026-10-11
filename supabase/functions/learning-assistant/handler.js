@@ -1,3 +1,4 @@
+import {validateUnit} from '../_shared/study-model.js';
 import {corsHeaders,jsonResponse,authenticate,readSSE} from '../_shared/http.js';
 
 export function validateRequest(body){
@@ -5,15 +6,15 @@ export function validateRequest(body){
   let length=0;const messages=body.messages.map(m=>{if(!m||!['user','assistant'].includes(m.role)||typeof m.content!=='string'||!m.content.trim()||m.content.length>6000)throw new Error('消息格式或长度不正确。');length+=m.content.length;return {role:m.role,content:m.content};});
   if(length>30000||messages.at(-1).role!=='user')throw new Error('对话过长，请开始新会话。');
   if(body.webSearch!==undefined&&typeof body.webSearch!=='boolean')throw new Error('联网选项无效。');
-  return {messages,webSearch:body.webSearch===true,lessonId:typeof body.lessonId==='string'?body.lessonId.slice(0,100):'',resourceId:typeof body.resourceId==='string'?body.resourceId.slice(0,100):''};
+  return {studyUnit:body.studyUnit?validateUnit(body.studyUnit):null,messages,webSearch:body.webSearch===true,lessonId:typeof body.lessonId==='string'?body.lessonId.slice(0,100):'',resourceId:typeof body.resourceId==='string'?body.resourceId.slice(0,100):''};
 }
 export function selectContext(knowledge,request){
   const lesson=knowledge.lessons.find(l=>l.id===request.lessonId);
   const question=request.messages.at(-1).content.toLowerCase();
   const terms=question.split(/[\s，。？！、,.?]+/).filter(t=>t.length>1).slice(0,12);
   const selected=knowledge.resources.map(r=>({r,score:(r.id===request.resourceId?100:0)+terms.reduce((s,t)=>s+([r.title,r.description,...r.tags].join(' ').toLowerCase().includes(t)?1:0),0)})).filter(e=>e.score>0).sort((a,b)=>b.score-a.score).slice(0,5).map(e=>e.r);
-  const sources=[...(lesson?.sources??[]),...selected.map(r=>({title:r.title,url:r.url,verifiedAt:r.verifiedAt}))].filter((r,i,a)=>a.findIndex(x=>x.url===r.url)===i).slice(0,8);
-  return {sources,context:[lesson?`当前课程：${lesson.title}\n${lesson.content.slice(0,12000)}`:'',...selected.map(r=>`${r.title}：${r.description}\n核实范围：${r.verification}${r.digest?'\n学习要点：'+r.digest.takeaways?.join('；'):''}`)].join('\n\n')};
+  const sources=[...(request.studyUnit?[request.studyUnit.source]:[]),...(lesson?.sources??[]),...selected.map(r=>({title:r.title,url:r.url,verifiedAt:r.verifiedAt}))].filter((r,i,a)=>a.findIndex(x=>x.url===r.url)===i).slice(0,8);
+  return {sources,context:[request.studyUnit?`私人学习单元（用户提供，非独立核实）：${request.studyUnit.title}\n读取范围：${request.studyUnit.source.scope}\n概要：${request.studyUnit.summary}\n要点：${request.studyUnit.takeaways.map(t=>t.point).join('；')}\n实际正文节选：${request.studyUnit.source.excerpt.slice(0,10000)}`:'',lesson?`当前课程：${lesson.title}\n${lesson.content.slice(0,12000)}`:'',...selected.map(r=>`${r.title}：${r.description}\n核实范围：${r.verification}${r.digest?'\n学习要点：'+r.digest.takeaways?.join('；'):''}`)].join('\n\n')};
 }
 export function webCitations(output){
   const sources=[];
