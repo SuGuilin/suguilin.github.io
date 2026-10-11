@@ -10,6 +10,8 @@ import {resourceLearningUnit} from '../assets/catalog-view.js';
 import {StudyWorkspace} from '../assets/study.js';
 import {LearningPlatform} from '../assets/platform.js';
 import {saveAnnotation} from '../assets/learning-signals.js';
+import {discoverySummary} from '../assets/discovery.js';
+import {sourceRecord} from '../assets/source-records.js';
 const units=JSON.parse(await readFile('content/study-units.json','utf8')).units;
 const unit=units[0],now=new Date('2026-10-11T08:00:00Z');
 
@@ -74,4 +76,19 @@ test('An empty plan offers learning without empty calendars; existing work is no
   s.studyProgress=[{...newProgress(unit),answers:[{id:'e1',text:'独立作答'}]}];
   const active=workspace.plan();assert.match(active,/继续自检/);assert.ok(!active.includes('待自检</span>'));
   assert.match(active,/<details class="plan-details plan-schedule"/);
+});
+
+test('Unprocessed source leads remain available without crowding out today tasks or questions',()=>{
+  let state=defaultState();
+  for(let i=0;i<8;i++)state=sourceRecord(state,{title:'待整理 '+i,url:'https://example.org/'+i},{origin:'GitHub',author:'作者',perspective:'待核实线索'},{now,id:'source-'+i}).state;
+  const workspace=Object.assign(Object.create(StudyWorkspace.prototype),{getState:()=>state,getCurated:()=>units,getData:()=>({resources:[]})});
+  const html=workspace.plan();assert.match(html,/<details class="learning-needs-sources" id="learning-needs">/);
+  assert.match(html,/8 份/);assert.ok(!html.includes('<h2>还待处理</h2>'));assert.match(html,/journal\/\?kind=inbox/);
+  assert.equal(state.notes.length,8);
+});
+
+test('Discovery completion describes stored leads honestly when no learning unit was generated',()=>{
+  const leads=discoverySummary({found:18,added:18});assert.ok(!leads.includes('生成 0'));assert.ok(!leads.includes('打开学习单元'));assert.match(leads,/继续整理要点与练习/);
+  assert.match(discoverySummary({learned:2,found:3,added:3,unread:1}),/打开学习单元/);
+  assert.match(discoverySummary({failures:3}),/换关键词/);
 });
