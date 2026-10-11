@@ -13,8 +13,14 @@ for(const item of [...data.curriculum,...data.projects])for(const id of item.res
 for(const g of data.guides)for(const id of g.refs)assert.ok(ids.has(id),`Missing guide source ${id}`);
 assert.equal(data.curriculum.length,12);assert.equal(data.curriculum.flatMap(w=>w.tasks).length,36);
 for(const article of data.legacy)await stat(path.join(root,article.url));
-for(const route of ['','roadmap','radar','lab','journal','interview','library','saved','about','guide']){
+for(const route of ['','roadmap','radar','lab','journal','interview','library','saved','about','guide','learn','assistant','account']){
   const html=await readFile(path.join(root,route,'index.html'),'utf8');assert.ok(!html.includes('{{'));assert.ok(html.includes('aria-label="搜索全站"'));
   for(const match of html.matchAll(/(?:href|src)="(\/[^"?#]*)(?:[?#][^"]*)?"/g)){const target=path.join(root,match[1]);const s=await stat(target);if(s.isDirectory())await stat(path.join(target,'index.html'));}
 }
-console.log(`Verified ${ids.size} unique resources, all curriculum/project/guide references, legacy routes and 10 page shells.`);
+const lessons=JSON.parse(await readFile(path.join(root,'content/lessons.json'),'utf8'));
+assert.equal(lessons.lessons.length,6);
+for(const l of lessons.lessons){assert.ok(l.content.length>700);assert.ok(l.sources.length>=3);for(const source of l.sources)assert.equal(new URL(source.url).protocol,'https:');}
+assert.equal(data.resources.filter(r=>r.digest).length,15);
+for(const r of data.interviewReports){assert.ok(r.author&&r.verification&&r.dateText);for(const id of r.questionRefs)assert.ok(data.questions.some(q=>q.id===id));}
+const config=JSON.parse(await readFile(path.join(root,'assets/public-config.json'),'utf8'));assert.ok(!JSON.stringify(config).includes('sb_secret_'));assert.ok(!Object.keys(config).some(k=>/service.?role|openai|access.?token/i.test(k)));
+console.log(`Verified ${ids.size} unique resources, all curriculum/project/guide references, legacy routes and 13 page shells.`);

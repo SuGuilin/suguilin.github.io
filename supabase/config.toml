@@ -1,0 +1,7 @@
+project_id = "suguilin-learning"
+
+[functions.learning-assistant]
+# The function validates every bearer token with Supabase Auth itself, then
+# verifies workspace membership. This also supports new publishable API keys.
+verify_jwt = false
+

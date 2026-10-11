@@ -1,0 +1,6 @@
+{
+  "supabaseUrl": "",
+  "supabasePublishableKey": "",
+  "assistantFunction": "learning-assistant",
+  "enableWebSearch": false
+}

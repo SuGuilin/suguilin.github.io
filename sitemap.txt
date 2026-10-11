@@ -1,5 +1,7 @@
 https://suguilin.github.io/
 https://suguilin.github.io/about/
+https://suguilin.github.io/account/
+https://suguilin.github.io/assistant/
 https://suguilin.github.io/blog/
 https://suguilin.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/
 https://suguilin.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/
@@ -18,6 +20,7 @@ https://suguilin.github.io/guide/?id=protocols
 https://suguilin.github.io/interview/
 https://suguilin.github.io/journal/
 https://suguilin.github.io/lab/
+https://suguilin.github.io/learn/
 https://suguilin.github.io/library/
 https://suguilin.github.io/link/index-1.html
 https://suguilin.github.io/link/index.html
