@@ -61,9 +61,10 @@ export class StudyWorkspace{
   needsPanel({compact=false,excludeKeys=[]}={}){
     const needs=learningNeeds(this.getState(),this.units()).filter(n=>!excludeKeys.includes(n.key)),labels={recall:'继续复习',question:'未解疑问',review:'到期复习',check:'待自检',practice:'检验重点',missing:'回看记录',source:'整理资料'};
     if(!needs.length)return '';
-    const row=n=>link(n.url,`<span class="learning-need-kind">${labels[n.kind]}</span><span><strong>${esc(n.title)}</strong><small>${esc(n.detail)}</small></span><span aria-hidden="true">→</span>`,'learning-need-row');
+    const tasks=needs.filter(n=>n.kind!=='source'),sources=needs.filter(n=>n.kind==='source');
+    const row=n=>link(n.url,`<span class="learning-need-kind">${labels[n.kind]}</span><span><strong>${esc(n.title)}</strong>${n.kind==='source'?'':'<small>'+esc(n.detail)+'</small>'}</span><span aria-hidden="true">→</span>`,'learning-need-row');
     const limit=compact?3:5;
-    return `<section class="learning-needs" aria-label="学习中还待处理的事项"><div class="section-heading"><h2>还待处理</h2>${compact?link('/plan/#learning-needs','查看全部 ↗'):''}</div><div id="learning-needs">${needs.slice(0,limit).map(row).join('')}</div>${needs.length>limit?compact?link('/plan/#learning-needs','还有 '+(needs.length-limit)+' 项 ↗'):'<details class="learning-needs-more"><summary>其他 '+(needs.length-limit)+' 项</summary>'+needs.slice(limit,limit+20).map(row).join('')+(needs.length>limit+20?'<p class="small-note">其余记录可在日志和全部安排中查看。</p>':'')+'</details>':''}</section>`;
+    return `<section class="learning-needs" aria-label="学习中还待处理的事项">${tasks.length?`<div class="section-heading"><h2>还待处理</h2>${compact?link('/plan/#learning-needs','查看全部 ↗'):''}</div><div id="learning-needs">${tasks.slice(0,limit).map(row).join('')}</div>${tasks.length>limit?compact?link('/plan/#learning-needs','还有 '+(tasks.length-limit)+' 项 ↗'):'<details class="learning-needs-more"><summary>其他 '+(tasks.length-limit)+' 项</summary>'+tasks.slice(limit,limit+20).map(row).join('')+'</details>':''}`:''}${sources.length?`<details class="learning-needs-sources" ${tasks.length?'':'id="learning-needs"'}><summary>待整理资料 <span>${sources.length} 份</span></summary>${sources.slice(0,3).map(row).join('')}${link('/journal/?kind=inbox','到资料收件箱继续整理 ↗')}</details>`:''}</section>`;
   }
   exercisesMarkup(unit,progress){
     const p=currentAttempt(progress),recall=!!progress.recall;

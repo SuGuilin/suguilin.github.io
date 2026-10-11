@@ -59,6 +59,9 @@ export function appendDiscoveryNotes(state,items){
   for(const item of items){const note=discoveryNote(item);if(ids.has(note.id))continue;if(notes.length>=1000)break;notes.push(note);ids.add(note.id);added++;}
   return {state:{...state,notes},added};
 }
+export function discoverySummary({learned=0,unread=0,found=0,added=0,failures=0}){
+  return `${learned?'生成 '+learned+' 个学习单元（要点、练习与计划）。':''}${unread?unread+' 条正文暂无法读取，可粘贴公开节选整理。':''}读取 ${found} 条结果，新增 ${added} 条到资料收件箱。${failures?failures+' 个来源读取失败，其他结果已保留。':''}${learned?'打开学习单元开始阅读与作答。':found?'选择一份资料，继续整理要点与练习。':'可换关键词或扩大时间范围。'}`;
+}
 export class KnowledgeDiscovery{
   constructor({getState,setState,persist,notify,study,getAccount=()=>''}){
     Object.assign(this,{getState,setState,persist,notify,study,getAccount});this.autoLearn=true;this.aiLearn=false;this.learningErrors={};this.query='LLM agents';this.days=30;this.busy=false;this.results={};this.message='';this.lastRequest=0;
@@ -83,7 +86,7 @@ export class KnowledgeDiscovery{
     try{if(account===this.getAccount()){
       const {state,added}=appendDiscoveryNotes(this.getState(),fresh);this.setState(state);const saved=this.persist();
       let learned=0,unread=0;if(this.autoLearn&&this.study&&saved){for(const item of fresh){if(account!==this.getAccount())break;if(this.getState().studyUnits.some(u=>u.source.url===item.url))continue;this.message='正在读取正文并生成学习内容：'+item.title;this.paint();try{await this.study.ingest(item,{ai:this.aiLearn});learned++;delete this.learningErrors[item.id];}catch(e){unread++;this.learningErrors[item.id]=e.message;}}}
-      this.message=account!==this.getAccount()?'账号已切换，后续资料未保存。':saved?`生成 ${learned} 个学习单元（要点 + 练习 + 每日计划）。${unread?unread+' 条正文暂无法读取，可粘贴公开节选整理。 ':''}读取 ${fresh.length} 条结果，新增 ${added} 条到资料收件箱${fresh.length>added?'（已有资料去重；笔记上限 1000 条）':''}。${failures?failures+' 个来源读取失败，其他结果已保留。':'打开学习单元即可开始阅读与作答。'}`:'结果已展示，但本机保存失败，请立即导出备份。';
+      this.message=account!==this.getAccount()?'账号已切换，后续资料未保存。':saved?discoverySummary({learned,unread,found:fresh.length,added,failures}):'结果已展示，但本机保存失败，请立即导出备份。';
     }else this.message='检索期间账号已切换。结果已展示，未写入新账号。请重新搜索后保存。';
     }catch{this.message='检索完成，但保存未完成。结果仍在页面，可重试或导出已有记录。';}finally{this.busy=false;this.paint();}
   }
