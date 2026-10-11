@@ -27,9 +27,11 @@ https://suguilin.github.io/link/index.html
 https://suguilin.github.io/movies/
 https://suguilin.github.io/music/
 https://suguilin.github.io/photos/
+https://suguilin.github.io/plan/
 https://suguilin.github.io/radar/
 https://suguilin.github.io/roadmap/
 https://suguilin.github.io/saved/
 https://suguilin.github.io/share/
+https://suguilin.github.io/study/
 https://suguilin.github.io/tags/Algorithms/
 https://suguilin.github.io/tags/index.html

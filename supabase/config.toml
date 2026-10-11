@@ -5,3 +5,6 @@ project_id = "suguilin-learning"
 # verifies workspace membership. This also supports new publishable API keys.
 verify_jwt = false
 
+[functions.learning-synthesis]
+verify_jwt = false
+

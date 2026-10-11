@@ -2,5 +2,6 @@
   "supabaseUrl": "",
   "supabasePublishableKey": "",
   "assistantFunction": "learning-assistant",
+  "synthesisFunction": "learning-synthesis",
   "enableWebSearch": false
 }
