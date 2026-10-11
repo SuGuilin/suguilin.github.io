@@ -1,5 +1,5 @@
 import {validReadingSection} from './study-model.js';
-import {noteUnitId} from './learning-signals.js';
+import {noteUnitId,readAnnotation} from './learning-signals.js';
 const kinds=['实验记录','源码研究','论文精读','学习复盘','学习笔记','待解答问题','已解决问题','重点标注','作者观点','面试复盘','项目记录','资料收件箱'];
 
 // Fold only the exact generated handoff block. Keep the stored note intact,
@@ -14,17 +14,26 @@ export function questionNoteParts(note){
 }
 export function journalTitle(note){
   if(note.kind==='学习复盘'&&/ · 学习复盘$/.test(note.title)&&note.body.includes('[回到学习单元](/study/'))return note.title.replace(/ · 学习复盘$/,'')+' · '+(/(?:^## 上次作答|\[对照上次作答\])/m.test(note.body)?'独立回忆':'学习自检');
+  const annotation=readAnnotation(note),suffix=annotation&&' · '+annotation.quote.slice(0,60);
+  if(suffix&&note.title.endsWith(suffix))return note.title.slice(0,-suffix.length)||note.title;
   return /^## 待解答的问题\n/.test(note.body)&&/ · 待解答问题$/.test(note.title)&&['待解答问题','已解决问题'].includes(note.kind)
-    ? notePreview(questionNoteParts(note).question,110)||note.title : note.title;
+    ? note.title.replace(/ · 待解答问题$/,'')||note.title : note.title;
+}
+export function journalNoteParts(note){
+  if(!readAnnotation(note))return questionNoteParts(note);
+  const footer=note.body.match(/\n\n\[回到标注位置\]\(\/study\/\?id=[a-zA-Z0-9_-]+#[a-zA-Z0-9_-]+\)\n\n原始来源：[^\n]+\n阅读范围：[^\n]+(?=\n\n|$)/);
+  return footer?{body:note.body.slice(0,footer.index)+note.body.slice(footer.index+footer[0].length),context:footer[0].trim(),question:''}:{body:note.body,context:'',question:''};
+}
+export function journalPreview(note){
+  if(['待解答问题','已解决问题'].includes(note.kind)&&/^## 待解答的问题\n/.test(note.body))return notePreview(questionNoteParts(note).question);
+  const annotation=readAnnotation(note);
+  if(annotation){const thought=note.body.match(/## 我的(?:思考|疑问)\n\n([\s\S]*?)(?=\n\n\[回到标注位置\]|$)/)?.[1]?.trim();return notePreview(thought||annotation.quote);}
+  return notePreview(note.kind==='资料收件箱'?(note.body.match(/## 已读取的信息\n+([\s\S]*?)(?=\n##|$)/)?.[1]||note.body):journalReadingBody(note));
 }
 export function journalReadingBody(note){
-  const parts=questionNoteParts(note);
-  const title=journalTitle(note);
+  const parts=journalNoteParts(note);
   let body=parts.body;
-  if(title!==note.title&&title===parts.question){
-    const prefix='## 待解答的问题\n\n'+parts.question;
-    if(body.startsWith(prefix))body=body.slice(prefix.length).trimStart();
-  }
+  if(['待解答问题','已解决问题'].includes(note.kind))body=body.replace(/^## 待解答的问题\n/,'## 问题\n');
   if(body.startsWith('# '+note.title+'\n'))body=body.slice(note.title.length+3).trimStart();
   if(note.kind==='资料收件箱')body=body.replace(/^## [^\n]+\n+(?=## |$)/gm,'');
   return body;

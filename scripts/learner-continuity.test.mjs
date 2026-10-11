@@ -5,7 +5,7 @@ import {defaultState} from '../assets/state.js';
 import {newProgress,recordReview,beginRecall} from '../assets/study-model.js';
 import {learningAction,dailyLearningQueue} from '../assets/learning-cycle.js';
 import {questionWithContext,saveStudySnapshot} from '../assets/study-session.js';
-import {questionNoteParts,journalTitle,journalReadingBody,noteDiscussion,noteLearningLink,filterJournal,journalScope} from '../assets/journal-model.js';
+import {questionNoteParts,journalNoteParts,journalPreview,journalTitle,journalReadingBody,noteDiscussion,noteLearningLink,filterJournal,journalScope} from '../assets/journal-model.js';
 import {resourceLearningUnit} from '../assets/catalog-view.js';
 import {StudyWorkspace} from '../assets/study.js';
 import {LearningPlatform} from '../assets/platform.js';
@@ -34,14 +34,28 @@ test('Question summaries fold only generated context; editing and backups retain
   const original=note.body,parts=questionNoteParts(note);
   assert.equal(parts.question,question);assert.match(parts.context,/关键要点/);
   assert.ok(!parts.body.includes('关键要点'));assert.match(parts.body,/后续理解/);
-  assert.equal(note.body,original);assert.equal(journalTitle(note),question);
-  assert.ok(!journalReadingBody(note).includes(question));assert.match(journalReadingBody(note),/后续理解/);assert.equal(note.body,original);
+  assert.equal(note.body,original);assert.equal(journalTitle(note),unit.title);assert.equal(journalPreview(note),question);
+  assert.ok(journalReadingBody(note).includes(question));assert.match(journalReadingBody(note),/后续理解/);assert.equal(note.body,original);
   const context=noteDiscussion(note,unit);
   assert.equal(context.question,question);assert.equal(context.journalNoteId,note.id);assert.equal(context.section,'exercise-e1');
   assert.equal(noteLearningLink(note).id,unit.id);
   const custom={...note,body:'## 待解答的问题\n\n自己的说明\n\n---\n学习单元：我的格式\n关键要点：\n用户自己的正文'};
   assert.equal(questionNoteParts(custom).body,custom.body);assert.equal(questionNoteParts(custom).context,'');
   assert.equal(noteLearningLink({...note,body:'[外部](https://example.org/study/?id=lesson-a)'}),null);
+});
+
+test('Annotation journals separate generated titles, thoughts and source context without changing user records',()=>{
+  const quote='超时只说明结果未知，不能证明远端没有提交。'.repeat(5),thought='我的理解：重试必须保持原操作 ID。';
+  const note=saveAnnotation(defaultState(),unit,{section:'chapter-1',quote},{comment:thought,kind:'学习笔记',now,id:'layout'}).note;
+  note.body+='\n\n## 后续笔记\n\n我的补充内容';
+  const original=structuredClone(note),parts=journalNoteParts(note);
+  assert.equal(journalTitle(note),unit.title);assert.equal(journalPreview(note),thought);
+  assert.match(parts.body,/超时只说明结果未知/);assert.match(parts.body,/后续笔记/);
+  assert.ok(!parts.body.includes('阅读范围：'));assert.ok(parts.context.includes(unit.source.url));assert.ok(parts.context.includes(unit.source.scope));
+  assert.deepEqual(note,original);assert.equal(journalTitle({...note,title:'我自己写的标题'}),'我自己写的标题');
+  const mark=saveAnnotation(defaultState(),unit,{section:'chapter-1',quote},{now,id:'mark'}).note;
+  assert.equal(journalPreview(mark),quote.slice(0,150));
+  assert.equal(filterJournal([note],{query:unit.source.scope}).length,1);
 });
 
 test('Today recommendations use the remaining time after recorded learning, without altering stored budgets or backend models',()=>{
