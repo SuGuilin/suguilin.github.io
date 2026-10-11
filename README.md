@@ -30,7 +30,7 @@
 
 ## 后端状态与费用
 
-Supabase Auth、按账号隔离的同步、离线队列、版本冲突、删除传播、服务端 OpenAI Responses 流式问答及可选联网搜索已实现。当前公开配置留空，**真实 Supabase 项目和模型服务尚未启用**。页面因此显示“云端待连接 / 模型服务待接入”，没有模拟 AI 回答。
+Supabase Auth、按账号隔离的同步、离线队列、版本冲突、删除传播、服务端 OpenAI Responses 流式问答及可选联网搜索已实现。**Supabase Free 项目、工作台数据库及两个服务函数已部署**；三张数据表均启用 RLS，匿名数据访问与未登录函数请求真实返回 401。按用户选择暂不开通学习账号，`enableSignIn:false`，页面显示“本机保存 · 云端暂未启用”。个人记录继续留在本机，JSON / Obsidian 可导出和恢复；模型密钥未配置，站内 AI 与跨设备同步尚未启用或进行登录后的真实验收。
 
 采用 Supabase Free：闲置可能暂停，本机使用、备份、再导入仍保留。OpenAI API 与联网工具另行按用量计费，与 ChatGPT 订阅不同；公开搜索与免费正文提炼不需要模型密钥。Gemini 会员可在官网使用，API 配额和计费另算，见 [Google 官方说明](https://discuss.ai.google.dev/t/google-ai-studio-pro-version-and-free-tier/169368/2)。
 

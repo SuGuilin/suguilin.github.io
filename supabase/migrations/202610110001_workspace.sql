@@ -2,6 +2,7 @@
 create schema if not exists private;
 revoke all on schema private from public, anon, authenticated;
 create table private.workspace_members (user_id uuid primary key references auth.users(id) on delete cascade);
+alter table private.workspace_members enable row level security;
 
 create or replace function public.is_workspace_member() returns boolean
 language sql stable security definer set search_path = '' as $$
@@ -83,6 +84,7 @@ revoke all on function public.save_workspace_document(text,text,jsonb,boolean,bi
 grant execute on function public.save_workspace_document(text,text,jsonb,boolean,bigint,uuid) to authenticated;
 
 create table private.ai_usage (user_id uuid not null references auth.users(id) on delete cascade,day date not null,requests integer not null default 0,last_request timestamptz,primary key(user_id,day));
+alter table private.ai_usage enable row level security;
 create or replace function public.consume_ai_quota() returns boolean
 language plpgsql security definer set search_path='' as $$
 declare current_usage private.ai_usage; caller uuid:=auth.uid(); today date:=(now() at time zone 'utc')::date;

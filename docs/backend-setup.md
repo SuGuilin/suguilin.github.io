@@ -1,11 +1,11 @@
 # Supabase Free 与服务端学习助手
 
-当前代码已实现；真实项目、数据库迁移与模型调用尚未启用。以下配置针对私人工作台。
+已在 Supabase Free 创建 `suguilin-learning` 项目并初始化工作台数据库。`learning-assistant` 与 `learning-synthesis` 已部署为 ACTIVE；真实请求验证未登录 / 无效会话返回 401、未授权来源返回 403、本站预检返回 204。按用户选择，网站学习账号暂不开通，公开配置 `enableSignIn:false`：网站不初始化 Auth 客户端，不发送登录邮件或发起同步，本机记录与备份继续可用。真实检查 Auth 用户与工作台成员均为 0。模型密钥未配置，站内 AI 与联网模型调用未启用。以下步骤中，账号授权与模型配置属于后续启用步骤。
 
 ## 免费项目、授权与登录
 
 1. 在 Supabase Free 组织建立项目，不升级套餐或启用付费附加项。闲置暂停规则见 [官方说明](https://supabase.com/docs/guides/platform/free-project-pausing)。
-2. 在 SQL Editor 依次执行 supabase/migrations/202610110001_workspace.sql 和 202610110002_study.sql，或用已登录的官方 CLI 链接项目后执行 supabase db push。迁移尚未在真实项目执行。
+2. 新项目在 SQL Editor 依次执行 supabase/migrations/202610110001_workspace.sql 和 202610110002_study.sql，或用已登录的官方 CLI 链接项目后执行 supabase db push。当前项目已通过 SQL Editor 事务初始化，不要重复执行 CREATE TABLE。SQL Editor 执行不会自动登记 CLI 迁移历史；以后使用 db push 前应核对真实结构并登记已执行迁移。
 3. Authentication → Users 管理员入口创建自己的用户并验证邮箱。前端 shouldCreateUser:false，不自行注册。
 4. 在 SQL Editor 授权确切账号，核对仅预期用户被加入：
 
@@ -15,7 +15,7 @@ select id from auth.users where email = 'YOUR_VERIFIED_EMAIL'
 on conflict do nothing;
 ```
 
-成员表与 AI 配额表位于 private schema。客户端仅可读取自己的文档，写入经有版本比较的 RPC。非成员即使登录也不能读写或调用模型。
+成员表与 AI 配额表位于 private schema，三个数据表均启用 RLS。客户端仅可读取自己的文档，写入经有版本比较的 RPC。非成员即使登录也不能读写或调用模型。当前不创建 Auth 用户，不插入成员记录，不发送邀请邮件。
 
 Auth Site URL 设置为 https://suguilin.github.io ，Redirect URLs 加 https://suguilin.github.io/account/ 。本地调试可另加 http://127.0.0.1:8000/account/ ，不用宽泛通配符。邮件模板使用有效登录链接或验证码，PKCE 链接在请求邮件的浏览器完成。
 
@@ -27,13 +27,14 @@ assets/public-config.json 仅填写 URL 与 publishable key（或 legacy anon ke
 {
   "supabaseUrl": "https://YOUR_PROJECT.supabase.co",
   "supabasePublishableKey": "YOUR_PUBLIC_KEY",
+  "enableSignIn": false,
   "assistantFunction": "learning-assistant",
   "synthesisFunction": "learning-synthesis",
   "enableWebSearch": false
 }
 ```
 
-不能填写 service_role、secret key 或 OpenAI key。发布公开配置后，账号页启用登录。登录前本机记录单独保留；登录后选择“合并登录前的本机记录”，先预览再合并。
+不能填写 service_role、secret key 或 OpenAI key。仅填写公开连接参数不会绕过账号启用开关；在用户决定启用、个人账号授权及回调设置完成后，才将 enableSignIn 改为 true。登录前本机记录单独保留；登录后选择“合并登录前的本机记录”，先预览再合并。
 
 ## 服务端模型
 
