@@ -38,6 +38,9 @@ test('README links and emphasis retain original evidence while producing readabl
   assert.ok(u.takeaways.every(t=>!t.point.includes('https://')&&!t.point.includes('**')));
   assert.ok(u.exercises.every(e=>!e.prompt.includes('https://')));
   assert.ok(u.takeaways.every(t=>!t.point.startsWith('API Reference')));
+  const navigation=pastedSource(item,markdown+'\nGuides – Quick, actionable code snippets for topics such as streaming, adding memory & persistence, and design patterns.\nHuman-in-the-loop – Inspect and modify agent state at any point to incorporate human oversight before a tool action.');
+  const filtered=extractiveUnit(navigation);assert.ok(filtered.takeaways.every(t=>!t.point.startsWith('Guides')));
+  assert.ok(extractiveUnit(pastedSource(item,'Human-in-the-loop – Inspect and modify agent state at any point to incorporate human oversight before a tool action.\nDurable execution – Checkpoints persist state so workflows resume after an interruption.\nGuides – Quick code snippets for memory & persistence and design patterns.')).takeaways.some(t=>t.point.startsWith('Human-in-the-loop')));
 });
 test('New learning flows respect daily budget, preserve attempts and bring reviews back when due',()=>{
   const u=unit(),s=defaultState();s.studyUnits=[u,{...u,id:'second-unit'}];s.dailyMinutes=30;

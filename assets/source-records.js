@@ -1,4 +1,9 @@
 import {validDay,dayKey} from './study-model.js';
+export function sourceRecordInfo(note){
+  const field=label=>note.body.match(new RegExp('^'+label+'：([^\\n]+)','m'))?.[1]||'';
+  const known=field('原文发布日期');
+  return {title:note.title,url:field('原始链接'),origin:field('平台'),author:field('作者')==='尚未填写'?'':field('作者'),publishedAt:validDay(known)?known:'',perspective:field('资料性质'),readingQuestion:note.body.match(/## 我想弄清的问题\n+([\s\S]*?)(?=\n##|$)/)?.[1]?.trim()||'',text:note.body.match(/## 已保存的节选\n+([\s\S]*?)(?=\n##|$)/)?.[1]?.trim().replace(/^仅保存了阅读线索，尚未整理或核实正文。$/,'')||''};
+}
 export function sourceDetails(fields){
   const get=(key,max)=>String(fields.get(key)||'').trim().slice(0,max);
   const origin=get('origin',60)||'公开资料',author=get('author',100),publishedAt=get('publishedAt',10),question=get('readingQuestion',2000),perspective=get('perspective',30)||'待核实线索';
@@ -18,7 +23,8 @@ export function sourceRecord(state,item,details,{text='',unit=null,now=new Date(
     if(unit&&!old.body.includes('[阅读与练习](/study/?id='+unit.id+')'))additions.push(unit.summary+'\n\n[阅读与练习](/study/?id='+unit.id+')\n\n阅读范围：'+unit.source.scope);
     if(text&&!unit&&!old.body.includes(text))additions.push('补充节选：\n\n'+text);
     if(!additions.length)return {state,note:old};
-    const body=old.body+'\n\n## 补充阅读\n\n'+additions.join('\n\n');if(body.length>80000)throw new Error('这份来源记录已满，请另建笔记保留新的思考');
+    const earlier=unit?old.body.replace('仅保存了阅读线索，尚未整理或核实正文。','初次收录时仅保存了阅读线索；本次整理内容与读取范围见下方补充阅读。'):old.body;
+    const body=earlier+'\n\n## 补充阅读\n\n'+additions.join('\n\n');if(body.length>80000)throw new Error('这份来源记录已满，请另建笔记保留新的思考');
     const note={...old,body,updatedAt:now.toISOString()};return {state:{...state,notes:state.notes.map(n=>n.id===old.id?note:n)},note};
   }
   if(state.notes.length>=1000)throw new Error('日志已满，请先备份');

@@ -80,6 +80,24 @@ begin
      end loop;
    end if;
    if p_kind='studyProgress' then
+     if p_value ? 'recall' then
+       if jsonb_typeof(p_value->'recall') is distinct from 'object'
+         or jsonb_array_length(p_value->'history')=0
+         or jsonb_typeof(p_value->'recall'->'startedAt') is distinct from 'string'
+         or length(p_value->'recall'->>'startedAt')>40
+         or p_value->'recall'->>'startedAt' !~ '^\d{4}-\d{2}-\d{2}T'
+         or jsonb_typeof(p_value->'recall'->'reflection') is distinct from 'string'
+         or length(p_value->'recall'->>'reflection')>6000
+         or jsonb_typeof(p_value->'recall'->'answers') is distinct from 'array'
+         or jsonb_array_length(p_value->'recall'->'answers')>5 then raise exception 'Invalid recall draft'; end if;
+       perform (p_value->'recall'->>'startedAt')::timestamptz;
+       if (select count(distinct a->>'id') from jsonb_array_elements(p_value->'recall'->'answers') a)<>jsonb_array_length(p_value->'recall'->'answers') then raise exception 'Duplicate recall answer'; end if;
+       for part in select * from jsonb_array_elements(p_value->'recall'->'answers') loop
+         if jsonb_typeof(part) is distinct from 'object' or jsonb_typeof(part->'id') is distinct from 'string'
+           or part->>'id' !~ '^e[1-5]$' or jsonb_typeof(part->'text') is distinct from 'string'
+           or length(part->>'text')>6000 then raise exception 'Invalid recall answer'; end if;
+       end loop;
+     end if;
      perform (p_value->>'scheduledFor')::date;
      if to_char((p_value->>'scheduledFor')::date,'YYYY-MM-DD')<>p_value->>'scheduledFor'
        or jsonb_typeof(p_value->'nextReview') is distinct from 'string' then raise exception 'Invalid review date'; end if;

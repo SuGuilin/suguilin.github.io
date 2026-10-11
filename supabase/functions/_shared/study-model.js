@@ -29,7 +29,21 @@ export function validateProgress(raw){
   const history=raw.history.map(h=>{if(!Number.isFinite(Date.parse(h.at))||!['again','hard','good'].includes(h.rating)||!Number.isInteger(h.minutes)||h.minutes<1||h.minutes>240)throw new Error('复习记录无效');return {at:new Date(h.at).toISOString(),rating:h.rating,minutes:h.minutes};});
   if(typeof raw.reflection!=='string'||raw.reflection.length>6000)throw new Error('复盘内容无效');
   if(raw.readingSection!==undefined&&!validReadingSection(raw.readingSection))throw new Error('阅读位置无效');
-  return {...(raw.readingSection?{readingSection:raw.readingSection}:{}),id:raw.id,title:string(raw.title,200),scheduledFor:raw.scheduledFor,nextReview:raw.nextReview||'',stage:Number.isInteger(raw.stage)&&raw.stage>=0&&raw.stage<=4?raw.stage:0,answers,reflection:raw.reflection,history,updatedAt:new Date(raw.updatedAt).toISOString()};
+  let recall;
+  if(raw.recall!==undefined){
+    const r=raw.recall;
+    if(!r||!history.length||!Number.isFinite(Date.parse(r.startedAt))||typeof r.reflection!=='string'||r.reflection.length>6000||!Array.isArray(r.answers)||r.answers.length>5)throw new Error('独立复习草稿无效');
+    const answers=r.answers.map(a=>{if(!/^e[1-5]$/.test(a.id)||typeof a.text!=='string'||a.text.length>6000)throw new Error('复习作答无效');return {id:a.id,text:a.text};});
+    if(new Set(answers.map(a=>a.id)).size!==answers.length)throw new Error('重复复习作答');
+    recall={startedAt:new Date(r.startedAt).toISOString(),answers,reflection:r.reflection};
+  }
+  return {...(recall?{recall}:{}),...(raw.readingSection?{readingSection:raw.readingSection}:{}),id:raw.id,title:string(raw.title,200),scheduledFor:raw.scheduledFor,nextReview:raw.nextReview||'',stage:Number.isInteger(raw.stage)&&raw.stage>=0&&raw.stage<=4?raw.stage:0,answers,reflection:raw.reflection,history,updatedAt:new Date(raw.updatedAt).toISOString()};
+}
+export const currentAttempt = progress => progress.recall ? {...progress,answers:progress.recall.answers,reflection:progress.recall.reflection} : progress;
+export function beginRecall(progress,now=new Date()){
+  if(!progress.history.length)throw new Error('先完成首次学习与自检');
+  if(progress.recall)return validateProgress(progress);
+  return validateProgress({...progress,recall:{startedAt:now.toISOString(),answers:[],reflection:''},updatedAt:now.toISOString()});
 }
 export function newProgress(unit,day=dayKey()){return {id:unit.id,title:unit.title,scheduledFor:day,nextReview:'',stage:0,answers:[],reflection:'',history:[],updatedAt:new Date().toISOString()};}
 export const scheduledDay = progress => progress.history.length ? progress.nextReview : progress.scheduledFor;
@@ -46,15 +60,18 @@ export function scheduleUnit(state,unit,now=new Date(),{today=false}={}){
 }
 export function dailyQueue(state,units,now=new Date(),resources=[]){
   const day=dayKey(now),lookup=new Map(units.map(u=>[u.id,u]));
-  const due=state.studyProgress.filter(p=>lookup.has(p.id)&&(p.history.length?p.nextReview&&p.nextReview<=day:p.scheduledFor<=day)).sort((a,b)=>(a.history.length?0:1)-(b.history.length?0:1)||(a.nextReview||a.scheduledFor).localeCompare(b.nextReview||b.scheduledFor));
+  const due=state.studyProgress.filter(p=>lookup.has(p.id)&&(p.recall||(p.history.length?p.nextReview&&p.nextReview<=day:p.scheduledFor<=day))).sort((a,b)=>(a.recall?0:a.history.length?1:2)-(b.recall?0:b.history.length?1:2)||(a.nextReview||a.scheduledFor).localeCompare(b.nextReview||b.scheduledFor));
   let minutes=0;const selected=[];for(const progress of due){const unit=lookup.get(progress.id),cost=Math.min(state.dailyMinutes,progress.history.length?10:unit.minutes);if(minutes+cost>state.dailyMinutes&&selected.length)continue;selected.push({unit,progress,minutes:cost,review:!!progress.history.length});minutes+=cost;}
   if(!selected.length){const unit=learningRecommendations(state,units,resources,{limit:units.length}).map(r=>r.unit).find(u=>!state.studyProgress.some(p=>p.id===u.id));if(unit)selected.push({unit,minutes:Math.min(state.dailyMinutes,unit.minutes),review:false,recommended:true});}
   return selected;
 }
 export function recordReview(progress,rating,minutes,now=new Date()){
   if(!['again','hard','good'].includes(rating))throw new Error('请选择复习感受');
-  if(!progress.answers.some(a=>a.text.trim()))throw new Error('先写下至少一道练习的回答，再进行自评');
+  if(progress.history.length&&!progress.recall)throw new Error('先开始一次独立回忆，已有答案不能重复记为新的复习');
+  const attempt=currentAttempt(progress);
+  if(!attempt.answers.some(a=>a.text.trim()))throw new Error('先写下至少一道练习的回答，再进行自评；想不起来也可以如实记录');
   const stage=rating==='again'?0:rating==='hard'?Math.max(0,progress.stage):Math.min(4,progress.stage+1),interval=rating==='again'?1:rating==='hard'?2:[1,3,7,14,30][stage];
-  return validateProgress({...progress,stage,nextReview:shiftDay(dayKey(now),interval),history:[...progress.history.slice(-99),{at:now.toISOString(),rating,minutes}],updatedAt:now.toISOString()});
+  const {recall,...old}=progress;
+  return validateProgress({...old,answers:attempt.answers,reflection:attempt.reflection,stage,nextReview:shiftDay(dayKey(now),interval),history:[...progress.history.slice(-99),{at:now.toISOString(),rating,minutes}],updatedAt:now.toISOString()});
 }
 export function unitMarkdown(unit){return `# ${unit.title}\n\n${unit.summary}\n\n## 关键要点\n\n${unit.takeaways.map(t=>'- '+t.point+'\n  - 依据：'+t.evidence).join('\n')}\n\n## 易错边界\n\n${unit.pitfalls.map(p=>'- '+p).join('\n')}\n\n## 练习与参考思路\n\n${unit.exercises.map(e=>`### ${e.prompt}\n\n提示：${e.hint}\n\n${e.answer}\n\n自检：${e.rubric.join('；')}`).join('\n\n')}\n\n## 来源\n\n${unit.source.title}：${unit.source.url}\n\n阅读范围：${unit.source.scope}\n读取时间：${unit.source.accessedAt}\n整理方式：${unit.mode}\n`;}
