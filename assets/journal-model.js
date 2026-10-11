@@ -1,6 +1,45 @@
+import {validReadingSection} from './study-model.js';
+import {noteUnitId} from './learning-signals.js';
 const kinds=['实验记录','源码研究','论文精读','学习复盘','学习笔记','待解答问题','已解决问题','重点标注','作者观点','面试复盘','项目记录','资料收件箱'];
+
+// Fold only the exact generated handoff block. Keep the stored note intact,
+// including user additions before or after it, for editing and every backup.
+export function questionNoteParts(note){
+  const body=note.body;
+  if(!['待解答问题','已解决问题'].includes(note.kind))return {body,context:'',question:body};
+  const match=body.match(/\n\n---\n学习单元：[^\n]+\n关键要点：\n[\s\S]*?\n\n请区分来源支持的事实与推断；先解释机制和边界，再给出一个最小验证方法。(?=\n\n|$)/);
+  if(!match)return {body,context:'',question:body.replace(/^## 待解答的问题\n+/, '')};
+  const question=body.slice(0,match.index).replace(/^## 待解答的问题\n+/, '').trim();
+  return {body:body.slice(0,match.index)+body.slice(match.index+match[0].length),context:match[0].replace(/^\n\n---\n/,''),question};
+}
+export function journalTitle(note){
+  return /^## 待解答的问题\n/.test(note.body)&&/ · 待解答问题$/.test(note.title)&&['待解答问题','已解决问题'].includes(note.kind)
+    ? notePreview(questionNoteParts(note).question,110)||note.title : note.title;
+}
+export function journalReadingBody(note){
+  const parts=questionNoteParts(note);
+  const title=journalTitle(note);
+  let body=parts.body;
+  if(title!==note.title&&title===parts.question){
+    const prefix='## 待解答的问题\n\n'+parts.question;
+    if(body.startsWith(prefix))body=body.slice(prefix.length).trimStart();
+  }
+  if(body.startsWith('# '+note.title+'\n'))body=body.slice(note.title.length+3).trimStart();
+  if(note.kind==='资料收件箱')body=body.replace(/^## [^\n]+\n+(?=## |$)/gm,'');
+  return body;
+}
+export function noteLearningLink(note){
+  const match=note.body.match(/\]\((\/study\/\?id=([a-zA-Z0-9_-]{1,100})(?:&mode=recall)?(?:#([a-zA-Z0-9_-]+))?)\)/);
+  if(!match)return null;
+  return {id:match[2],url:match[1],section:validReadingSection(match[3])?match[3]:'study-reflection'};
+}
+export function noteDiscussion(note,unit){
+  const q=questionNoteParts(note),ref=noteLearningLink(note),question=['待解答问题','已解决问题'].includes(note.kind)
+    ? q.question : '这是我保存的'+note.kind+'：\n\n'+q.body+'\n\n请帮助我检查理解的假设与边界，先提出一个需要澄清的问题。';
+  return {title:unit?.title||note.title,studyUnit:unit,journalNoteId:note.id,section:ref?.section||'study-reflection',question:question.slice(0,6000)};
+}
 export function journalScope(params){
-  for(const field of ['id','source','lesson','week','project','guide']){
+  for(const field of ['id','source','unit','lesson','week','project','guide']){
     const value=params.get(field);if(value&&/^[a-zA-Z0-9_-]{1,100}$/.test(value))return field+':'+value;
   }
   return 'new';
@@ -16,7 +55,7 @@ export function validateJournalDraft(raw){
 export function notePreview(body,max=150){
   return body.replace(/^# [^\n]+\n+/, '').replace(/```[^\n]*\n([\s\S]*?)```/g,'$1').replace(/!?\[([^\]\n]+)\]\([^\n)]*\)/g,'$1').replace(/https?:\/\/\S+/g,'').replace(/^\s{0,3}#{1,6}\s+/gm,'').replace(/[*`>|]/g,'').replace(/\s+/g,' ').trim().slice(0,max);
 }
-export function filterJournal(notes,{inbox=false,kind='',query=''}={}){
+export function filterJournal(notes,{inbox=false,kind='',query='',unit=''}={}){
   const needle=query.trim().toLocaleLowerCase();
-  return notes.filter(n=>(!inbox||n.kind==='资料收件箱')&&(!kind||n.kind===kind)&&(!needle||[n.title,n.body,n.tags].join(' ').toLocaleLowerCase().includes(needle))).sort((a,b)=>Date.parse(b.updatedAt)-Date.parse(a.updatedAt));
+  return notes.filter(n=>(!inbox||n.kind==='资料收件箱')&&(!kind||n.kind===kind)&&(!unit||noteUnitId(n)===unit)&&(!needle||[n.title,n.body,n.tags].join(' ').toLocaleLowerCase().includes(needle))).sort((a,b)=>Date.parse(b.updatedAt)-Date.parse(a.updatedAt));
 }
