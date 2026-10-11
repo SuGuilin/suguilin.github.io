@@ -30,6 +30,15 @@ test('Free packs are grounded in actual text, keep access scope, and reject fabr
   const promotion=pastedSource(item,'We build swarms for complex, long-running agentic workloads.\nOur powerful agent product helps teams get started quickly and achieve great results.\nJoin our community to learn more about the agent ecosystem and our roadmap.\nContact our sales team to get a personal demo and discuss your needs.');
   assert.throws(()=>extractiveUnit(promotion),/具体机制/);
 });
+test('README links and emphasis retain original evidence while producing readable key points',()=>{
+  const markdown='- **Durable execution**: Checkpoints persist agent state so workflows can resume after interruption without losing progress.\n- **Human oversight**: Inspect and modify agent state at any point using [human-in-the-loop controls](https://example.com/oversight).\n- **Comprehensive memory**: Maintain agent state across conversations with [long-term memory](https://example.com/memory) and persistence.\n- API Reference: Detailed reference on core state classes, recovery methods, the graph and checkpointing APIs.';
+  const u=extractiveUnit(pastedSource(item,markdown,now));
+  assert.ok(u.takeaways.length>=2);
+  assert.ok(u.takeaways.every(t=>markdown.includes(t.evidence)));
+  assert.ok(u.takeaways.every(t=>!t.point.includes('https://')&&!t.point.includes('**')));
+  assert.ok(u.exercises.every(e=>!e.prompt.includes('https://')));
+  assert.ok(u.takeaways.every(t=>!t.point.startsWith('API Reference')));
+});
 test('New learning flows respect daily budget, preserve attempts and bring reviews back when due',()=>{
   const u=unit(),s=defaultState();s.studyUnits=[u,{...u,id:'second-unit'}];s.dailyMinutes=30;
   const a=scheduleUnit(s,u,now),b=scheduleUnit(a,s.studyUnits[1],now);assert.equal(b.studyProgress[0].scheduledFor,dayKey(now));assert.notEqual(b.studyProgress[0].scheduledFor,b.studyProgress[1].scheduledFor);assert.equal(scheduleUnit(b,u,now).studyProgress.length,2);

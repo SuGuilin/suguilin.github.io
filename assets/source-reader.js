@@ -32,21 +32,24 @@ export function pastedSource(raw,text,now=new Date()){
   return {title:String(raw.title).slice(0,200),url:url.href,scope:'用户粘贴的公开节选；未自动核实与原网页的一致性',accessedAt:now.toISOString(),excerpt:text.trim()};
 }
 export const sourceUnitId=url=>{let a=2166136261,b=5381;for(const c of url){a=Math.imul(a^c.charCodeAt(0),16777619);b=Math.imul(b,33)^c.charCodeAt(0);}return 'study-'+(a>>>0).toString(16)+(b>>>0).toString(16);};
+const statementLabel=text=>text.length<=120?text:text.slice(0,120).replace(/\s+\S*$/,'').trimEnd()+'…';
 // Free, local, extractive fallback. Explicitly names its limits; it never
 // invents a mechanism or a result from a search title or repository metadata.
 export function extractiveUnit(source){
-  const lines=source.excerpt.split(/\n|(?<=[。.!?])\s+/).map(s=>s.replace(/^\s*[#>*-]+\s*/,'').replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1').trim()).filter(s=>s.length>=45&&s.length<=500&&!/https?:|^```|pip install|npm install|<img/i.test(s));
+  const lines=source.excerpt.split(/\n|(?<=[。.!?])\s+/).map(raw=>({raw:raw.trim(),text:raw.replace(/^\s*[#>*-]+\s*/,'').replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1').replace(/\*\*|__/g,'').trim()})).filter(s=>s.text.length>=45&&s.text.length<=500&&!/https?:|^```|pip install|npm install|<img/i.test(s.text));
   const keywords=/agent|memory|tool|state|context|evaluat|recover|workflow|模型|工具|记忆|状态|评测|智能体|上下文/i;
   const score=s=>(keywords.test(s)?2:0)+(/checkpoint|persist|reconcil|operation identity|effective time|evidence|artifact|lease|timeout|transaction|bootstrap|logprob|gradient|idempoten|retry|retries|permission|budget|schema|mask|reward|baseline|latency|isolat|conflict|recover|对账|溯源|有效时间|租约|超时|事务|损失|梯度|检查点|持久|幂等|重试|权限|预算|约束|奖励|基线|隔离|冲突/i.test(s)?4:0)+(s.length>=90?1:0)-(/powerful|awesome|make your own|minimal, extensible|built for|强大|最佳|开箱即用/i.test(s)?3:0);
-  const chosen=[...new Set(lines)].map((text,index)=>({text,index,score:score(text)})).filter(s=>s.score>=4).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,3).map(s=>s.text);
+  const chosen=[...new Map(lines.map(s=>[s.text,s])).values()].map((s,index)=>({...s,index,score:score(s.text)})).filter(s=>s.score>=4&&!/^(?:api reference|tutorials?|quickstart|documentation|learn more|get started)\s*[:—-]/i.test(s.text)).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,3);
   if(chosen.length<2)throw new Error('正文缺少足够的具体机制说明，暂保留为阅读线索。请补充技术章节，或使用 AI 整理。');
-  const evidence=chosen.map(s=>{const start=source.excerpt.indexOf(s);return start>=0?s.slice(0,160):source.excerpt.split('\n').find(l=>l.includes(s.slice(0,45)))?.trim().slice(0,160);}).filter(Boolean);
-  if(evidence.length<2)throw new Error('正文格式不适合自动提炼，请改用纯文本节选');
+  // Keep the original Markdown span as evidence; removing links or emphasis
+  // must not make an otherwise readable README lose its source grounding.
+  const evidence=chosen.map(s=>s.raw.slice(0,160));
+  const points=chosen.map(s=>s.text);
   const topics=[['长程记忆',/memory|记忆/i],['评测与实验',/evaluat|benchmark|评测/i],['工具与可靠性',/tool|recover|工具|恢复/i],['强化学习',/reinforcement|reward|强化|奖励/i]];
   const topic=topics.find(([,re])=>re.test(source.title+' '+evidence.join(' ')))?.[0]||'Agent 系统';
-  const unit={id:sourceUnitId(source.url),title:source.title,topic,summary:'正文线索：'+chosen[0].slice(0,220)+'（正文摘取，未进行 AI 语义归纳或事实核验。）',mode:'extractive',minutes:30,prerequisites:['能够阅读技术文档；涉及术语可结合专题补齐'],
-    takeaways:evidence.map(e=>({point:e,evidence:e})),pitfalls:['这些陈述来自作者，不能据此认定效果已被独立复现。','节选未包含的实现、数据与限制需要返回原文核实。'],
-    exercises:[{prompt:`解释第一条陈述：${evidence[0].slice(0,100)}`,hint:'先还原作者的对象、问题与方法；找不到的信息明确写“节选未说明”。',answer:`原文依据：${evidence[0]}\n围绕这条证据复述机制，区分明确陈述与自己的推断。节选不支持的实现或性能结论不能补写为事实。`,rubric:['准确复述原文对象与意图','列出至少一个尚需核实的问题']},
-      {prompt:`针对“${evidence[1].slice(0,100)}”，怎样设计一个能暴露失效边界的最小检查？`,hint:'明确这一陈述适用的对象、输入条件、需要观察的结果；先列出节选没有交代的条件。',answer:`原文依据：${evidence[1]}\n先写下这条陈述成立所需的条件；将一个条件改掉，比较正常与失败路径。记录输出、次数或状态，说明什么结果会反驳当前理解。节选未提供实现时，先返回技术章节核对；这里是练习思路，未声称运行。`,rubric:['检查对象直接对应这条正文陈述','验证包含基线与失败条件','不把计划写成已取得的结果']}],source,updatedAt:new Date().toISOString()};
+  const unit={id:sourceUnitId(source.url),title:source.title,topic,summary:'正文线索：'+points[0].slice(0,220)+'（正文摘取，未进行 AI 语义归纳或事实核验。）',mode:'extractive',minutes:30,prerequisites:['能够阅读技术文档；涉及术语可结合专题补齐'],
+    takeaways:points.map((point,i)=>({point,evidence:evidence[i]})),pitfalls:['这些陈述来自作者，不能据此认定效果已被独立复现。','节选未包含的实现、数据与限制需要返回原文核实。'],
+    exercises:[{prompt:`解释第一条陈述：${statementLabel(points[0])}`,hint:'先还原作者的对象、问题与方法；找不到的信息明确写“节选未说明”。',answer:`原文依据：${evidence[0]}\n围绕这条证据复述机制，区分明确陈述与自己的推断。节选不支持的实现或性能结论不能补写为事实。`,rubric:['准确复述原文对象与意图','列出至少一个尚需核实的问题']},
+      {prompt:`针对“${statementLabel(points[1])}”，怎样设计一个能暴露失效边界的最小检查？`,hint:'明确这一陈述适用的对象、输入条件、需要观察的结果；先列出节选没有交代的条件。',answer:`原文依据：${evidence[1]}\n先写下这条陈述成立所需的条件；将一个条件改掉，比较正常与失败路径。记录输出、次数或状态，说明什么结果会反驳当前理解。节选未提供实现时，先返回技术章节核对；这里是练习思路，未声称运行。`,rubric:['检查对象直接对应这条正文陈述','验证包含基线与失败条件','不把计划写成已取得的结果']}],source,updatedAt:new Date().toISOString()};
   return validateUnit(unit);
 }

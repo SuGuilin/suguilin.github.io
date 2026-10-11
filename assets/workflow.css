@@ -1,0 +1,50 @@
+/* Planning, finding a source, and writing use the same quiet reading rhythm. */
+.plan-today{padding:22px 0 28px;margin-bottom:30px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.plan-today .section-heading{margin:0 0 16px}.plan-today .section-heading>span,.plan-calendar .section-heading>span{font-size:12px;color:var(--muted)}
+.plan-today-row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:12px 0}
+.plan-today-row>div{max-width:760px}.plan-today-row h3{font-size:21px;line-height:1.55;margin:8px 0 7px;font-weight:620}
+.plan-today-row p{font-size:14px;line-height:1.8;margin:0;color:var(--muted)}.plan-today-row>.button{flex-shrink:0;white-space:nowrap}
+.plan-today-row .topic-label{font-size:12px}.plan-calendar .section-heading{margin:0 0 16px}
+.plan-week{margin-bottom:28px}.plan-day{min-height:132px;padding:16px 13px}.plan-day header{margin-bottom:16px}
+.plan-day.is-today{box-shadow:inset 0 2px var(--accent)}.plan-day.is-today header strong{color:var(--accent)}
+.plan-open{font-size:11px;line-height:1.75;color:var(--muted)}.plan-unit{font-size:11px;line-height:1.7;padding:8px 0}.plan-unit strong{font-size:13px;line-height:1.7}
+.plan-detail-row{gap:24px}.plan-detail-row strong{font-size:15px;line-height:1.7}.plan-detail-row small{font-size:12px;line-height:1.8}
+.plan-detail-row>label{font-size:12px;gap:10px}.plan-detail-row input{font-size:14px;min-height:39px;padding:7px 10px;border-color:var(--control-border)}
+.plan-empty{padding:22px 0;margin:0}.plan-method p{font-size:14px;line-height:1.9;max-width:780px}
+.resource-catalog .toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 20px;align-items:center;scroll-margin-top:88px}
+.resource-catalog .filter-bar{grid-column:1/-1;gap:5px;flex-wrap:wrap}.resource-catalog .filter-button{font-size:12px;min-height:36px;padding:7px 11px;border-radius:5px}
+.resource-catalog .search-field{width:min(100%,420px);min-height:42px}.resource-catalog .search-field input{font-size:14px}.resource-catalog .view-switch{justify-self:end}
+.catalog-count{font-size:12px;line-height:1.8;margin:15px 0 10px;color:var(--muted)}
+.resource-card h3{font-size:17px;line-height:1.65}.resource-card p{font-size:14px;line-height:1.85}.resource-card footer{font-size:12px;gap:16px}
+.resource-card footer>span{color:var(--muted);font-size:12px;line-height:1.7}.resource-actions{display:flex;gap:10px 20px;flex-wrap:wrap;align-items:center}
+.resource-actions a{font-size:13px;min-height:32px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.resource-grid.list .resource-card{grid-template-columns:36px minmax(0,1fr) 210px;gap:6px 18px;padding:22px 0!important;align-items:start}
+.resource-grid.list .resource-card h3{grid-column:2;grid-row:1;font-size:17px;margin:0}
+.resource-grid.list .resource-card p{grid-column:2;grid-row:2;margin:0;font-size:14px;line-height:1.8;max-width:730px;color:var(--muted)}
+.resource-grid.list .resource-card .tags{grid-column:2;grid-row:3;margin:5px 0 0;gap:6px}.resource-grid.list .tag{font-size:11px}
+.resource-grid.list .resource-card-head{grid-column:1;grid-row:1/4;display:flex;flex-direction:column;align-items:center;gap:8px;margin:0}
+.resource-grid.list .resource-card-head .save-button{position:static;width:34px;height:34px}.resource-grid.list .resource-symbol{font-size:9px;width:34px;height:24px}
+.resource-grid.list .resource-card footer{grid-column:3;grid-row:1/4;padding:0;margin:0;align-items:flex-end;gap:9px;flex-direction:column}
+.resource-grid.list .resource-card footer>span{max-width:210px;font-size:12px;line-height:1.7}.resource-grid.list .resource-actions{flex-direction:column;align-items:flex-end;gap:4px}
+.resource-grid.list .resource-card:last-child{border-bottom:1px solid var(--line)}
+.journal-view-tabs{display:flex;gap:24px;margin:0 0 22px;border-bottom:1px solid var(--line)}
+.journal-view-tabs a{padding:10px 0;font-size:14px;color:var(--muted);border-bottom:2px solid transparent}
+.journal-view-tabs a.active{color:var(--accent);border-bottom-color:var(--accent)}
+.journal-filters{display:grid;grid-template-columns:minmax(0,420px) 160px;gap:14px;margin-bottom:25px;align-items:center}
+.journal-filters .search-field{width:100%;min-height:42px}.journal-filters input{font-size:14px}.journal-filters select{font-size:14px;min-height:42px;padding:8px 11px}
+.journal-layout{grid-template-columns:280px minmax(0,1fr);gap:40px}.journal-index{position:sticky;top:88px;min-width:0}
+.journal-index-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:0 8px 12px;color:var(--muted);font-size:12px}
+.journal-index-heading button{display:none}.journal-list{display:grid;grid-template-columns:1fr;gap:0;padding:0;max-height:calc(100dvh - 200px);overflow:auto}
+.note-preview{padding:16px 12px}.note-preview strong{font-size:14px;line-height:1.65;margin:8px 0 0;font-weight:600}.note-preview p{font-size:12px;line-height:1.8;margin:6px 0 8px}.note-preview small{font-size:11px;line-height:1.7}
+.note-reader,#note-form{max-width:720px;padding:0;scroll-margin-top:88px}.note-reader:focus{outline:none}.note-reader h2{font-size:25px;line-height:1.55;margin:18px 0 12px;font-weight:650;letter-spacing:-.02em}
+.note-meta{font-size:12px;line-height:1.8;color:var(--muted);padding-bottom:22px;margin:0 0 24px;border-bottom:1px solid var(--line)}
+.journal-source-unit{padding:0 0 24px;margin-bottom:26px;border-bottom:1px solid var(--line)}.journal-source-unit h3{font-size:17px;margin:0 0 10px}.journal-source-unit p{font-size:12px;line-height:1.8;color:var(--muted)}.journal-source-unit li{font-size:15px;line-height:1.85;margin:10px 0}.journal-source-unit .actions{gap:20px;font-size:14px}
+.note-reader .note-body{font-size:16px;line-height:1.85;white-space:normal}.note-reader .note-body p,.note-reader .note-body li{font-size:16px;line-height:1.85}.note-body p{margin:0 0 18px}
+.note-body h3{font-size:21px;line-height:1.6;margin:28px 0 16px}.note-body h4{font-size:17px;line-height:1.75;margin:22px 0 12px}.note-body pre{white-space:pre;font-size:13px;line-height:1.75}.note-body :not(pre)>code{font-size:.87em}
+#note-form input,#note-form textarea{font-size:16px;line-height:1.8}#note-form textarea{min-height:320px;padding:16px;resize:vertical}#note-form label{font-size:13px}
+#note-form .editor-title h2{font-size:21px}#note-form .editor-footer{gap:15px;align-items:center}#editor-status{font-size:12px;line-height:1.8;max-width:420px}
+.journal-empty-reader{padding:24px 0}.journal-empty-reader h2{font-size:22px}.journal-empty-reader p{font-size:15px;line-height:1.85;color:var(--muted)}
+.backup-panel{margin-top:35px;padding:22px 0;border-top:1px solid var(--line);border-bottom:0;background:transparent;border-radius:0}.backup-panel p{font-size:12px;line-height:1.8}
+@media(max-width:1000px){.resource-grid.list .resource-card{grid-template-columns:36px minmax(0,1fr)}.resource-grid.list .resource-card footer{grid-column:2;grid-row:4;flex-direction:row;align-items:center;justify-content:space-between}.resource-grid.list .resource-actions{flex-direction:row;gap:16px}.journal-layout{grid-template-columns:220px minmax(0,1fr);gap:25px}}
+@media(max-width:700px){.plan-today-row{display:block;padding:10px 0}.plan-today-row h3{font-size:20px}.plan-today-row>.button{margin-top:15px}.plan-today .section-heading{align-items:flex-start;gap:12px;flex-wrap:wrap}.plan-day{min-height:118px}.plan-detail-row{display:block}.plan-detail-row>label{margin-top:12px;justify-content:space-between}.plan-calendar .section-heading{align-items:flex-start}.plan-calendar .section-heading>span{font-size:11px;text-align:right}.resource-grid.list .resource-card{gap:7px 12px}.resource-grid.list .resource-card h3{font-size:16px}.resource-grid.list .resource-card p{font-size:14px}.resource-grid.list .resource-card footer{align-items:flex-start;flex-direction:column;gap:5px}.resource-grid.list .resource-card footer>span{max-width:100%;white-space:normal}.resource-grid.list .resource-actions{gap:16px}.resource-catalog .search-field{width:100%}.resource-catalog .search-field input{font-size:16px}.resource-catalog .filter-button{font-size:12px;padding:7px 9px}.journal-filters{grid-template-columns:minmax(0,1fr) 118px;gap:9px}.journal-filters input,.journal-filters select{font-size:16px}.journal-layout{grid-template-columns:1fr;gap:22px}.journal-index{position:static}.journal-index-heading{padding:0 0 12px;border-bottom:1px solid var(--line)}.journal-index-heading button{display:inline-flex;align-items:center;gap:5px;min-height:36px;font-size:13px}.journal-index .journal-list{display:none;max-height:270px}.journal-index.is-open .journal-list{display:grid}.note-reader h2{font-size:23px}.note-reader,#note-form{max-width:none}.note-reader .editor-title{gap:10px}.note-reader .editor-title .actions{gap:8px}.note-body h3{font-size:20px}.note-body h4{font-size:17px}.backup-panel{display:block}.backup-panel .actions{margin-top:15px;flex-wrap:wrap;gap:8px}#note-form textarea{min-height:280px}#note-form .editor-footer{flex-direction:column;align-items:stretch}#note-form .editor-footer .actions{justify-content:flex-end}}
+@media(max-width:560px){#main[data-route="journal"] .page-title.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;margin-bottom:18px}#main[data-route="journal"] .page-title.row>div:first-child{display:contents}#main[data-route="journal"] .page-title .eyebrow,#main[data-route="journal"] .page-title p{grid-column:1/-1}#main[data-route="journal"] .page-title h1{margin:0;font-size:25px}#main[data-route="journal"] .page-title .actions{grid-column:2;grid-row:2;margin:0}#main[data-route="journal"] .page-title .actions .button{font-size:12px;min-height:36px;padding:7px 10px}}

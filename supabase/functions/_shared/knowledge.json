@@ -1952,6 +1952,22 @@
             "section": "Key Features / Getting Started / Recipe requirements",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "grpo",
+            "title": "verl GRPO documentation",
+            "url": "https://verl.readthedocs.io/en/latest/algo/grpo.html",
+            "section": "adv_estimator / rollout sample count / loss aggregation / KL",
+            "verification": "本轮直接读取官方配置说明；算法机制同时核对原论文",
+            "verifiedAt": "2026-10-11"
+          },
+          {
+            "id": "advantage",
+            "title": "Search-R1 original paper · PPO / GRPO",
+            "url": "https://arxiv.org/html/2503.09516v1",
+            "section": "3.1 Learned value / GAE / Group-relative baseline",
+            "verification": "本轮直接读取原论文对应章节",
+            "verifiedAt": "2026-10-11"
           }
         ],
         "versionNote": "支持列表来自本次 README，具体后端兼容性应按选定配置核对。",

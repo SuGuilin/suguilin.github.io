@@ -31,6 +31,11 @@ export function validateProgress(raw){
   return {...(raw.readingSection?{readingSection:raw.readingSection}:{}),id:raw.id,title:string(raw.title,200),scheduledFor:raw.scheduledFor,nextReview:raw.nextReview||'',stage:Number.isInteger(raw.stage)&&raw.stage>=0&&raw.stage<=4?raw.stage:0,answers,reflection:raw.reflection,history,updatedAt:new Date(raw.updatedAt).toISOString()};
 }
 export function newProgress(unit,day=dayKey()){return {id:unit.id,title:unit.title,scheduledFor:day,nextReview:'',stage:0,answers:[],reflection:'',history:[],updatedAt:new Date().toISOString()};}
+export const scheduledDay = progress => progress.history.length ? progress.nextReview : progress.scheduledFor;
+export function rescheduleProgress(progress,day,now=new Date()){
+  if(!validDay(day))throw new Error('请选择有效日期');
+  return validateProgress({...progress,[progress.history.length?'nextReview':'scheduledFor']:day,updatedAt:now.toISOString()});
+}
 export function scheduleUnit(state,unit,now=new Date(),{today=false}={}){
   if(state.studyProgress.some(p=>p.id===unit.id))return state;
   if(state.studyProgress.length>=300)throw new Error('学习计划已满，请先导出备份并整理旧计划');
