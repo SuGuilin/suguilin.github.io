@@ -70,7 +70,7 @@ export function mergeBackupStates(current,incoming){
     const winner=state[kind].find(r=>r.id===imported.id);
     // validateState returns new objects, so compare the content of the winner.
     const losing=content(winner,kind)===content(imported,kind)?existing:imported;
-    if(kind==='studyProgress'){const id='backup-progress-'+fingerprint(content(losing,kind));if(!state.notes.some(n=>n.id===id)){state.notes.push({id,title:losing.title.slice(0,170)+'（备份作答保留）',kind:'学习复盘',tags:'备份冲突',createdAt:losing.updatedAt,updatedAt:losing.updatedAt,body:`## 备份中保留的作答与计划\n\n${losing.answers.map(a=>'### '+a.id+'\n\n'+a.text).join('\n\n')}\n\n复盘：${losing.reflection}\n计划日期：${losing.scheduledFor}\n下次复习：${losing.nextReview}\n\n历史：\n${losing.history.map(h=>h.at+' · '+h.rating+' · '+h.minutes+' 分钟').join('\n')}`});conflicts++;}continue;}
+    if(kind==='studyProgress'){const id='backup-progress-'+fingerprint(content(losing,kind));if(!state.notes.some(n=>n.id===id)){state.notes.push({id,title:losing.title.slice(0,170)+'（备份作答保留）',kind:'学习复盘',tags:'备份冲突',createdAt:losing.updatedAt,updatedAt:losing.updatedAt,body:`## 备份中保留的作答与计划\n\n${losing.answers.map(a=>'### '+a.id+'\n\n'+a.text).join('\n\n')}\n\n复盘：${losing.reflection}\n计划日期：${losing.scheduledFor}\n下次复习：${losing.nextReview}\n\n${losing.recall?`独立复习草稿（${losing.recall.startedAt}）：\n${losing.recall.answers.map(a=>a.id+'\n'+a.text).join('\n\n')}\n本次复盘：${losing.recall.reflection}\n\n`:""}历史：\n${losing.history.map(h=>h.at+' · '+h.rating+' · '+h.minutes+' 分钟').join('\n')}`});conflicts++;}continue;}
     const base=imported.id.slice(0,55)+'-backup-'+fingerprint(content(losing));
     let id=base,index=1;
     while(state[kind].some(r=>r.id===id&&content({...r,title:losing.title})!==content(losing)))id=base+'-'+index++;

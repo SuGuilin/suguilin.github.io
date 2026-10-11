@@ -2,7 +2,7 @@
 // or inferred skill score is needed, and backups remain ordinary notes.
 export const normalizeQuote = value => String(value).replace(/\s+/g,' ').trim();
 export function noteUnitId(note){
-  const match=note.body.match(/\]\(\/study\/\?id=([a-zA-Z0-9_-]{1,100})(?:#[a-zA-Z0-9_-]+)?\)/);
+  const match=note.body.match(/\]\(\/study\/\?id=([a-zA-Z0-9_-]{1,100})(?:&mode=recall)?(?:#[a-zA-Z0-9_-]+)?\)/);
   return match?.[1]||'';
 }
 export function readAnnotation(note){
@@ -42,13 +42,14 @@ export function learningRecommendations(state,units,resources=[],{exclude='',lim
     const unitThemes=themeIds(u.title+' '+u.topic+' '+u.summary),shared=unitThemes.find(t=>interests.has(t));
     let score=0,reason='',section='';
     if(question){score=120;reason='你留下的问题还待解答';section=readAnnotation(question)?.section||'study-reflection';}
+    else if(p?.recall){score=110;reason='继续这次还未自检的独立复习';section='study-practice';}
     else if(p&&!p.history.length){score=90;reason=p.answers.some(a=>a.text.trim())?'已有作答，继续自检或动手验证':'继续已开始的阅读';section=p.readingSection||'study-essentials';}
     else if(freshAnnotation){score=70;reason='从你标注的重点继续，完成一道验证题';section='study-practice';}
     else if(saved){score=60;reason='你收藏过这份资料';}
     else if(shared){score=40;reason='延伸你近期关注的'+themes.find(t=>t[0]===shared)[1];}
     else if(source?.priority==='frontier'){score=hasSignals?20:50;reason='近期补充的方向，先理解机制与限制';}
     else{score=hasSignals?5:10;reason=hasSignals?'补充一个尚未练习的方向':'从一个具体机制开始';}
-    if(p?.history.length&&!question&&!freshAnnotation)score=-1;
+    if(p?.history.length&&!p.recall&&!question&&!freshAnnotation)score=-1;
     return {unit:u,progress:p,score,reason,section,theme:unitThemes[0]||u.topic,question};
   }).filter(r=>r.score>=0).sort((a,b)=>b.score-a.score||a.unit.id.localeCompare(b.unit.id));
   const result=[],used=new Set();

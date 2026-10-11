@@ -11,6 +11,8 @@
 - 选中正文可标注重点、写带选文的笔记或提问，记录保留返回章节链接。标注以普通笔记保存，可随 JSON、同步文档与 Obsidian 导出；正文变化时仍保留原选文。
 - 推荐从收藏、未解决疑问、标注、阅读位置和作答记录派生，并显示理由；已练习的旧标注不会不断重复推荐。这是本机规则，不推断技能等级。
 - 作者分享区纳入公众号、小红书和其他社区。收录时保留作者、原帖、未知或已知发布日期、资料性质及自己的阅读问题；重复来源追加新的思考，不覆盖既有笔记。
+- 学习单元明确显示未开始、阅读中、待自检、复习作答中和到期复习；首页与计划汇总未解疑问、待整理来源、已标注未练习和未完成的独立复习。资料收件箱可带着原链接、作者、节选和阅读问题继续整理。
+- 独立回忆先提供空白新作答，再按需要展开提示、参考思路和上次作答；刷新和备份保留本次草稿，自评后把前后答案留在日志。旧答案不能重复记为一次新复习。
 - 每日计划：新资料排入空闲日期，自评后按 1 / 2 / 3 / 7 / 14 / 30 天规则复习；记录不代表已掌握技能。
 - 六个专题与 Jev 导读提供 Colab 打开和 .ipynb 下载：5 个 CPU 笔记本，包含真实 LangGraph 1.2.14 审批恢复、故障协议、任务分组统计，以及记忆 / loss mask / Worker 版本检查。无需模型密钥；全部已在本机逐单元格执行，Colab 运行由用户启动。
 - 知识库分类、搜索、分页、收藏及 16 份要点 / 误区 / 练习 / 自检导读。
@@ -32,7 +34,7 @@ Supabase Auth、按账号隔离的同步、离线队列、版本冲突、删除�
 
 采用 Supabase Free：闲置可能暂停，本机使用、备份、再导入仍保留。OpenAI API 与联网工具另行按用量计费，与 ChatGPT 订阅不同；公开搜索与免费正文提炼不需要模型密钥。Gemini 会员可在官网使用，API 配额和计费另算，见 [Google 官方说明](https://discuss.ai.google.dev/t/google-ai-studio-pro-version-and-free-tier/169368/2)。
 
-见 [后端接入说明](docs/backend-setup.md) 和 [完整要求、设计研究与验收](docs/product-acceptance.md)。个人记录不进入 GitHub；密钥不进入静态文件或导出备份。
+见 [学习体系基座与模式](docs/product-acceptance.md#学习体系的基座与模式)、[后端接入说明](docs/backend-setup.md) 和 [完整要求、设计研究与验收](docs/product-acceptance.md)。个人记录不进入 GitHub；密钥不进入静态文件或导出备份。
 
 ## 本地开发
 
@@ -55,7 +57,7 @@ python3 -m http.server 8000 --bind 127.0.0.1
 - notebooks/：Colab 学习实验；scripts/verify-notebooks.py 默认执行四个标准库笔记本。在已安装 LangGraph 1.2.14 的 Python 3.10+ 隔离环境运行 `python scripts/verify-notebooks.py --sdk`，额外执行真实 SDK 笔记本；验证脚本不会自动安装依赖。
 - assets/product.js / product.css：专题索引、知识库与通用组件。
 - assets/workspace.js：路线、项目、日志、资料详情、搜索与路由。
-- assets/reading-annotations.js / learning-signals.js / source-records.js / source-perspectives.js：选文标注、后续学习推荐、作者资料与个人阅读记录。
+- assets/learning-cycle.js / reading-annotations.js / learning-signals.js / source-records.js / source-perspectives.js：选文标注、后续学习推荐、作者资料与个人阅读记录。
 - assets/discovery.js / updates.js：实时发现、资料收件箱与发布动态。
 - assets/platform.js / sync.js / backup.js：账号、问答、同步、JSON 与 Obsidian。
 - assets/state.js / markdown.js：旧 v1 兼容、校验、合并与安全阅读。
