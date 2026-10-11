@@ -9,3 +9,9 @@ http://suguilin.github.io/
 http://suguilin.github.io/tags/Algorithms/
 http://suguilin.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/
 http://suguilin.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/
+https://suguilin.github.io/share/
+https://suguilin.github.io/photos/
+https://suguilin.github.io/music/
+https://suguilin.github.io/movies/
+https://suguilin.github.io/comment/
+https://suguilin.github.io/about/

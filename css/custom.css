@@ -166,3 +166,40 @@ hr:before {
 ::-webkit-scrollbar-corner {
     background-color: transparent
 }
+
+/* Shared layouts for the blog's standalone pages. */
+.site-page-content .site-page-intro {
+    color: var(--font-color);
+    line-height: 1.9;
+}
+
+.site-page-content .site-empty-state {
+    padding: 2rem 1rem;
+    border: 1px dashed var(--hr-border);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.site-page-content .site-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 1rem;
+}
+
+#article-container .site-gallery figure {
+    margin: 0;
+}
+
+#article-container .site-gallery img {
+    display: block;
+    width: 100%;
+    height: 220px;
+    margin: 0;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.site-gallery figcaption {
+    padding-top: .5rem;
+    text-align: center;
+}
