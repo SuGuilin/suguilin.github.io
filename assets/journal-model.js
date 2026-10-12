@@ -73,7 +73,7 @@ export function noteDiscussion(note,unit){
   return {title:unit?.title||note.title,studyUnit:unit,journalNoteId:note.id,section:ref?.section||'study-reflection',question:question.slice(0,6000)};
 }
 export function journalScope(params){
-  for(const field of ['id','source','unit','lesson','week','project','guide']){
+  for(const field of ['id','question','source','unit','lesson','week','project','guide']){
     const value=params.get(field);if(value&&/^[a-zA-Z0-9_-]{1,100}$/.test(value))return field+':'+value;
   }
   return 'new';
