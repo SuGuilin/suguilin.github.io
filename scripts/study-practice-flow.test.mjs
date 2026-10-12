@@ -6,7 +6,7 @@ import {annotationThought,ReadingAnnotations} from '../assets/reading-annotation
 import {saveAnnotation,readAnnotation} from '../assets/learning-signals.js';
 import {StudyWorkspace} from '../assets/study.js';
 import {defaultState,validateState} from '../assets/state.js';
-import {newProgress} from '../assets/study-model.js';
+import {newProgress,recordReview,beginRecall} from '../assets/study-model.js';
 import {vaultFiles} from '../assets/backup.js';
 import {studyQuestion,questionWithContext,learningSources,saveStudySnapshot} from '../assets/study-session.js';
 import {notebookPanel} from '../assets/study-visuals.js';
@@ -15,6 +15,17 @@ import {journalTitle} from '../assets/journal-model.js';
 const {units}=JSON.parse(await readFile('content/study-units.json','utf8'));
 const unit=units.find(u=>u.id==='lesson-tool-reliability');
 const report={experiment:'durable-agent',data_scope:'synthetic in-memory simulation',results:[{protocol:'query_then_retry',crash_at:'after_remote_commit',status:'confirmed',business_commits:1,write_requests:1}],sqlite:{workers:20,business_commits:1,distinct_receipts:1,reopen_commits:1,rollback_commits:0,payload_conflict:true},my_explanation:'查询找到了已有回执，因此没有再发写请求。'};
+test('Exercise questions carry this attempt experiment notes, retain the request and keep previous recall evidence separate',()=>{
+  const progress={...newProgress(unit),answers:[{id:'e1',text:'我的当前作答'}],reflection:recoveryReportNote(JSON.stringify(report))};
+  const question=studyQuestion(unit,progress,'e1');
+  assert.match(question,/我的当前作答/);assert.match(question,/20 个并发调用/);assert.match(question,/查询找到了已有回执/);
+  const reviewed=recordReview(progress,'hard',10,new Date('2026-10-12T04:00:00Z')),recall=beginRecall(reviewed,new Date('2026-10-14T04:00:00Z'));
+  const fresh=studyQuestion(unit,recall,'e1');assert.ok(!fresh.includes('20 个并发调用'));assert.ok(!fresh.includes('我的当前作答'));assert.match(fresh,/还未作答/);
+  recall.recall.reflection='本次新实验：结果仍未知。';assert.match(studyQuestion(unit,recall,'e1'),/本次新实验/);
+  const large={...unit,title:'题'.repeat(200),exercises:[{...unit.exercises[0],prompt:'题'.repeat(2000)}]};
+  const bounded=studyQuestion(large,{...progress,answers:[{id:'e1',text:'答'.repeat(4000)}],reflection:'观察'.repeat(3000)},'e1');
+  assert.ok(bounded.length<=6000);assert.ok(bounded.endsWith('用一个追问帮助我继续思考。'));
+});
 test('Reading marks show the learner thought and discussion preserves the note and return context',()=>{
   const {note}=saveAnnotation(defaultState(),unit,{quote:'超时说明结果未知',section:'chapter-1'},{kind:'学习笔记',comment:'两个并发请求都查到未提交时，怎样阻止重复创建？',id:'thought'});
   const a=readAnnotation(note),thought=annotationThought(note);assert.match(thought,/两个并发请求/);assert.doesNotMatch(thought,/原始来源|回到标注位置/);assert.equal(annotationThought(undefined),'');
