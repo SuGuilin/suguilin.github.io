@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 import sys
+import re
 
 root = Path(__file__).resolve().parent.parent
 names = ['durable-agent.ipynb', 'paired-agent-evaluation.ipynb', 'agent-mechanism-checks.ipynb', 'decision-calibration.ipynb']
@@ -68,3 +69,26 @@ for name in names:
         finally:
             os.chdir(previous_cwd)
     print(f'{name}: all cells and output invariants passed')
+
+if '--sdk' in sys.argv:
+    # Execute the exact Python snippets shown in the reading page, including imports.
+    reading = next(r for r in json.loads((root / 'content/topic-readings.json').read_text())['readings'] if r['id'] == 'digest-langgraph')
+    snippets = re.findall(r'~~~python\n(.*?)\n~~~', reading['content'], re.S)
+    scope = {}
+    for snippet in snippets:
+        exec(compile(snippet, 'LangGraph reading snippet', 'exec'), scope)
+    assert scope['merge_evidence']({'a': 'same'}, {'a': 'same'}) == {'a': 'same'}
+    from typing import TypedDict
+    from langgraph.graph import StateGraph, START, END
+    from langgraph.checkpoint.memory import InMemorySaver
+    from langgraph.types import Command
+    class ApprovalState(TypedDict, total=False):
+        draft: str
+        draft_version: str
+        approval: dict
+        status: str
+    graph = StateGraph(ApprovalState).add_node('approve', scope['approve']).add_edge(START, 'approve').add_edge('approve', END).compile(checkpointer=InMemorySaver())
+    config = {'configurable': {'thread_id': 'snippet'}}
+    assert graph.invoke({'draft': '正文代码检查', 'draft_version': 'v1'}, config)['__interrupt__']
+    assert graph.invoke(Command(resume={'approved': True, 'draft_version': 'v1'}), config)['status'] == 'approved'
+    print('LangGraph reading snippets: imports, reducer and real interrupt/resume passed')
