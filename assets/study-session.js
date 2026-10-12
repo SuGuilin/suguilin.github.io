@@ -1,5 +1,11 @@
 // Pure helpers keep personal work recoverable across reading, notes and backups.
 import {validReadingSection,currentAttempt} from './study-model.js';
+import {defaultState,validateState} from './state.js';
+export function progressBackup(state,id){
+  const progress=state.studyProgress.find(p=>p.id===id);
+  if(!progress)throw new Error('本篇没有已保存的学习进度');
+  return validateState({...defaultState(),studyUnits:state.studyUnits.filter(u=>u.id===id),studyProgress:[progress]});
+}
 export function learningSources(unit,{lessons=[],resources=[],readings=[]}={}){
   if(!unit)return [];
   const original=lessons.find(l=>l.id===unit.id)?.sources??resources.find(r=>'digest-'+r.id===unit.id)?.digest?.sourceLinks??[unit.source];

@@ -10,7 +10,7 @@ import sys
 root = Path(__file__).resolve().parent.parent
 names = ['durable-agent.ipynb', 'paired-agent-evaluation.ipynb', 'agent-mechanism-checks.ipynb', 'decision-calibration.ipynb']
 if '--sdk' in sys.argv:
-    names.append('langgraph-interrupts.ipynb')
+    names.extend(['langgraph-interrupts.ipynb', 'langgraph-durable-workflow.ipynb'])
 for name in names:
     notebook = json.loads((root / 'notebooks' / name).read_text())
     assert notebook['nbformat'] == 4
@@ -25,10 +25,11 @@ for name in names:
                 for cell in notebook['cells']:
                     if cell['cell_type'] == 'code':
                         assert cell['outputs'] == [] and cell['execution_count'] is None
-                        if name == 'langgraph-interrupts.ipynb' and 'subprocess.check_call' in ''.join(cell['source']):
+                        if name.startswith('langgraph-') and 'subprocess.check_call' in ''.join(cell['source']):
                             # Verification uses an already installed isolated environment.
                             os.environ['LANGSMITH_TRACING'] = 'false'
                             os.environ['LANGCHAIN_TRACING_V2'] = 'false'
+                            os.environ['LANGGRAPH_STRICT_MSGPACK'] = 'true'
                             continue
                         exec(compile(''.join(cell['source']), name, 'exec'), namespace)
             if name == 'durable-agent.ipynb':
@@ -48,6 +49,14 @@ for name in names:
                 assert report['calls'] == {'before_interrupt': 4, 'after_interrupt': 2}
                 assert report['same_thread_approved'] and not report['other_thread_approved']
                 assert report['new_saver_state'] == {}
+            elif name == 'langgraph-durable-workflow.ipynb':
+                report = json.loads(Path('langgraph_report.json').read_text())
+                assert report['versions'] == {'langgraph': '1.2.14', 'langgraph-checkpoint': '4.2.0', 'langgraph-checkpoint-sqlite': '3.1.1'}
+                assert report['after_crash'] == {'next': ['save'], 'business_rows': 1, 'write_attempts': 1, 'before_interrupt': 2}
+                assert report['recovered'] == {'next': [], 'business_rows': 1, 'write_attempts': 2, 'before_interrupt': 2}
+                assert report['rejected']['business_rows'] == report['rejected']['write_attempts'] == 0
+                assert report['thread_isolated'] and report['new_memory_empty'] and report['fork_requires_new_approval']
+                assert report['reducer_keys'] == ['a', 'b']
             elif name == 'decision-calibration.ipynb':
                 report = json.loads(Path('calibration_report.json').read_text())
                 assert report['experiment'] == 'decision-calibration' and report['model_evaluated'] is False

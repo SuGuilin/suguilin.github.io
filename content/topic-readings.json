@@ -4,20 +4,40 @@
     {
       "id": "digest-langgraph",
       "title": "LangGraph：状态与恢复先于复杂编排",
-      "goal": "能说明恢复时哪些代码会再次执行，并设计一个不会重复写入的审批流程。",
-      "scope": "机制讲解与恢复实验；SDK 代码见下方配套 notebook，生产数据库部署另需验证。",
+      "goal": "能解释状态合并与恢复的边界，运行跨进程审批图，用真实输出区分重复调用和唯一业务结果。",
+      "scope": "官方状态、检查点、中断与历史机制；真实 SDK 1.2.14 / SQLite 3.1.1 的本机子进程实验已执行。固定教学材料，无模型、远端服务或生产部署验证。",
       "reviewedAt": "2026-10-12",
-      "content": "## 为什么恢复不能只靠一段对话\n\n假设 Agent 已生成一份修改方案，等待人批准。关闭进程后，新的进程必须知道方案、审批对象、下一步执行位置；重新把聊天记录发给模型，不能证明它会恢复到同一个任务。LangGraph 把可恢复工作表达为状态、节点和执行边界，checkpointer 保存图的状态。消息只是状态的一部分。\n\n本篇使用官方 persistence 与 interrupts 文档所描述的模型。线程标识 thread_id 用来定位保存的执行历史；它不是用户身份，也不是授权机制。把两个人的任务误用同一线程，可能混合状态，因此任务身份和访问控制仍由应用负责。\n\n## 沿着一次审批理解状态变化\n\n考虑本站原创的只读草稿流程：prepare 生成草稿；approve 调用 interrupt 返回审批问题；publish 在确认后写入结果。用三个状态字段 draft、approval、receipt 分开记录“建议”“批准”“已经产生的结果”。只保存 approved=True，却没记录批准哪一版草稿，会让随后修改的草稿借用旧批准。\n\n| 执行时刻 | 保存的状态 | 下一步判断 |\n| --- | --- | --- |\n| 生成 v1 草稿后 | draft=v1，approval 为空 | 等待用户查看 v1 |\n| 审批暂停 | 审批请求带草稿版本 | 恢复时核对版本 |\n| 确认后写入 | approval=v1，receipt 含结果 ID | 重跑先查 receipt |\n\ncheckpoint 提供图内的恢复依据；外部写入是否发生，需要外部系统的幂等键或结果查询。图状态和远端数据库不是自动共同提交的一笔事务。\n\n## interrupt 恢复会重跑节点\n\n官方文档明确：恢复一个 interrupt 时，节点从头重新执行，interrupt 之前的代码也会再执行。因此下面这个顺序有风险：先扣款，再 interrupt 请求批准。即使扣款放在 interrupt 前只是为了“预处理”，恢复仍可能再扣一次。\n\n一个可检验的改法是：把纯计算放在审批节点，把外部写入放在批准后的单独节点；写入带稳定业务键。即使这样，写入成功后进程崩溃、checkpoint 尚未记录结果，恢复仍会再次到达写入节点，幂等和结果核对不能省略。\n\n并发更新也要明确合并方式。两个分支各自返回 messages，如果状态 reducer 是追加，结果与覆盖不同；非交换的合并规则不能假设分支完成顺序固定。先用两个固定返回值的节点验证合并，再加入模型随机性。\n\n## 最小恢复实验怎么验收\n\n运行下方 LangGraph 恢复 notebook，先看无模型的确定性流程。记录暂停时的 thread_id、状态与待执行节点；退出并重新创建图，使用同一个持久化 checkpoint 恢复，确认拿到同一份草稿。再修改线程 ID，解释为什么不再是同一次恢复。\n\n额外加入一条计数日志到 interrupt 之前，暂停并恢复，观察它被执行两次。这个实验检验节点重跑语义，不等于支付服务可以重试。下一层实验才是把外部写入换成有幂等键的本地模拟服务，分别在写入前、写入后制造崩溃，检查业务结果始终只有一份。\n\n## 再向深处读什么\n\n如果已掌握暂停恢复，继续追踪 checkpoint 中 values、next 与 metadata 的用途，再看生产 saver 的连接与事务条件。区分“从 checkpoint 读取状态”“重放执行”“从过去状态分叉”三个问题；用同一条任务比较它们生成的结果和副作用。版本升级后先重跑恢复实验，再扩展图的复杂度。",
+      "content": "## 先把执行状态与聊天历史分开\n\n一个任务要读取材料、起草、等待批准、保存结果。进程退出后，仅把聊天历史重新发给模型，不能确定草稿是哪一版、谁批准了什么、下一步是否已经写入。LangGraph 用状态、节点和边界表达执行过程；模型只是可放入节点的一种计算。\n\n本篇配套代码使用真实 LangGraph 1.2.14、checkpoint 4.2.0、SQLite 插件 3.1.1。检索和起草使用固定教学材料，无模型调用。四节点 `retrieve → draft → approve → save` 可以真正跨进程恢复；拒绝分支直接结束。先理解确定性基线，再考虑加入检索服务或模型，否则失败来源会混在一起。\n\n状态中保存 `task_id`、证据、草稿、`draft_version`、审批与回执。草稿版本由内容摘要生成；审批引用该版本；回执代表业务写入得到的结果。三个身份不要混用：`thread_id` 定位图的执行历史，`task_id:草稿版本` 标识本次业务操作，用户身份决定访问权。线程名不是登录凭据，也不自动赋予数据库权限。\n\n## 节点返回局部更新，reducer 决定怎样合并\n\n节点通常读取状态，返回需要更新的字段，而非每次重建整份状态。例如检索只返回 `documents`，起草返回 `draft` 与版本。普通字段采用替换语义；同一 super-step 中两个并行节点写同一普通字段会触发 `InvalidUpdateError`，不能假设“最后完成者自动覆盖”。这个失败基线也在 notebook 中实际运行。\n\n假设两条并行检索分支分别返回证据 a、b。本篇按证据 ID 合并：相同 ID 和相同内容重放不重复增加；同一 ID 指向不同内容则拒绝，交由上层核对。下面是配套实验中的 reducer：\n\n~~~python\ndef merge_evidence(old, new):\n    for key in old.keys() & new.keys():\n        if old[key] != new[key]:\n            raise ValueError('同一证据 ID 的内容发生冲突')\n    return {**old, **new}\n\nclass State(TypedDict):\n    evidence: Annotated[dict[str, str], merge_evidence]\n~~~\n\n实际输出为 `{'a': '检查点', 'b': '中断'}`。直接用列表拼接也能合并，但重复更新会重复追加，交换分支顺序可能改变顺序。这里的字典合并在内容不冲突时不依赖写入顺序；展示时再按稳定键排序。reducer 解决字段合并，不解决来源可信度、模型正确性或外部副作用。\n\n## 检查点保存的是边界，不是 Python 程序栈\n\nLangGraph 按 super-step 推进：并行活动节点属于同一步，顺序节点分属不同步骤。检查点记录状态值与接下来要执行的任务，不能理解为恢复到 Python 函数内部的任意一行。\n\n暂停后在另一个进程中调用 `graph.get_state(config)`，实验读到 `values` 中已有草稿与版本，`next == ('approve',)`。`values` 回答“目前有什么”，`next` 回答“还要执行什么”；`metadata` 中的 step 和检查点配置用于追踪历史。完成后 `next == ()`，对最终检查点调用 `invoke(None, config)` 不会重新保存。\n\n`get_state_history` 读取历史，不执行节点。并行步骤中已经成功的节点还有 pending writes 机制，支持失败恢复时复用其写入；不能据此推导未确认的远端请求也只执行一次。检查点内容与业务结果需要分别观察。\n\n## interrupt 恢复为什么会重新进入节点\n\n审批节点调用 `interrupt`，把草稿和版本交给外部显示；恢复时，`Command(resume=decision)` 的值成为该调用的返回值。**节点从头重跑，interrupt 前的代码也会再次执行。** 配套代码在前面写入一个可重复的观测计数，第一次为 1，批准后为 2。\n\n~~~python\ndef approve(state):\n    record_entry()  # 实验计数，允许重复，不是业务提交\n    decision = interrupt({\n        'draft': state['draft'],\n        'draft_version': state['draft_version'],\n    })\n    validate_decision(decision, state['draft_version'])\n    return {'approval': decision}\n~~~\n\n上段是从完整实现抽出的顺序示意；`record_entry` 与 `validate_decision` 的完整逻辑在 notebook 的 worker 中。这里批准必须是明确的布尔值，不能把字符串 `'false'` 用 `bool()` 当成批准。审批还要核对版本；批准 v1 后改成 v2，旧批准应拒绝。\n\n将付费请求或写入放到 interrupt 之前会在恢复时重做。移到批准后的独立节点可缩小风险，但仍需要幂等。不要用宽泛的 `except Exception` 吞掉中断控制流；同一节点中多次 interrupt 的顺序和数量也应保持可预测。这些规则来自中断文档，配套实验重点验证单次审批重入。\n\n## 真正关闭进程，再从 SQLite 恢复\n\nnotebook 每次 `run_worker` 都启动独立 Python 进程。进程 A 生成草稿并暂停后退出；进程 B 重建图，打开同一个 `checkpoints.sqlite`，使用同一 `thread_id` 读取并继续。断言比较了两次进程 ID、草稿与待执行节点，避免把同一进程内新建对象称作“重启恢复”。\n\n对照组使用新的 `InMemorySaver`，读不到旧状态；另一个 `thread_id` 也为空。checkpointer 保存线程内执行快照；store 是应用定义的跨线程数据，例如同一用户在不同会话中共享的偏好。共享 namespace、访问授权和冲突更新由应用负责，本实验没有实现 store 或多用户授权。\n\n本例使用 `durability='sync'`，在下一步前同步保存检查点。当前文档还区分 async 与 exit：前者允许写入和后续执行重叠，后者主要在运行退出时保存。同步保存缩小图状态丢失窗口，仍不能把两个独立数据库变成共同事务。\n\nSQLite 文件适合这里的同机开发实验。Colab 的临时文件会随运行环境回收，应下载报告；它不是本网站的长期学习备份。生产数据库、连接生命周期、清理策略和多副本恢复仍需独立验证。\n\n## 保存已提交、检查点还没确认，会发生什么\n\n本篇故意使用两个库：`checkpoints.sqlite` 保存图状态，`business.sqlite` 保存结果。保存节点先提交业务事务，再通过 `os._exit(17)` 硬退出，节点还来不及返回回执。退出码与新进程的检查结果如下，均来自真实执行：\n\n| 观察时刻 | 待执行节点 | 业务结果数 | 保存调用数 | interrupt 前次数 |\n| --- | --- | --- | --- | --- |\n| 审批暂停 | approve | 0 | 0 | 1 |\n| 写后硬退出 | save | 1 | 1 | 2 |\n| 新进程恢复 | 无 | 1 | 2 | 2 |\n| 拒绝审批，另一任务 | 无 | 0 | 0 | 2 |\n\n新进程用 `invoke(None, config)` 执行尚未完成的 save。第二次调用带相同的 `task_id:草稿版本`。业务表的唯一约束和 `BEGIN IMMEDIATE` 事务让已有结果被复用；相同操作 ID 携带不同内容会被拒绝。结果数为 1，调用次数为 2：这证明的是本地幂等结果，没有证明代码只执行一次。\n\n如果每次重试随机生成一个新操作 ID，业务端会把它当成新动作；如果远端系统没有相应原子协议，本地检查点也无法弥补。远端超时的结果查询与对账可继续学习工具可靠性专题。本例不覆盖网络服务、多副本并发或硬盘掉电。\n\n## 读取历史、继续执行和分叉是三种操作\n\n`get_state(config)` 只读状态；`Command(resume=...)` 为待审批中断提供输入；失败后 `invoke(None, config)` 继续未完成节点。带旧 `checkpoint_id` 的配置重放，会重新执行该点之后的节点，可能重新调用模型、API 或再次暂停，不能把它等同于读缓存。\n\n分叉则先 `update_state` 创建新检查点，再继续。本实验在审批前的历史点修改草稿并生成新版本，用 `as_node='draft'` 指明这是起草节点的更新，因此下一步再次进入 approve。旧检查点内容仍可读取，已写入的业务结果不会被自动撤回。实际用旧版本审批新草稿时被拒绝，新版本没有业务结果。\n\n`update_state` 的更新仍按 reducer 处理。把追加列表误当覆盖，或把 `as_node` 当作真实业务执行证明，会得到错误的历史解释。没有可信调用方和授权检查时，任何审批示例都不能被当成完整安全系统。\n\n## 用预测、观察和解释完成这次学习\n\n先写下三个预测：普通字段能否接收两个并行更新；写后硬退出时业务库和图状态分别是什么；恢复后的保存调用数与结果数是否相同。运行配套代码，对照断言，再把 `langgraph_report.json` 导入本篇笔记。保留预测和自己的解释，未通过的结果也值得记录。\n\n练习 1 用两个会话解释 checkpointer 与 store；练习 2 根据真实恢复输出推导故障窗口与幂等条件；练习 3 设计证据合并规则并解释冲突。完成后自检，下次先独立回忆“为什么两次保存仍只有一份结果”，再展开旧作答比较。加入真实模型、跨线程 store、子图或远端服务时，每次只扩展一个验证范围。\n",
       "sources": [
         {
-          "title": "LangGraph persistence",
-          "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
-          "supports": "状态快照、线程与 checkpointer 的职责"
+          "title": "Graph API",
+          "url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "supports": "状态、局部更新、reducer 与 super-step"
         },
         {
-          "title": "LangGraph interrupts",
+          "title": "Checkpointers",
+          "url": "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "supports": "values/next、历史、pending writes 与 durability 模式"
+        },
+        {
+          "title": "Interrupts",
           "url": "https://docs.langchain.com/oss/python/langgraph/interrupts",
-          "supports": "暂停恢复以及节点从头重跑的语义"
+          "supports": "节点重入、恢复输入与副作用边界"
+        },
+        {
+          "title": "Persistence",
+          "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "supports": "内存与持久化 saver 的范围"
+        },
+        {
+          "title": "Stores",
+          "url": "https://docs.langchain.com/oss/python/langgraph/stores",
+          "supports": "应用定义的跨线程数据与 namespace"
+        },
+        {
+          "title": "Use time-travel",
+          "url": "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "supports": "历史读取、重放与 update_state 分叉"
         }
       ]
     },

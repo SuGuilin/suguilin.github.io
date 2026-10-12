@@ -101,6 +101,10 @@
 .nav-exploration{margin:20px 0 0}.nav-exploration>summary{padding:8px 12px;color:var(--muted);font-size:13px;line-height:1.6;cursor:pointer}.nav-exploration>summary:hover{color:var(--ink)}.nav-exploration .secondary-nav{margin:8px 0 0}.nav-settings{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
 .sidebar-close{display:none}
 .plan-detail-row{scroll-margin-top:90px}
+.plan-record-actions{position:relative;flex:0 0 auto;font-size:12px;color:var(--muted)}
+.plan-record-actions summary{cursor:pointer;min-height:32px;display:flex;align-items:center;justify-content:flex-end}
+.plan-record-actions button{position:absolute;right:0;top:32px;white-space:nowrap;z-index:3;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px #0000000d}
+@media(max-width:700px){.plan-record-actions{margin-top:4px}}
 .profile>span:nth-child(2){min-width:0;flex:1}.profile small{max-width:none;text-wrap:pretty}.profile .avatar,.profile>[data-icon]{flex-shrink:0}
 @media(max-width:800px){.sidebar:not(.open){visibility:hidden}.sidebar-close{display:grid;position:absolute;top:22px;right:12px}.sidebar .brand{padding-right:32px}.navigation-open{overflow:hidden}}
 #main[data-route="plan"] .desk-header{align-items:center}#main[data-route="plan"] .daily-budget{min-width:150px;padding-top:0;font-size:var(--type-caption)}.daily-budget select{font-size:var(--type-control)}

@@ -11,6 +11,7 @@ export const mechanismDiagrams={
 };
 export function questionTitle(unit){return mechanismDiagrams[unit.id]?.title||unit.title;}
 export const learningNotebooks={
+ 'digest-langgraph':[['langgraph-durable-workflow.ipynb','状态合并、跨进程恢复与审批边界','真实 SDK + SQLite · 25–35 分钟']],
  'digest-jev':[['decision-calibration.ipynb','概率、错误与回退阈值','合成数据 · 15 分钟']],
  'lesson-harness':[['langgraph-interrupts.ipynb','LangGraph 审批暂停与恢复','真实 SDK · 15 分钟'],['durable-agent.ipynb','检查点与远端副作用','内存模拟 + SQLite · 25 分钟']],
  'lesson-tool-reliability':[['durable-agent.ipynb','超时、幂等与查询恢复','内存模拟 + SQLite · 25 分钟']],
