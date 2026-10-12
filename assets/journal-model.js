@@ -19,16 +19,25 @@ export function journalTitle(note){
   return /^## 待解答的问题\n/.test(note.body)&&/ · 待解答问题$/.test(note.title)&&['待解答问题','已解决问题'].includes(note.kind)
     ? note.title.replace(/ · 待解答问题$/,'')||note.title : note.title;
 }
+function foldUnitFooter(note,parts){
+  const generated=['学习笔记','学习复盘'].includes(note.kind)&&note.title.endsWith(' · '+note.kind)
+    || ['待解答问题','已解决问题'].includes(note.kind)&&note.title.endsWith(' · 待解答问题')&&note.body.startsWith('## 待解答的问题\n');
+  if(!generated)return parts;
+  const matches=[...parts.body.matchAll(/\n\n\[回到学习单元\]\(\/study\/\?id=[a-zA-Z0-9_-]{1,100}(?:&mode=recall)?(?:#[a-zA-Z0-9_-]+)?\)\n\n原始来源：\[[^\]\n]+\]\(https?:\/\/[^\s\n)]+\)(?=\n\n|$)/g)];
+  if(matches.length!==1)return parts;
+  const footer=matches[0];
+  return {...parts,body:parts.body.slice(0,footer.index)+parts.body.slice(footer.index+footer[0].length),context:[parts.context,footer[0].trim()].filter(Boolean).join('\n\n')};
+}
 export function journalNoteParts(note){
   if(!readAnnotation(note)){
     const parts=questionNoteParts(note);
     if(note.kind==='学习复盘'&&/ · 学习复盘$/.test(note.title)){
       const marker='\n\n## 上次作答（供事后比较）\n\n',start=note.body.indexOf(marker),end=note.body.lastIndexOf('\n\n[回到学习单元](/study/?id=');
       if(start>=0&&end>start&&note.body.indexOf(marker,start+marker.length)===-1&&/^\n\n\[回到学习单元\]\(\/study\/\?id=[a-zA-Z0-9_-]+(?:#[a-zA-Z0-9_-]+)?\)\n\n原始来源：\[[^\n]+\]\(https?:\/\/[^\n]+\)/.test(note.body.slice(end))){
-        return {...parts,body:note.body.slice(0,start)+note.body.slice(end),comparison:note.body.slice(start+marker.length,end)};
+        return foldUnitFooter(note,{...parts,body:note.body.slice(0,start)+note.body.slice(end),comparison:note.body.slice(start+marker.length,end)});
       }
     }
-    return parts;
+    return foldUnitFooter(note,parts);
   }
   const footer=note.body.match(/\n\n\[回到标注位置\]\(\/study\/\?id=[a-zA-Z0-9_-]+#[a-zA-Z0-9_-]+\)\n\n原始来源：[^\n]+\n阅读范围：[^\n]+(?=\n\n|$)/);
   return footer?{body:note.body.slice(0,footer.index)+note.body.slice(footer.index+footer[0].length),context:footer[0].trim(),question:''}:{body:note.body,context:'',question:''};
@@ -47,6 +56,7 @@ export function journalPreview(note){
 export function journalReadingBody(note){
   const parts=journalNoteParts(note);
   let body=parts.body;
+  if(readAnnotation(note))body=body.replace(/(?:^|\n)## 我的(?:思考|疑问)\n(?:[ \t]*\n)*(?=## |\s*$)/g,'\n');
   if(['待解答问题','已解决问题'].includes(note.kind))body=body.replace(/^## 待解答的问题\n/,'## 问题\n');
   if(body.startsWith('# '+note.title+'\n'))body=body.slice(note.title.length+3).trimStart();
   if(note.kind==='资料收件箱')body=body.replace(/^## [^\n]+\n+(?=## |$)/gm,'');
@@ -58,8 +68,8 @@ export function noteLearningLink(note){
   return {id:match[2],url:match[1],section:validReadingSection(match[3])?match[3]:'study-reflection'};
 }
 export function noteDiscussion(note,unit){
-  const q=questionNoteParts(note),ref=noteLearningLink(note),question=['待解答问题','已解决问题'].includes(note.kind)
-    ? q.question : '这是我保存的'+note.kind+'：\n\n'+q.body+'\n\n请帮助我检查理解的假设与边界，先提出一个需要澄清的问题。';
+  const q=journalNoteParts(note),ref=noteLearningLink(note),question=['待解答问题','已解决问题'].includes(note.kind)
+    ? q.body.replace(/^## 待解答的问题\n+/, '').trim() : '这是我保存的'+note.kind+'：\n\n'+q.body+(q.comparison?'\n\n## 上次作答（供比较）\n\n'+q.comparison:'')+'\n\n请帮助我检查理解的假设与边界，先提出一个需要澄清的问题。';
   return {title:unit?.title||note.title,studyUnit:unit,journalNoteId:note.id,section:ref?.section||'study-reflection',question:question.slice(0,6000)};
 }
 export function journalScope(params){

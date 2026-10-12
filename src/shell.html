@@ -23,6 +23,7 @@
         <img src="/assets/mark.svg" width="36" height="36" alt="">
         <span>SuGuilin<small>Agent 学习工作台</small></span>
       </a>
+      <button class="icon-button sidebar-close" id="sidebar-close" aria-label="关闭导航"><span data-icon="close"></span></button>
       <div class="sidebar-navigation">
       <nav class="primary-nav" aria-label="主要页面">
         <span class="nav-caption">学习与记录</span>
@@ -48,7 +49,7 @@
         <a class="profile" id="account-entry" href="/account/" data-nav><span class="avatar">SG</span><span>SuGuilin<small><span data-sync-label>本机保存</span></small></span><span data-icon="chevron"></span></a>
       </div>
     </aside>
-    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="关闭导航" hidden></button>
+    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="关闭导航" aria-hidden="true" tabindex="-1" hidden></button>
     <div class="main-shell">
       <header class="topbar">
         <div class="topbar-start"><button class="icon-button mobile-menu" id="mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><span data-icon="menu"></span></button><span class="breadcrumb">工作台 <span>/</span> <strong id="breadcrumb-title">{{title}}</strong></span></div>
