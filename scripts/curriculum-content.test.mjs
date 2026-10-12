@@ -42,4 +42,5 @@ test('Mechanism reports preserve failure, explanation and provenance across lear
     const forged=structuredClone(report);forged.checks[Object.keys(spec)[0]]='true';assert.throws(()=>appendPracticeReport('',JSON.stringify(forged),experiment));
   }
   assert.throws(()=>appendPracticeReport('',JSON.stringify({experiment:'langgraph-control-flow',model_called:true,version:'1.2.14',checks:mechanismChecks['langgraph-control-flow']}),'langgraph-control-flow'));
+  for(const id of ['constructor','__proto__'])assert.throws(()=>appendPracticeReport('',JSON.stringify({experiment:id,scope:'stdlib fixtures; no model/service',checks:{}}),id));
 });

@@ -24,7 +24,7 @@
       "digest": {
         "resourceId": "jev",
         "title": "Jev：把语义判断与生成、计算分开",
-        "oneSentence": "Choice、Score、Noul 的语义与 confidence 定义不同，输出集中不等于真实校准；缺类别和任务分布会改变判断，数字/日期/权限应由明确代码处理。",
+        "oneSentence": "掌握类型化判断、confidence 换算、校准和回退代价，测类别缺失、风险与版本漂移。",
         "prerequisites": [
           "Python",
           "概率与基本评测"
@@ -246,7 +246,7 @@
       "digest": {
         "resourceId": "langgraph",
         "title": "LangGraph：状态图、工具循环与可靠编排",
-        "oneSentence": "状态、消息 reducer 与业务身份分别建模；TypedDict 是类型约定，业务约束仍要运行时校验；条件边、Command、Send 与子图有不同调度语义；静态边不会被 Command 自动取消。",
+        "oneSentence": "掌握状态、路由、工具、并行、子图、流式与恢复；分三次完成控制流和跨进程实验。",
         "prerequisites": [
           "Python 类型标注与函数",
           "SQLite 事务基础",
@@ -370,7 +370,7 @@
       "digest": {
         "resourceId": "deep-agents",
         "title": "Deep Agents：Harness 的组件与边界",
-        "oneSentence": "Backend 决定虚拟文件的生命周期与存储范围，检查点和磁盘不是同一种持久化；任务列表、Skills、文件卸载和子代理各自解决不同问题；按需启用并独立验收产物。",
+        "oneSentence": "理解 Backend 生命周期、规划与 Skills、上下文卸载和委派合同，检查材料与权限边界。",
         "prerequisites": [
           "工具 Agent",
           "LangGraph 基本状态管理"
@@ -515,7 +515,7 @@
       "digest": {
         "resourceId": "mcp",
         "title": "MCP：统一连接接口与明确工具契约",
-        "oneSentence": "Host、Client、Server 与 tools/resources/prompts 的职责不同，连接成功不等于动作授权；2026-07-28 使用无状态请求、逐请求元数据与 server/discover；不能套用旧版初始化顺序。",
+        "oneSentence": "掌握协议角色、当前请求与发现、工具契约、传输、OAuth 和错误处理，分别验收兼容与授权。",
         "prerequisites": [
           "JSON Schema",
           "HTTP/RPC",
@@ -928,7 +928,7 @@
       "digest": {
         "resourceId": "paper-react",
         "title": "ReAct：通过环境反馈更新行动",
-        "oneSentence": "ReAct 在观察后调整行动，语言记录和工具执行对环境的作用不同；外层确定性约束与内层有限行动循环可组合，适用性取决于任务是否需要动态决策。",
+        "oneSentence": "掌握基于观察的有限行动循环，诊断无信息重复、错误工具和终止，再用同预算对照验证。",
         "prerequisites": [
           "LLM prompting",
           "工具执行循环"
@@ -1043,7 +1043,7 @@
       "digest": {
         "resourceId": "paper-dspy",
         "title": "DSPy：把提示优化变成程序与指标",
-        "oneSentence": "Signature 描述任务语义，Module 组织程序，metric 定义优化目标，类型不保证事实正确；BootstrapFewShot、MIPROv2 与 GEPA 的可调对象和候选产生方式不同。",
+        "oneSentence": "理解 Signature、Module、metric 与不同优化器，识别评分漏洞、数据泄漏和优化成本。",
         "prerequisites": [
           "Python 模块化",
           "训练/验证划分",
@@ -1152,7 +1152,7 @@
       "digest": {
         "resourceId": "eval-gaia",
         "title": "GAIA：检验跨工具的答案与证据链",
-        "oneSentence": "GAIA 的工具、多模态和推理需求需按题目拆开，不能从总分归因单项能力；附件记录 hash 与页码/字段/时间段，OCR 和视觉信息不是等价输入。",
+        "oneSentence": "拆解工具与多模态附件任务，建立证据依赖、字段计算和 grader，区分能力错误与环境错误。",
         "prerequisites": [
           "工具 Agent",
           "资料浏览与解析",
@@ -1225,7 +1225,7 @@
       "digest": {
         "resourceId": "eval-tau-family",
         "title": "τ-bench 系列：规则、状态与重复运行可靠性",
-        "oneSentence": "终态、领域规则和对话质量分层验收，合法轨迹不必逐字匹配参考动作；动态用户与 dual-control 环境会改变状态，需要澄清与版本核对。",
+        "oneSentence": "掌握终态、规则、动态用户与重复可靠性，手算 pass@k 和 pass^k 并核对 benchmark 版本。",
         "prerequisites": [
           "工具调用",
           "状态转换",
@@ -1351,7 +1351,7 @@
       "digest": {
         "resourceId": "eval-terminalbench",
         "title": "Terminal-Bench：用环境产物评估 Agent 工作",
-        "oneSentence": "instruction、环境和 verifier 分别定义任务、起点与成功，参考解不能泄漏；每个 trial 从隔离初始环境运行，失败题与环境故障均需保留。",
+        "oneSentence": "理解任务环境、隔离与可信 verifier，用实际程序和产物验收，识别评分器被修改的风险。",
         "prerequisites": [
           "Linux/容器基础",
           "代码 Agent",
@@ -1978,7 +1978,7 @@
       "digest": {
         "resourceId": "mem0",
         "title": "Mem0：从存储偏好到有证据的记忆",
-        "oneSentence": "记忆是抽取、验证、写入、索引、检索与使用的数据管线，不是把摘要存起来；有效时间、主体和原始证据决定当前可用性，相似度不能解决矛盾。",
+        "oneSentence": "掌握抽取、添加、冲突、检索和删除链路，核对时间、用户隔离与不同产品的可见性。",
         "prerequisites": [
           "向量/关键词检索",
           "多会话应用",
@@ -2208,7 +2208,7 @@
       "digest": {
         "resourceId": "verl",
         "title": "verl：从算法目标到训练与 Rollout 数据流",
-        "oneSentence": "采样、当前与参考策略作用不同，策略比率分母是采样策略；GRPO 的组内相对优势、归一化、KL 与 token/sequence 聚合共同决定训练目标。",
+        "oneSentence": "掌握 PPO/GRPO 目标、batch 与 rollout 数据流，核对 mask、logprob、归一化、并行和显存。",
         "prerequisites": [
           "PyTorch",
           "PPO/GRPO",
@@ -2308,7 +2308,7 @@
       "digest": {
         "resourceId": "agent-lightning",
         "title": "Agent Lightning：在真实 Harness 中采集训练轨迹",
-        "oneSentence": "训练解耦仍需 rollout、请求、token、logprob、reward 与策略版本的严格关联；重新分词、streaming 丢片段和重试重复会破坏训练样本，不是仅加一个代理地址。",
+        "oneSentence": "追踪 v1.0 的 Gateway、Controller 与 Trainer，核对请求、token、奖励和异步策略身份。",
         "prerequisites": [
           "PPO/GRPO",
           "rollout 数据",
@@ -2395,7 +2395,7 @@
       "digest": {
         "resourceId": "paper-ragen",
         "title": "RAGEN：多轮 Agent RL 的轨迹与训练崩塌",
-        "oneSentence": "多轮轨迹的终止奖励存在信用分配问题，critic 与交互粒度有各自误差和成本；高奖励变异筛选改变训练分布，低方差不能一律判为无用任务。",
+        "oneSentence": "理解多轮信用分配、变异筛选与稳定化，区分环境故障、训练分布变化和策略改善。",
         "prerequisites": [
           "策略梯度",
           "多轮环境",
@@ -2465,7 +2465,7 @@
       "digest": {
         "resourceId": "search-r1",
         "title": "Search-R1：把检索交互纳入策略优化",
-        "oneSentence": "检索服务与搜索策略分层诊断，用人工 query/证据进行可干预对照；查询、控制标记与答案是动作，工具正文是观察；action 与 attention mask 不同。",
+        "oneSentence": "区分检索器、交互策略和训练，用动作 mask、人工证据干预和固定语料定位失败。",
         "prerequisites": [
           "RAG",
           "PPO/GRPO",
@@ -2537,7 +2537,7 @@
       "digest": {
         "resourceId": "paper-deepseek-r1",
         "title": "DeepSeek-R1：区分 RL 推理、冷启动与蒸馏",
-        "oneSentence": "R1-Zero、R1 多阶段训练与蒸馏学生有不同初始化、数据与优化信号；正确性、格式与偏好目标不能互相替代，奖励与样本筛选也会被利用。",
+        "oneSentence": "区分 Zero、R1 多阶段和蒸馏路径，核对奖励、采样、量化及推理预算，判断成绩可比性。",
         "prerequisites": [
           "SFT",
           "策略优化与奖励",
@@ -2812,7 +2812,7 @@
       "digest": {
         "resourceId": "hello-agents",
         "title": "HelloAgents：用课程骨架建立个人实验路线",
-        "oneSentence": "课程按基础、执行和深化的能力依赖阅读，先补根因相关机制；源码追踪关注数据形状、状态增量、异常和终止，框架默认行为须核对。",
+        "oneSentence": "按能力依赖选读课程，沿一次工具调用追踪源码，用成功与失败实验补齐机制。",
         "prerequisites": [
           "Python",
           "LLM API 基本概念"
@@ -6481,6 +6481,37 @@
         "q9",
         "q17",
         "q19"
+      ]
+    },
+    {
+      "id": "byte-agent-aug26-compilation",
+      "title": "Agent 开发：上下文、检索与协作追问",
+      "company": "字节跳动（汇编作者标注）",
+      "author": "林小白zii",
+      "dateText": "页面 08-28 01:17；所读相关段落自述 2026 年 8 月多场面试",
+      "url": "https://www.nowcoder.com/discuss/922659050167226368",
+      "platform": "牛客",
+      "evidence": "公开面经汇编 / 考点发现线索",
+      "verifiedAt": "2026-10-13",
+      "verification": "已读公开正文相关段落；内容为作者整理，未确认每场面试的来源、真实性或企业归属。作为练习线索，不作为技术结论或企业认证真题。",
+      "topics": [
+        "Context",
+        "RAG",
+        "Harness",
+        "Multi-Agent"
+      ],
+      "questions": [
+        "区分上下文压缩与跨任务记忆，说明信息和版本保留方式。",
+        "从资料解析到检索、重排和生成，诊断证据缺失。",
+        "处理并行子任务的共享文件与结果冲突。"
+      ],
+      "practice": "本站原创：用固定材料与预算分别测压缩丢条件、检索缺候选和并行冲突；参考答案在对应专题，结果进入个人日志。",
+      "questionRefs": [
+        "q4",
+        "q5",
+        "q7",
+        "q8",
+        "q25"
       ]
     }
   ],

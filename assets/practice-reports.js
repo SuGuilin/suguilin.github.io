@@ -46,7 +46,7 @@ export const notebookReports={
   'decision-calibration.ipynb':{experiment:'decision-calibration',filename:'calibration_report.json'}
 };
 export function appendPracticeReport(reflection,text,expectedExperiment='durable-agent'){
-  const note=mechanismChecks[expectedExperiment]?mechanismReportNote(text,expectedExperiment):expectedExperiment==='langgraph-durable-workflow'?langgraphReportNote(text):expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
+  const note=Object.hasOwn(mechanismChecks,expectedExperiment)?mechanismReportNote(text,expectedExperiment):expectedExperiment==='langgraph-durable-workflow'?langgraphReportNote(text):expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
   if(!note)throw new Error('本篇暂不支持此实验记录');
   if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
 }
@@ -63,7 +63,7 @@ export const mechanismChecks={
 export function mechanismReportNote(text,expected){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的实验 JSON');
   let r;try{r=JSON.parse(text);}catch{throw new Error('实验记录不是有效 JSON');}
-  const spec=mechanismChecks[expected],sdk=expected==='langgraph-control-flow';
+  const spec=Object.hasOwn(mechanismChecks,expected)?mechanismChecks[expected]:null,sdk=expected==='langgraph-control-flow';
   if(!spec||r?.experiment!==expected)throw new Error('实验类型不匹配');
   if(sdk){if(r.model_called!==false||typeof r.version!=='string'||!/^\d+\.\d+\.\d+$/.test(r.version))throw new Error('SDK 版本或运行范围不匹配');}
   else if(r.scope!=='stdlib fixtures; no model/service')throw new Error('实验运行范围不匹配');
