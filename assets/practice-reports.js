@@ -38,11 +38,25 @@ export function calibrationReportNote(text){
   return body;
 }
 export const notebookReports={
+  'langgraph-durable-workflow.ipynb':{experiment:'langgraph-durable-workflow',filename:'langgraph_report.json'},
   'durable-agent.ipynb':{experiment:'durable-agent',filename:'recovery_report.json'},
   'decision-calibration.ipynb':{experiment:'decision-calibration',filename:'calibration_report.json'}
 };
 export function appendPracticeReport(reflection,text,expectedExperiment='durable-agent'){
-  const note=expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
+  const note=expectedExperiment==='langgraph-durable-workflow'?langgraphReportNote(text):expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
   if(!note)throw new Error('本篇暂不支持此实验记录');
   if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
+}
+export function langgraphReportNote(text){
+  if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的 langgraph_report.json');
+  let r;try{r=JSON.parse(text);}catch{throw new Error('实验记录不是有效 JSON');}
+  if(r?.experiment!=='langgraph-durable-workflow'||r.data_scope!=='local SDK + SQLite subprocess experiment'||r.model_called!==false)throw new Error('这不是本篇支持的 LangGraph 实验记录');
+  const versions=r.versions;if(!versions||!['langgraph','langgraph-checkpoint','langgraph-checkpoint-sqlite'].every(k=>typeof versions[k]==='string'&&/^\d+\.\d+\.\d+(?:[a-z0-9.+-]*)?$/i.test(versions[k])&&versions[k].length<40))throw new Error('SDK 版本记录不完整');
+  const next=n=>Array.isArray(n)&&n.length<=4&&n.every(v=>['retrieve','draft','approve','save'].includes(v))&&new Set(n).size===n.length;
+  if(!next(r.paused?.next)||!count(r.paused.before_interrupt)||![r.after_crash,r.recovered,r.rejected].every(s=>s&&[s.business_rows,s.write_attempts,s.before_interrupt].every(count)&&s.business_rows<=s.write_attempts)||![r.after_crash,r.recovered].every(s=>next(s.next))||!['thread_isolated','new_memory_empty','fork_requires_new_approval'].every(k=>typeof r[k]==='boolean')||!Array.isArray(r.reducer_keys)||r.reducer_keys.length>10||r.reducer_keys.some(k=>typeof k!=='string'||!/^[a-z0-9_-]{1,30}$/i.test(k))||new Set(r.reducer_keys).size!==r.reducer_keys.length)throw new Error('LangGraph 实验的状态、计数或边界记录无效');
+  if(r.my_explanation!==undefined&&typeof r.my_explanation!=='string')throw new Error('实验解释须为文本');
+  const status=values=>values.length?values.join('、'):'无待执行节点',check=value=>value?'通过':'未通过';
+  let body=`## 代码实践 · LangGraph 恢复\n\n范围：真实 SDK、本地 SQLite 与独立子进程；固定教学材料，无模型调用。不是远端服务或多副本恢复证明。\n\n版本：LangGraph ${versions.langgraph}；checkpoint ${versions['langgraph-checkpoint']}；SQLite 插件 ${versions['langgraph-checkpoint-sqlite']}。\n\n| 观察时刻 | 待执行节点 | 业务结果数 | 保存调用数 | interrupt 前执行次数 |\n| --- | --- | --- | --- | --- |\n| 审批暂停 | ${status(r.paused.next)} | — | — | ${r.paused.before_interrupt} |\n| 写后硬退出 | ${status(r.after_crash.next)} | ${r.after_crash.business_rows} | ${r.after_crash.write_attempts} | ${r.after_crash.before_interrupt} |\n| 新进程恢复 | ${status(r.recovered.next)} | ${r.recovered.business_rows} | ${r.recovered.write_attempts} | ${r.recovered.before_interrupt} |\n| 拒绝审批 | — | ${r.rejected.business_rows} | ${r.rejected.write_attempts} | ${r.rejected.before_interrupt} |\n\n线程隔离：${check(r.thread_isolated)}；新内存 saver 为空：${check(r.new_memory_empty)}；新草稿拒绝旧审批：${check(r.fork_requires_new_approval)}。\n合并后的证据 ID：${r.reducer_keys.join('、')||'无'}。\n\n导入校验格式与计数关系，不认证文件的运行来源；未通过结果会如实保留。`;
+  if(r.my_explanation?.trim())body+='\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500);
+  return body;
 }

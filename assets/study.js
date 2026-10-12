@@ -2,7 +2,7 @@ import {questionTitle,mechanismFigure,lessonChapters,bindMechanismExplorers,note
 import {escapeHTML as esc} from './state.js';
 import {renderMarkdown} from './markdown.js';
 import {validateUnit,dayKey,shiftDay,validDay,validReadingSection,newProgress,scheduleUnit,recordReview,beginRecall,currentAttempt,unitMarkdown,scheduledDay,rescheduleProgress} from './study-model.js';
-import {learningSources,studyQuestion,saveStudySnapshot} from './study-session.js';
+import {learningSources,studyQuestion,saveStudySnapshot,progressBackup} from './study-session.js';
 import {readSource,pastedSource,extractiveUnit,sourceUnitId} from './source-reader.js';
 import {journalTitle} from './journal-model.js';
 import {learningRecommendations} from './learning-signals.js';
@@ -103,7 +103,7 @@ export class StudyWorkspace{
     return `<header class="desk-header"><div><h1>每日计划</h1><p>${new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'})}</p></div>${this.budget()}</header>
       <section class="plan-today" aria-label="今天的学习安排"><div class="section-heading"><h2>${minutes>=s.dailyMinutes?'今天已达到时间预算':'今天'}</h2>${minutes?'<span>已记录 '+minutes+' 分钟</span>':''}</div>${queue.map(q=>{const action=learningAction(q.unit,q.progress,{review:q.review});return `<div class="plan-today-row"><div><span class="topic-label">${q.recommended?'推荐内容':action.stage.label} · ${q.minutes} 分钟</span><h3>${esc(questionTitle(q.unit))}</h3><p>${esc(summaryText(q.unit))}</p></div>${link(action.url,action.label+' →','button button-dark button-small')}</div>`;}).join('')}</section>
       ${this.needsPanel({excludeKeys:queue.map(q=>q.unit.id)})}
-      ${records.length?`<details class="plan-details plan-schedule" id="learning-queue"><summary>全部安排与改期 <span>${records.length} 项</span></summary>${records.map(p=>{const unit=this.unit(p.id),action=unit?learningAction(unit,p,{review:!!p.history.length}):null;return `<div class="plan-detail-row" id="schedule-${esc(p.id)}">${link(action?.url||'/journal/?q='+encodeURIComponent(p.title),`<strong>${esc(p.title)}</strong><small>${unit?learningStage(p).label:'原单元暂不可用 · 回看日志'}</small>`)}<label for="plan-date-${p.id}">${p.history.length?'下次复习':'学习日期'}<input id="plan-date-${p.id}" aria-label="${esc(p.title)} · ${p.history.length?'下次复习':'学习日期'}" type="date" data-study-date="${p.id}" value="${scheduledDay(p)}"></label></div>`;}).join('')}</details>`:''}
+      ${records.length?`<details class="plan-details plan-schedule" id="learning-queue"><summary>全部安排与改期 <span>${records.length} 项</span></summary>${records.map(p=>{const unit=this.unit(p.id),action=unit?learningAction(unit,p,{review:!!p.history.length}):null;return `<div class="plan-detail-row" id="schedule-${esc(p.id)}">${link(action?.url||'/journal/?q='+encodeURIComponent(p.title),`<strong>${esc(p.title)}</strong><small>${unit?learningStage(p).label:'原单元暂不可用 · 回看日志'}</small>`)}<label for="plan-date-${p.id}">${p.history.length?'下次复习':'学习日期'}<input id="plan-date-${p.id}" aria-label="${esc(p.title)} · ${p.history.length?'下次复习':'学习日期'}" type="date" data-study-date="${p.id}" value="${scheduledDay(p)}"></label><details class="plan-record-actions"><summary aria-label="管理 ${esc(p.title)} 的安排">管理</summary><button class="text-link" data-study="export-remove" data-id="${esc(p.id)}" title="先下载本篇作答、复习和计划 JSON，再移出；日志与收藏保留，可在账号与备份中导入恢复">导出并移出安排</button></details></div>`;}).join('')}</details>`:''}
       <nav class="plan-browse" aria-label="选择学习内容">${link('/study/','选择其他学习内容 ↗')}${link('/library/','查找资料 ↗')}${link('/journal/','回看学习日志 ↗')}</nav>
       <details class="plan-method"><summary>复习日期如何安排？</summary><p>“还需重学”安排明天，“基本理解”安排 2 天后；“能独立解释”逐次安排 3、7、14、30 天后。可在“全部安排与改期”中调整。</p></details>`;
   }
@@ -116,6 +116,15 @@ export class StudyWorkspace{
     case 'bookmark':if(unit){const key=this.bookmarkKey(unit),s=this.getState(),saved=s.saved.includes(key);this.setState({...s,saved:saved?s.saved.filter(id=>id!==key):[...s.saved,key]});const ok=this.persist();this.updateCounts?.();b.textContent=saved?'收藏本篇':'已收藏本篇';b.setAttribute('aria-pressed',String(!saved));this.notify(ok?(saved?'已取消收藏':'已收藏，可在收藏夹继续学习'):'本机保存失败，请导出备份');}return;
     case 'focus':this.focus=!this.focus;try{localStorage.setItem('suguilin.readerFocus',String(this.focus));}catch{}this.applyReader(this.captureReader());b.textContent=this.focus?'退出专注':'专注阅读';b.setAttribute('aria-pressed',String(this.focus));return;
     case 'plan':if(!unit)return;if(this.getState().studyProgress.some(p=>p.id===unit.id)){this.navigate('/plan/#schedule-'+unit.id);return;}this.setState(scheduleUnit(this.getState(),unit));this.persist();b.textContent='查看我的安排';this.notify('已加入学习计划');return;
+    case 'export-remove':{
+      const previous=this.getState(),backup=progressBackup(previous,b.dataset.id);
+      this.platform.download('SuGuilin-progress-'+b.dataset.id+'.json',backup);
+      this.setState({...previous,studyProgress:previous.studyProgress.filter(p=>p.id!==b.dataset.id)});
+      if(!this.persist()){this.setState(previous);this.render();this.notify('本机保存失败，原进度仍保留');return;}
+      this.render();const queue=document.querySelector('.plan-schedule');if(queue)queue.open=true;
+      (queue?.querySelector('summary')||document.querySelector('#main'))?.focus({preventScroll:true});
+      this.notify('本篇进度已导出并移出安排；日志与收藏保留，可导入 JSON 恢复');return;
+    }
     case 'prerequisite':if(unit){const prerequisite=unit.prerequisites[Number(b.dataset.prerequisite)];if(prerequisite)this.platform.openAssistant({title:unit.title,studyUnit:unit,selectionKey:'prerequisite:'+prerequisite,section:'study-essentials',question:`我在学习「${unit.title}」，卡在前置知识「${prerequisite}」。\n\n请先用一个最小例子解释它与本篇机制的关系，问我一个诊断问题，再根据我的回答补充缺失概念；不要直接展开完整课程。`});}return;
     case 'ask':if(unit){const exerciseId=b.dataset.exercise||'',section=this.readingSection();this.platform.openAssistant({lessonId:this.getLessons().some(l=>l.id===unit.id)?unit.id:'',title:unit.title,studyUnit:unit,exerciseId,section:exerciseId?'exercise-'+exerciseId:section?.id,question:studyQuestion(unit,this.progress(unit),exerciseId,section?.querySelector('h2')?.textContent||'')});}return;
     case 'copy':if(unit){await navigator.clipboard.writeText(unitMarkdown(unit)+'\n\n请以提问帮助我理解，先让我独立回答，再反馈误区；不要假装已经复现实验。');this.notify('已复制学习任务，可粘贴到 Gemini 或 ChatGPT');}return;
