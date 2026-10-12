@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-content-version="dfc8e33e0ed8" lang="zh-CN">
+<html data-content-version="259176e522d5" lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,12 +8,12 @@
   <title>学习助手 · SuGuilin</title>
   <link rel="canonical" href="https://suguilin.github.io/assistant/">
   <link rel="icon" type="image/svg+xml" href="/assets/mark.svg">
-  <link rel="stylesheet" href="/assets/workspace.css?v=dfc8e33e0ed8">
-  <link rel="stylesheet" href="/assets/product.css?v=dfc8e33e0ed8">
-  <link rel="stylesheet" href="/assets/experience.css?v=dfc8e33e0ed8">
-  <link rel="stylesheet" href="/assets/workflow.css?v=dfc8e33e0ed8">
-  <link rel="stylesheet" href="/assets/reader.css?v=dfc8e33e0ed8">
-  <script type="module" src="/assets/app.js?v=dfc8e33e0ed8"></script>
+  <link rel="stylesheet" href="/assets/workspace.css?v=259176e522d5">
+  <link rel="stylesheet" href="/assets/product.css?v=259176e522d5">
+  <link rel="stylesheet" href="/assets/experience.css?v=259176e522d5">
+  <link rel="stylesheet" href="/assets/workflow.css?v=259176e522d5">
+  <link rel="stylesheet" href="/assets/reader.css?v=259176e522d5">
+  <script type="module" src="/assets/app.js?v=259176e522d5"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -23,6 +23,7 @@
         <img src="/assets/mark.svg" width="36" height="36" alt="">
         <span>SuGuilin<small>Agent 学习工作台</small></span>
       </a>
+      <button class="icon-button sidebar-close" id="sidebar-close" aria-label="关闭导航"><span data-icon="close"></span></button>
       <div class="sidebar-navigation">
       <nav class="primary-nav" aria-label="主要页面">
         <span class="nav-caption">学习与记录</span>
@@ -30,6 +31,7 @@
 <a href="/plan/" data-nav data-route="plan"><span data-icon="route"></span>每日计划</a>
 <a href="/study/" data-nav data-route="study"><span data-icon="file"></span>专题学习</a>
 <a href="/journal/" data-nav data-route="journal"><span data-icon="pen"></span>学习日志</a>
+<a href="/assistant/" data-nav data-route="assistant"><span data-icon="spark"></span>学习助手</a>
       </nav>
       <nav class="secondary-nav" aria-label="资料">
         <span class="nav-caption">资料</span>
@@ -41,8 +43,7 @@
         <summary>路线、实践与面试</summary>
         <nav class="secondary-nav" aria-label="路线与深化"><a href="/roadmap/" data-nav data-route="roadmap"><span data-icon="route"></span>深化路线</a>
 <a href="/lab/" data-nav data-route="lab"><span data-icon="flask"></span>实践实验室</a>
-<a href="/interview/" data-nav data-route="interview"><span data-icon="briefcase"></span>面试准备</a>
-<a href="/assistant/" data-nav data-route="assistant"><span data-icon="spark"></span>学习助手</a></nav>
+<a href="/interview/" data-nav data-route="interview"><span data-icon="briefcase"></span>面试准备</a></nav>
       </details>
       <nav class="secondary-nav nav-settings" aria-label="其他页面">
         <a href="/blog/"><span data-icon="archive"></span>历史博客<span data-icon="external" class="nav-end"></span></a>
@@ -54,7 +55,7 @@
         <a class="profile" id="account-entry" href="/account/" data-nav><span class="avatar">SG</span><span>SuGuilin<small><span data-sync-label>本机保存</span></small></span><span data-icon="chevron"></span></a>
       </div>
     </aside>
-    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="关闭导航" hidden></button>
+    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="关闭导航" aria-hidden="true" tabindex="-1" hidden></button>
     <div class="main-shell">
       <header class="topbar">
         <div class="topbar-start"><button class="icon-button mobile-menu" id="mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><span data-icon="menu"></span></button><span class="breadcrumb">工作台 <span>/</span> <strong id="breadcrumb-title">学习助手</strong></span></div>

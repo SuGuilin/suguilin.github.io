@@ -37,7 +37,7 @@ test('Question summaries fold only generated context; editing and backups retain
   assert.equal(note.body,original);assert.equal(journalTitle(note),unit.title);assert.equal(journalPreview(note),question);
   assert.ok(journalReadingBody(note).includes(question));assert.match(journalReadingBody(note),/后续理解/);assert.equal(note.body,original);
   const context=noteDiscussion(note,unit);
-  assert.equal(context.question,question);assert.equal(context.journalNoteId,note.id);assert.equal(context.section,'exercise-e1');
+  assert.ok(context.question.startsWith(question));assert.match(context.question,/后续理解\n\n需要查询远端操作/);assert.ok(!context.question.includes('关键要点'));assert.ok(!context.question.includes('原始来源：'));assert.equal(context.journalNoteId,note.id);assert.equal(context.section,'exercise-e1');
   assert.equal(noteLearningLink(note).id,unit.id);
   const custom={...note,body:'## 待解答的问题\n\n自己的说明\n\n---\n学习单元：我的格式\n关键要点：\n用户自己的正文'};
   assert.equal(questionNoteParts(custom).body,custom.body);assert.equal(questionNoteParts(custom).context,'');
@@ -55,6 +55,7 @@ test('Annotation journals separate generated titles, thoughts and source context
   assert.deepEqual(note,original);assert.equal(journalTitle({...note,title:'我自己写的标题'}),'我自己写的标题');
   const mark=saveAnnotation(defaultState(),unit,{section:'chapter-1',quote},{now,id:'mark'}).note;
   assert.equal(journalPreview(mark),quote.slice(0,150));
+  assert.ok(!journalReadingBody(mark).includes('## 我的思考'));assert.ok(mark.body.includes('## 我的思考'));
   assert.equal(filterJournal([note],{query:unit.source.scope}).length,1);
 });
 test('Recall journals fold previous evidence for reading while keeping edits, search and backup content intact',()=>{
@@ -64,12 +65,37 @@ test('Recall journals fold previous evidence for reading while keeping edits, se
   note.body+='\n\n## 后续补充\n\n我自己添加的内容';
   const original=structuredClone(note),parts=journalNoteParts(note);
   assert.match(parts.body,/这次独立解释/);assert.match(parts.body,/后续补充/);assert.ok(!parts.body.includes('旧实验记录'));
-  assert.match(parts.comparison,/旧作答的具体证据/);assert.match(parts.comparison,/0.2797/);assert.match(journalReadingBody(note),/回到学习单元/);
+  assert.match(parts.comparison,/旧作答的具体证据/);assert.match(parts.comparison,/0.2797/);assert.ok(!journalReadingBody(note).includes('回到学习单元'));assert.match(parts.context,/回到学习单元/);assert.ok(parts.context.includes(unit.source.url));
   assert.equal(filterJournal([note],{query:'旧实验记录'}).length,1);assert.deepEqual(note,original);
   assert.equal(journalPreview(note),'新的理解');
   const onlyAnswer=saveStudySnapshot(defaultState(),unit,{...current,reflection:''},{now,id:'answer-only'}).note;assert.equal(journalPreview(onlyAnswer),'这次独立解释');
   assert.equal(journalNoteParts({...note,title:'我自定义的复盘'}).comparison,undefined);
   assert.equal(journalNoteParts({...note,body:note.body.split('[回到学习单元]')[0]}).comparison,undefined);
+});
+
+test('Generated return metadata folds without hiding a learner addition, a custom link or the original stored note',()=>{
+  const note=saveStudySnapshot(defaultState(),unit,{...newProgress(unit),reflection:'本次的理解'},{now,id:'footer'}).note;
+  note.body+='\n\n## 补充思考\n\n保留这个反例。\n\n[我的验证记录](/study/?id=lesson-harness#chapter-2)';
+  const original=structuredClone(note),parts=journalNoteParts(note);
+  assert.ok(!parts.body.includes('原始来源：'));assert.ok(!parts.body.includes('[回到学习单元]'));
+  assert.match(parts.body,/保留这个反例/);assert.match(parts.body,/我的验证记录/);
+  assert.ok(parts.context.includes(unit.source.url));assert.equal(noteLearningLink(note).section,'study-reflection');
+  assert.deepEqual(note,original);
+  const custom={...note,title:'自定义记录'};assert.equal(journalNoteParts(custom).body,custom.body);
+});
+
+test('Continuing resolved questions and recall records carries new understanding and previous evidence',()=>{
+  const pending=saveStudySnapshot(defaultState(),unit,newProgress(unit),{question:questionWithContext('原始问题',unit),now,id:'continuation'}).note;
+  pending.body+='\n\n## 新理解\n\n我已检查稳定操作 ID，还需要验证参数冲突。';
+  const resolved={...pending,kind:'已解决问题'};
+  assert.match(noteDiscussion(resolved,unit).question,/原始问题/);
+  assert.match(noteDiscussion(resolved,unit).question,/新理解/);
+  assert.match(noteDiscussion(resolved,unit).question,/验证参数冲突/);
+  const previous={...newProgress(unit),answers:[{id:'e1',text:'上次的错误假设'}],reflection:'旧实验'};
+  const review=saveStudySnapshot(defaultState(),unit,{...newProgress(unit),reflection:'本次修正了假设'},{review:'hard',previous,now,id:'review-context'}).note;
+  assert.match(noteDiscussion(review,unit).question,/本次修正了假设/);
+  assert.match(noteDiscussion(review,unit).question,/上次的错误假设/);
+  assert.match(noteDiscussion(review,unit).question,/旧实验/);
 });
 
 test('Today recommendations use the remaining time after recorded learning, without altering stored budgets or backend models',()=>{
@@ -78,6 +104,15 @@ test('Today recommendations use the remaining time after recorded learning, with
   assert.ok(dailyLearningQueue(s,units,now).reduce((n,q)=>n+q.minutes,0)<=15);
   assert.equal(s.dailyMinutes,45);
   s.dailyMinutes=30;assert.deepEqual(dailyLearningQueue(s,units,now),[]);
+});
+
+test('Viewing a topic schedule targets its row without rescheduling or changing the existing learning state',async()=>{
+  const progress={...newProgress(unit),scheduledFor:'2026-10-28',readingSection:'chapter-2'};
+  const state={...defaultState(),studyProgress:[progress]},original=structuredClone(state);
+  const study=Object.create(StudyWorkspace.prototype);let target;
+  study.unit=()=>unit;study.getState=()=>state;study.navigate=url=>target=url;study.persist=()=>{throw new Error('Read-only schedule navigation must not persist');};
+  await study.action({dataset:{study:'plan',id:unit.id}});
+  assert.equal(target,'/plan/#schedule-'+unit.id);assert.deepEqual(state,original);
 });
 
 test('Per-unit journals include annotations and snapshots without mixing drafts from other units',()=>{

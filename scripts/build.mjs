@@ -27,8 +27,8 @@ const routes = [
   ['/guide/', 'guide', '学习手记', '围绕 Agent 核心问题的原创实践导读与一手资料。', 'file']
 ];
 const navLink=id=>{const [url,,title,,icon]=routes.find(r=>r[1]===id);return `<a href="${url}" data-nav data-route="${id}"><span data-icon="${icon}"></span>${id==='study'?'专题学习':title}</a>`;};
-const navigation = ['home','plan','study','journal'].map(navLink).join('\n');
-const explorationNavigation = ['roadmap','lab','interview','assistant'].map(navLink).join('\n');
+const navigation = ['home','plan','study','journal','assistant'].map(navLink).join('\n');
+const explorationNavigation = ['roadmap','lab','interview'].map(navLink).join('\n');
 for (const [url, id, title, description] of routes) {
   const dir = path.join(root, url);
   await mkdir(dir, {recursive: true});
