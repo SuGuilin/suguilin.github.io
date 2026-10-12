@@ -47,7 +47,7 @@ test('A per-topic progress export restores answers, review history and unfinishe
 
 test('LangGraph reading and exercises expose the same runnable recovery experiment',async()=>{
   const reading=JSON.parse(await readFile('content/topic-readings.json','utf8')).readings.find(r=>r.id===unit.id),panel=notebookPanel(unit);
-  assert.equal((lessonChapters(reading).match(/class="reading-chapter"/g)||[]).length,8);assert.match(panel,/langgraph-durable-workflow.ipynb/);assert.match(panel,/data-experiment="langgraph-durable-workflow"/);assert.match(panel,/langgraph_report.json/);assert.equal(unit.exercises.length,3);
+  assert.equal((lessonChapters(reading).match(/class="reading-chapter"/g)||[]).length,15);assert.match(panel,/langgraph-durable-workflow.ipynb/);assert.match(panel,/data-experiment="langgraph-durable-workflow"/);assert.match(panel,/langgraph_report.json/);assert.equal(unit.exercises.length,5);
   assert.match(reading.content,/进程 A/);assert.match(reading.content,/InvalidUpdateError/);assert.ok(reading.sources.some(s=>s.url.endsWith('/use-time-travel')));
 });
 test('Leaving an arrangement keeps the original progress if export or persistence fails',async()=>{

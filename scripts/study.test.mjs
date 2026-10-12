@@ -57,7 +57,7 @@ test('Units, answers, self assessment and daily settings round-trip through sync
   assert.equal(mergeBackupStates(restored,s).conflicts,0);
 });
 test('Editorial units include specific answers and rubrics, not only metadata or empty practice templates',async()=>{
-  const {units}=JSON.parse(await readFile('content/study-units.json','utf8'));assert.equal(units.length,22);for(const u of units){validateUnit(u);assert.ok(u.summary.length>15);assert.ok(u.exercises.every(e=>e.answer.length>60&&e.rubric.length>=2));}
+  const {units}=JSON.parse(await readFile('content/study-units.json','utf8'));assert.equal(units.length,28);for(const u of units){validateUnit(u);assert.ok(u.summary.length>15);assert.ok(u.exercises.every(e=>e.answer.length>60&&e.rubric.length>=2));}
 });
 test('Colab notebooks execute all cells and demonstrate recovery and correlated evaluation invariants',()=>{
   const output=execFileSync('python3',['scripts/verify-notebooks.py'],{encoding:'utf8'});assert.match(output,/durable-agent.ipynb: all cells/);assert.match(output,/paired-agent-evaluation.ipynb: all cells/);assert.match(output,/agent-mechanism-checks.ipynb: all cells/);

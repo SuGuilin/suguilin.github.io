@@ -9,9 +9,29 @@ export const mechanismDiagrams={
  'lesson-agent-rl':{title:'工具返回的 token 应计算动作损失吗？',steps:[['动作','模型生成的 token','工具请求和最终回答是模型的策略动作，需要与 rollout 的 log probability 和动作位置对齐。'],['观察','环境返回的信息','工具返回通常不计模型动作的生成损失，但仍作为条件上下文影响后续决策。mask 不等于从上下文删除。'],['奖励','到底在优化什么','检查奖励是否与目标一致、是否可以被利用，以及终止条件和失败惩罚是否可信。'],['评测','验证可迁移能力','在未见任务上用独立验收检查成功、成本、重复动作和行为覆盖；不能只看训练奖励上涨。']],question:'被 loss mask 排除的工具观察是否仍影响后续动作？',choices:['不会，被 mask 就完全没有影响','会，它仍可以进入条件上下文','会，因为它一定参与策略生成损失'],correct:1,explanation:'loss mask 控制哪些位置计算生成损失；工具观察仍能进入上下文并改变后续动作概率。具体 attention 与 mask 实现要查所用框架。'},
  'lesson-production-system-design':{title:'过期 Worker 怎样被阻止提交状态？',steps:[['排队','任务生命周期','把 queued、running、waiting_approval 和终止状态定义清楚，再连接队列、worker 和模型。'],['持久化','状态、租约与预算','保存检查点、稳定操作身份、心跳或租约和预算，使 worker 崩溃后仍能识别未确认工作。'],['协作','审批与权限边界','审批绑定具体动作与参数；取消停止新动作，已提交的远端副作用仍需查询和对账。'],['取舍','用基线解释架构','同任务比较单 Agent 与多 Agent 的成功率、成本和时延，证明拆分收益足以覆盖协调与一致性成本。']],question:'任务被取消，是否意味着远端已提交的写入也被撤销？',choices:['是，取消会自动回滚所有系统','不是，已提交动作仍需查询或补偿','取决于模型是否回答“已撤销”'],correct:1,explanation:'取消可以停止新的动作，但不能自动撤回其他系统已经提交的副作用。需要明确的状态查询、补偿或对账流程。'}
 };
-export function questionTitle(unit){return mechanismDiagrams[unit.id]?.title||unit.title;}
+export function questionTitle(unit){return unit.title;}
 export const learningNotebooks={
- 'digest-langgraph':[['langgraph-durable-workflow.ipynb','状态合并、跨进程恢复与审批边界','真实 SDK + SQLite · 25–35 分钟']],
+ 'digest-langgraph':[['langgraph-control-flow.ipynb','路由、工具、并行、子图、流式与故障','真实 SDK · 25 分钟'],['langgraph-durable-workflow.ipynb','状态合并、跨进程恢复与审批边界','真实 SDK + SQLite · 25–35 分钟']],
+ 'lesson-llm-contract':[['llm-contract.ipynb','结构、日期和金额的拒绝路径','标准库合同 · 15 分钟']],
+ 'lesson-retrieval-rag':[['retrieval-rag.ipynb','RRF、Recall@k 与可见候选','离线排序 fixture · 15 分钟']],
+ 'lesson-context-engineering':[['context-engineering.ipynb','预算与必要状态保留','成本单位 fixture · 15 分钟']],
+ 'lesson-agent-security':[['agent-security.ipynb','可信身份、scope 与越权拒绝','本地合同 · 15 分钟']],
+ 'lesson-multi-agent':[['multi-agent.ipynb','子任务证据、冲突与总预算','本地归并 fixture · 15 分钟']],
+ 'lesson-inference-serving':[['inference-serving.ipynb','KV baseline、成本与尾部指标','离线算例 · 15 分钟']],
+ 'digest-deep-agents':[['context-engineering.ipynb','上下文装配与保留条件','基础合同 · 不运行 Deep Agents'],['multi-agent.ipynb','委派结果与冲突','基础合同 · 不调用模型']],
+ 'digest-mcp':[['agent-security.ipynb','身份、scope 与对象归属','应用合同 · 不是 MCP transport']],
+ 'digest-paper-react':[['agent-research-checks.ipynb','有限循环、无信息观察与停止','第 6 节 · 固定决策']],
+ 'digest-paper-dspy':[['agent-research-checks.ipynb','评分器负例与来源划分','第 5 节 · 不运行优化器']],
+ 'digest-eval-gaia':[['agent-research-checks.ipynb','附件 join 与金额 grader','第 4 节 · 原创任务']],
+ 'digest-eval-tau-family':[['agent-research-checks.ipynb','pass@k / pass^k 组合估计','第 3 节 · 合成 trial']],
+ 'digest-eval-terminalbench':[['agent-research-checks.ipynb','实际业务结果与 grader 负例','第 4、5 节 · 无容器']],
+ 'digest-mem0':[['agent-mechanism-checks.ipynb','用户归属与有效时间','第 1 节 · 不运行 Mem0']],
+ 'digest-verl':[['agent-research-checks.ipynb','PPO 裁剪、组优势与 mask','第 1、2 节 · 无 GPU 训练']],
+ 'digest-agent-lightning':[['agent-research-checks.ipynb','rollout 身份与 token 边界','第 2 节 · 不运行 Gateway']],
+ 'digest-paper-ragen':[['agent-research-checks.ipynb','组内零方差与动作合同','第 1、2 节 · 不运行 RAGEN']],
+ 'digest-search-r1':[['agent-research-checks.ipynb','action mask 与观察条件','第 2 节 · 无检索服务']],
+ 'digest-paper-deepseek-r1':[['agent-research-checks.ipynb','裁剪目标与评测可靠性','第 1、3 节 · 未加载权重']],
+ 'digest-hello-agents':[['llm-contract.ipynb','模型接口与拒绝路径','基础合同 · 15 分钟'],['agent-research-checks.ipynb','有限循环的停止机制','第 6 节 · 固定决策']],
  'digest-jev':[['decision-calibration.ipynb','概率、错误与回退阈值','合成数据 · 15 分钟']],
  'lesson-harness':[['langgraph-interrupts.ipynb','LangGraph 审批暂停与恢复','真实 SDK · 15 分钟'],['durable-agent.ipynb','检查点与远端副作用','内存模拟 + SQLite · 25 分钟']],
  'lesson-tool-reliability':[['durable-agent.ipynb','超时、幂等与查询恢复','内存模拟 + SQLite · 25 分钟']],

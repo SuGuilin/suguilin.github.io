@@ -1,0 +1,42 @@
+{
+  "reviewedAt": "2026-10-13",
+  "scope": "现有课程的重点覆盖与学习依赖；外部资料目录不是已完成课程，也不承诺穷尽整个 Agent 领域。",
+  "groups": [
+    {"id":"base","title":"模型与检索","units":["lesson-llm-contract","lesson-retrieval-rag","digest-paper-react","digest-paper-dspy","digest-jev","digest-hello-agents"]},
+    {"id":"system","title":"执行与协作","units":["lesson-harness","lesson-tool-reliability","digest-langgraph","digest-deep-agents","digest-mcp","lesson-multi-agent"]},
+    {"id":"memory","title":"上下文与记忆","units":["lesson-context-engineering","lesson-long-term-memory","digest-mem0"]},
+    {"id":"evaluation","title":"评测与实验","units":["lesson-evaluation-statistics","digest-eval-gaia","digest-eval-tau-family","digest-eval-terminalbench"]},
+    {"id":"rl","title":"算法与策略学习","units":["lesson-agent-rl","digest-verl","digest-agent-lightning","digest-paper-ragen","digest-search-r1","digest-paper-deepseek-r1"]},
+    {"id":"product","title":"生产工程","units":["lesson-agent-security","lesson-inference-serving","lesson-production-system-design"]}
+  ],
+  "connections": {
+    "lesson-llm-contract":["lesson-tool-reliability","digest-langgraph"],
+    "lesson-retrieval-rag":["lesson-context-engineering","digest-search-r1"],
+    "lesson-harness":["digest-langgraph","lesson-production-system-design"],
+    "lesson-tool-reliability":["digest-mcp","lesson-production-system-design"],
+    "digest-langgraph":["lesson-llm-contract","lesson-tool-reliability","lesson-multi-agent"],
+    "digest-deep-agents":["lesson-context-engineering","lesson-multi-agent"],
+    "digest-mcp":["lesson-agent-security","lesson-llm-contract"],
+    "lesson-context-engineering":["lesson-long-term-memory","lesson-retrieval-rag"],
+    "lesson-long-term-memory":["digest-mem0","lesson-context-engineering"],
+    "digest-mem0":["lesson-long-term-memory","lesson-agent-security"],
+    "lesson-evaluation-statistics":["digest-eval-tau-family","digest-eval-terminalbench"],
+    "digest-eval-gaia":["lesson-retrieval-rag","lesson-evaluation-statistics"],
+    "digest-eval-tau-family":["lesson-evaluation-statistics","lesson-tool-reliability"],
+    "digest-eval-terminalbench":["lesson-evaluation-statistics","lesson-agent-security"],
+    "lesson-agent-rl":["digest-verl","digest-paper-ragen"],
+    "digest-verl":["lesson-agent-rl","digest-agent-lightning"],
+    "digest-agent-lightning":["lesson-agent-rl","lesson-production-system-design"],
+    "digest-paper-ragen":["lesson-agent-rl","digest-verl"],
+    "digest-search-r1":["lesson-retrieval-rag","lesson-agent-rl"],
+    "digest-paper-deepseek-r1":["lesson-agent-rl","lesson-inference-serving"],
+    "digest-paper-react":["lesson-retrieval-rag","digest-langgraph"],
+    "digest-paper-dspy":["lesson-evaluation-statistics","lesson-retrieval-rag"],
+    "digest-hello-agents":["lesson-llm-contract","lesson-harness"],
+    "digest-jev":["lesson-llm-contract","lesson-evaluation-statistics"],
+    "lesson-agent-security":["digest-mcp","lesson-production-system-design"],
+    "lesson-multi-agent":["digest-langgraph","lesson-agent-security"],
+    "lesson-inference-serving":["lesson-evaluation-statistics","lesson-production-system-design"],
+    "lesson-production-system-design":["lesson-agent-security","lesson-inference-serving"]
+  }
+}

@@ -10,8 +10,10 @@ import re
 
 root = Path(__file__).resolve().parent.parent
 names = ['durable-agent.ipynb', 'paired-agent-evaluation.ipynb', 'agent-mechanism-checks.ipynb', 'decision-calibration.ipynb']
+foundations=['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving']
+names.extend([name+'.ipynb' for name in foundations]+['agent-research-checks.ipynb'])
 if '--sdk' in sys.argv:
-    names.extend(['langgraph-interrupts.ipynb', 'langgraph-durable-workflow.ipynb'])
+    names.extend(['langgraph-interrupts.ipynb', 'langgraph-durable-workflow.ipynb','langgraph-control-flow.ipynb'])
 for name in names:
     notebook = json.loads((root / 'notebooks' / name).read_text())
     assert notebook['nbformat'] == 4
@@ -66,9 +68,28 @@ for name in names:
                 assert abs(namespace['brier'](namespace['labels'], namespace['probabilities']) - 0.1671875) < 1e-12
                 accepted = namespace['selective'](namespace['changed'], namespace['probabilities'], 0.9)
                 assert accepted['coverage'] == 0.25 and accepted['accepted_error'] == 0.5
+            elif name=='langgraph-control-flow.ipynb':
+                report=json.loads(Path('langgraph_flow_report.json').read_text())
+                assert report['version']=='1.2.14' and report['model_called'] is False
+                assert len(report['checks'])==9 and all(report['checks'].values())
+                assert namespace['calls']=={'good':1,'bad':2} and namespace['batch']['total']==29
+            elif name.removesuffix('.ipynb') in foundations or name=='agent-research-checks.ipynb':
+                report=json.loads(Path('mechanism_report.json').read_text())
+                assert report['scope']=='stdlib fixtures; no model/service' and all(report['checks'].values())
+                assert report['experiment']==('agent-research-checks' if name=='agent-research-checks.ipynb' else 'lesson-'+name.removesuffix('.ipynb'))
         finally:
             os.chdir(previous_cwd)
     print(f'{name}: all cells and output invariants passed')
+
+# Page and notebook contracts cannot drift: run the exact shipped reading snippets.
+lesson_data=json.loads((root/'content/lessons.json').read_text())['lessons']
+for name in foundations:
+    lesson=next(l for l in lesson_data if l['id']=='lesson-'+name)
+    blocks=re.findall(r'```python\n(.*?)\n```',lesson['content'],re.S)
+    assert len(blocks)==1
+    with contextlib.redirect_stdout(io.StringIO()):
+        exec(compile(blocks[0],lesson['id'],'exec'),{})
+print('Six foundation reading snippets: exact page code and negative paths passed')
 
 if '--sdk' in sys.argv:
     # Execute the exact Python snippets shown in the reading page, including imports.

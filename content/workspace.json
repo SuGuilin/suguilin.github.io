@@ -24,7 +24,7 @@
       "digest": {
         "resourceId": "jev",
         "title": "Jev：把语义判断与生成、计算分开",
-        "oneSentence": "理解类型化决策、置信度与回退，再用小实验检查判断是否值得信任。",
+        "oneSentence": "Choice、Score、Noul 的语义与 confidence 定义不同，输出集中不等于真实校准；缺类别和任务分布会改变判断，数字/日期/权限应由明确代码处理。",
         "prerequisites": [
           "Python",
           "概率与基本评测"
@@ -35,10 +35,10 @@
           "独立评测摘要：与官方限制对照，回到自己的数据验证"
         ],
         "takeaways": [
-          "Jev 接收状态与类型化问题，返回可由代码消费的决策；Choice 选候选项，Score 按等级评分，Noul 返回陈述成立的概率。它不负责生成解释或代码。",
-          "把宽泛判断拆成单一问题，再由确定性代码组合结果。数学、日期比较和权限检查留在代码中，模型负责语义判断。",
-          "Choice / Score 的 confidence 概括分布集中程度，不等于每次答对的概率；Noul 没有独立 confidence。业务阈值要在自己的有标签数据上选择。",
-          "当前文档列出 jev-1.13.0，latest 别名会随发布移动。实验应记录响应模型 ID；额外检查选项顺序、中文样本和无关上下文。"
+          "Choice、Score、Noul 的语义与 confidence 定义不同，输出集中不等于真实校准。",
+          "缺类别和任务分布会改变判断，数字/日期/权限应由明确代码处理。",
+          "自动处理、回退和误判的代价决定策略，完整代价矩阵比统一阈值更充分。",
+          "阈值验证与独立测试分开，记录覆盖、选择性错误、版本及分层漂移。"
         ],
         "pitfalls": [
           "不要用厂商演示或单次高置信度代替独立验证。数学、计数、日期与复杂间接推理在当前官方限制清单中。",
@@ -46,36 +46,29 @@
           "低置信度回退会改变总体时延和成本；同时报告自动处理比例与该子集的错误率。"
         ],
         "practice": [
-          "在 Colab 的离线概率实验中构造一个高置信度错误预测，比较 Brier 分数和不同阈值的覆盖率。"
+          "误处理代价为 20，回退代价为 1，若 q 是已校准的正确概率，自动处理的简化门槛是多少？为何不能直接对所有 Choice confidence 用此门槛？"
         ],
         "selfCheck": [
           "一个 Agent 要路由请求、计算账单、生成解释。哪些步骤适合 Jev，哪些应交给代码或生成模型？",
-          "为什么 confidence 很高仍可能答错？你会怎样验证路由阈值？"
+          "为什么 confidence 很高仍可能答错？你会怎样验证路由阈值？",
+          "在 Colab 的离线概率实验中构造一个高置信度错误预测，比较 Brier 分数和不同阈值的覆盖率。",
+          "误处理代价为 20，回退代价为 1，若 q 是已校准的正确概率，自动处理的简化门槛是多少？为何不能直接对所有 Choice confidence 用此门槛？"
         ],
         "sourceLinks": [
           {
-            "id": "intro",
-            "title": "TypeSafe Introduction",
+            "title": "Typesafe 官方介绍",
             "url": "https://docs.typesafe.ai/introduction",
-            "section": "State / Choice / Score / Noul",
-            "verification": "已实际打开所述范围",
-            "verifiedAt": "2026-10-11"
+            "supports": "Choice、Score、Noul 的类型化决策用途"
           },
           {
-            "id": "confidence",
-            "title": "TypeSafe Confidence",
+            "title": "Confidence 官方定义",
             "url": "https://docs.typesafe.ai/confidence",
-            "section": "Confidence 与 probabilities 的区别",
-            "verification": "已实际打开所述范围",
-            "verifiedAt": "2026-10-11"
+            "supports": "Choice 公式、Score 区别与 Noul 范围"
           },
           {
-            "id": "limits",
-            "title": "Jev 1.13 jaggedness",
+            "title": "jev-1.13 jaggedness",
             "url": "https://docs.typesafe.ai/model-jaggedness/jev-1.13",
-            "section": "2026-10-02 限制清单",
-            "verification": "已实际打开所述范围",
-            "verifiedAt": "2026-10-11"
+            "supports": "当前版本列出的薄弱点；没有本轮 API 实测"
           },
           {
             "id": "models",
@@ -94,10 +87,10 @@
             "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "2026-10-11 核实当前文档；Jev 1.13 限制页标记 2026-10-02。教学 notebook 为合成数据，不调用 Jev。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "配套离线 notebook 已验证可执行；尚未进行 Jev API 实测。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "官方限制与本站学习归纳分列。"
       }
     },
@@ -252,8 +245,8 @@
       "priority": "focus",
       "digest": {
         "resourceId": "langgraph",
-        "title": "LangGraph：状态与恢复先于复杂编排",
-        "oneSentence": "运行真实 SDK 与 SQLite 四节点图，用进程硬退出验证恢复；区分状态合并、审批版本、重复调用与唯一业务结果。",
+        "title": "LangGraph：状态图、工具循环与可靠编排",
+        "oneSentence": "状态、消息 reducer 与业务身份分别建模；TypedDict 是类型约定，业务约束仍要运行时校验；条件边、Command、Send 与子图有不同调度语义；静态边不会被 Command 自动取消。",
         "prerequisites": [
           "Python 类型标注与函数",
           "SQLite 事务基础",
@@ -265,11 +258,12 @@
           "Interrupts 的恢复与副作用"
         ],
         "takeaways": [
-          "节点返回局部更新；并行节点写同一普通字段会冲突，reducer 应明确合并、去重和冲突规则。",
-          "检查点保存线程内状态与待执行节点，不保存 Python 程序栈；跨线程 store 和授权由应用分别设计。",
-          "interrupt 所在节点恢复时从头重跑；审批须核对具体草稿版本，写入仍须使用稳定业务操作身份。",
-          "写入后崩溃会留下“业务已提交、图尚未确认”的窗口；本地实验保存调用两次，但幂等事务只产生一份结果。",
-          "读历史不执行节点；旧检查点重放与状态分叉会执行后续节点，不会自动撤回已经发生的业务写入。"
+          "状态、消息 reducer 与业务身份分别建模；TypedDict 是类型约定，业务约束仍要运行时校验。",
+          "条件边、Command、Send 与子图有不同调度语义；静态边不会被 Command 自动取消。",
+          "工具请求、ToolMessage 和循环终止必须对应；模型的动作选择不授予权限。",
+          "检查点与 pending writes 复用执行状态，interrupt 与未确认副作用仍可能重入。",
+          "Runtime context、Store namespace 和 stream 白名单共同界定可信身份与数据暴露范围。",
+          "先跑控制流与故障基线，再引入真实模型；通过本地机制断言不代表生产完成。"
         ],
         "pitfalls": [
           "把 InMemorySaver 或同进程新建图当作进程重启恢复。",
@@ -278,16 +272,67 @@
           "用顺序敏感的 reducer 合并并行结果，却没有验证重复更新与冲突。"
         ],
         "practice": [
-          "checkpointer 与 store 的范围为何不同？",
-          "实现检索→起草→人工审核→保存四节点图，用临时文件或数据库 saver 验证重启恢复。",
-          "两个并行节点各返回一条 evidence。普通字段为什么报错？怎样处理不同 ID、相同 ID 重放，以及相同 ID 的内容冲突？"
+          "invoke 只返回 answer，却在 values 流看到了内部字段。如何限制输出？模型输入的 claimed_user 与可信 context 冲突时用哪个？"
         ],
         "selfCheck": [
-          "并行字段怎样合并并保持重放一致？",
-          "审批重入、图重启和业务幂等分别证明什么？",
-          "读取历史、继续执行和分叉有何区别？"
+          "checkpointer 与 store 的范围为何不同？",
+          "实现检索→起草→人工审核→保存四节点图，用临时文件或数据库 saver 验证重启恢复。",
+          "两个并行节点各返回一条 evidence。普通字段为什么报错？怎样处理不同 ID、相同 ID 重放，以及相同 ID 的内容冲突？",
+          "一个节点返回 Command(goto=\"search\")，同时有到 answer 的静态边，会发生什么？若三条动态检索分支要汇总，状态与 join 应怎样设计？",
+          "invoke 只返回 answer，却在 values 流看到了内部字段。如何限制输出？模型输入的 claimed_user 与可信 context 冲突时用哪个？"
         ],
         "sourceLinks": [
+          {
+            "title": "Graph API",
+            "url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
+            "supports": "状态、局部更新、reducer 与 super-step"
+          },
+          {
+            "title": "Checkpointers",
+            "url": "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+            "supports": "values/next、历史、pending writes 与 durability 模式"
+          },
+          {
+            "title": "Interrupts",
+            "url": "https://docs.langchain.com/oss/python/langgraph/interrupts",
+            "supports": "节点重入、恢复输入与副作用边界"
+          },
+          {
+            "title": "Persistence",
+            "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+            "supports": "内存与持久化 saver 的范围"
+          },
+          {
+            "title": "Stores",
+            "url": "https://docs.langchain.com/oss/python/langgraph/stores",
+            "supports": "应用定义的跨线程数据与 namespace"
+          },
+          {
+            "title": "Use time-travel",
+            "url": "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+            "supports": "历史读取、重放与 update_state 分叉"
+          },
+          {
+            "title": "Use graph API",
+            "url": "https://docs.langchain.com/oss/python/langgraph/use-graph-api",
+            "supports": "路由、重试与错误处理",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
+          {
+            "title": "Subgraphs",
+            "url": "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+            "supports": "共享 schema、映射与持久化边界",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
+          {
+            "title": "Streaming",
+            "url": "https://docs.langchain.com/oss/python/langgraph/streaming",
+            "supports": "updates/values、v2 格式及字段边界",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
           {
             "id": "overview",
             "title": "LangGraph overview",
@@ -295,28 +340,12 @@
             "section": "Core benefits",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "persistence",
-            "title": "LangGraph persistence",
-            "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
-            "section": "Checkpointer vs. store / Troubleshooting",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "interrupts",
-            "title": "LangGraph interrupts",
-            "url": "https://docs.langchain.com/oss/python/langgraph/interrupts",
-            "section": "Side effects called before interrupt must be idempotent",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "2026-10-12 核对官方机制，配套代码固定本次 SDK 版本；升级后需重跑断言。",
-        "verifiedAt": "2026-10-12",
+        "versionNote": "Graph API 核心机制；真实 SDK 1.2.14 控制流与 SQLite 跨进程实验已执行。固定决策，无真实模型、远端服务、多副本或完整版本迁移验证。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "真实 SDK 1.2.14、checkpoint 4.2.0、SQLite 3.1.1，本机独立子进程实验已执行；无模型或生产数据库验证。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -341,7 +370,7 @@
       "digest": {
         "resourceId": "deep-agents",
         "title": "Deep Agents：Harness 的组件与边界",
-        "oneSentence": "把执行环境、上下文、委派和人工控制作为可组合组件，而不是仅延长提示词。",
+        "oneSentence": "Backend 决定虚拟文件的生命周期与存储范围，检查点和磁盘不是同一种持久化；任务列表、Skills、文件卸载和子代理各自解决不同问题；按需启用并独立验收产物。",
         "prerequisites": [
           "工具 Agent",
           "LangGraph 基本状态管理"
@@ -352,10 +381,10 @@
           "Delegation 与 Task planning"
         ],
         "takeaways": [
-          "Deep Agents 是建立在 LangChain 组件和 LangGraph 运行时之上的 Agent harness。",
-          "执行能力包括文件/工具与环境连接；上下文管理包括技能、记忆、总结与外置内容。",
-          "子 Agent 用于隔离子任务；结构化待办用于跟踪任务，两者不能替代产物验收。",
-          "当前文档明确 v0.7 起 task planning 为 opt-in，需要 TodoListMiddleware；早期版本默认启用。"
+          "Backend 决定虚拟文件的生命周期与存储范围，检查点和磁盘不是同一种持久化。",
+          "任务列表、Skills、文件卸载和子代理各自解决不同问题；按需启用并独立验收产物。",
+          "压缩保留目标、版本、证据和未确认动作，关键限制需要回读原文。",
+          "委派有输入输出与预算契约，主代理负责证据核对和冲突整合。"
         ],
         "pitfalls": [
           "按旧教程假定任何版本默认具有 write_todos，运行时工具集合可能不同。",
@@ -363,29 +392,38 @@
           "将文件化或总结视为无损压缩，关键限制和证据仍需可恢复。"
         ],
         "practice": [
-          "用同一资料整理任务比较基础工具循环与带文件上下文的 harness，记录 token、成本、引用丢失情况。",
-          "将证据检索交给受限子任务，主 Agent 使用结构化结果进行检查。",
-          "显式启用/关闭规划，比较长任务遗漏项；验收待办状态必须对应可查产物。"
+          "把 /sources 留在 StateBackend、/memories 路由到 StoreBackend 后，分别解释新线程、重启与删除用户数据时的结果。"
         ],
         "selfCheck": [
           "框架、运行时与 harness 分别承担什么？",
-          "子任务返回哪些字段才能审查结论？",
-          "总结后如何保留原始来源与硬性约束？"
+          "用同一资料整理任务比较基础工具循环与带文件上下文的 harness，记录 token、成本、引用丢失情况。",
+          "把 /sources 留在 StateBackend、/memories 路由到 StoreBackend 后，分别解释新线程、重启与删除用户数据时的结果。"
         ],
         "sourceLinks": [
           {
-            "id": "overview",
-            "title": "Deep Agents Overview",
+            "title": "Deep Agents overview",
             "url": "https://docs.langchain.com/oss/python/deepagents/overview",
-            "section": "Execution / Context management / Delegation / Task planning",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "supports": "当前组件、规划变更、backend 与权限边界；未复现模型示例"
+          },
+          {
+            "title": "Backends",
+            "url": "https://docs.langchain.com/oss/python/deepagents/backends",
+            "supports": "文件存储、路由与生命周期",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
+          {
+            "title": "Context engineering",
+            "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+            "supports": "卸载、压缩、笔记与子代理取舍",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
           }
         ],
-        "versionNote": "v0.7 opt-in 来自本次实际文档；实践时核对锁定版本及中间件。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -477,7 +515,7 @@
       "digest": {
         "resourceId": "mcp",
         "title": "MCP：统一连接接口与明确工具契约",
-        "oneSentence": "协议统一发现和调用方式，服务端仍需实现授权、输入验证与业务规则。",
+        "oneSentence": "Host、Client、Server 与 tools/resources/prompts 的职责不同，连接成功不等于动作授权；2026-07-28 使用无状态请求、逐请求元数据与 server/discover；不能套用旧版初始化顺序。",
         "prerequisites": [
           "JSON Schema",
           "HTTP/RPC",
@@ -489,10 +527,11 @@
           "Errors 与 Security Considerations"
         ],
         "takeaways": [
-          "MCP 通过 host、client、server 架构连接 AI 应用与外部能力；资源、提示和工具是不同协议能力。",
-          "工具的 inputSchema 描述输入契约，outputSchema 可选，结构化内容与展示文本可以分开处理。",
-          "工具名只要求在同一服务器内唯一；聚合多个服务器时客户端需要明确消歧。",
-          "协议错误与工具执行错误不同；执行错误可带 isError 和可行动的反馈，帮助模型调整参数。"
+          "Host、Client、Server 与 tools/resources/prompts 的职责不同，连接成功不等于动作授权。",
+          "2026-07-28 使用无状态请求、逐请求元数据与 server/discover；不能套用旧版初始化顺序。",
+          "请求 ID 用于关联响应，稳定业务 ID 用于副作用恢复，二者不能混用。",
+          "结构、语义、对象归属和 OAuth 资源 scope 分别校验；annotations 不决定权限。",
+          "协议错误、工具业务失败和远端结果未知有不同恢复路径。"
         ],
         "pitfalls": [
           "把工具 annotations 当可信授权声明；规范要求未经可信服务器提供的注解视为不可信。",
@@ -500,16 +539,40 @@
           "只让模型判断权限，而服务端不校验输入和访问控制。"
         ],
         "practice": [
-          "做只读计算器/资料检索服务器，为有效与无效输入写出结构化返回契约。",
-          "同时接入两台都提供 search 的服务器，给它们可追踪的身份前缀并验证路由。",
-          "设计参数错误、业务拒绝和协议故障三种用例，检查客户端恢复行为和日志。"
+          "MCP 写工具超时后 client 重新生成 JSON-RPC request ID。是否也应生成新的业务操作 ID？发现工具标为 readOnly 能代替什么检查？"
         ],
         "selfCheck": [
           "MCP 能标准化什么，业务授权由谁实现？",
-          "inputSchema、outputSchema、annotations 各有什么作用？",
-          "工具执行失败与未知方法错误怎样区分？"
+          "做只读计算器/资料检索服务器，为有效与无效输入写出结构化返回契约。",
+          "MCP 写工具超时后 client 重新生成 JSON-RPC request ID。是否也应生成新的业务操作 ID？发现工具标为 readOnly 能代替什么检查？"
         ],
         "sourceLinks": [
+          {
+            "title": "MCP architecture · 2026-07-28",
+            "url": "https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture",
+            "supports": "角色、能力发现与工具调用结构；应用层校验为本站原创示例"
+          },
+          {
+            "title": "Tools specification",
+            "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools",
+            "supports": "工具 schema、错误与 annotations",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
+          {
+            "title": "HTTP authorization",
+            "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization",
+            "supports": "资源、issuer、scope 与授权",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
+          {
+            "title": "Transport overview",
+            "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports",
+            "supports": "版本匹配的传输层范围",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
           {
             "id": "intro",
             "title": "MCP Introduction",
@@ -517,28 +580,12 @@
             "section": "Definition",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "architecture",
-            "title": "MCP Architecture",
-            "url": "https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture",
-            "section": "Host / Client / Server / Primitives",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "tools",
-            "title": "MCP Tools specification",
-            "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools",
-            "section": "Tool definition / Names / Errors / Security",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "本次 latest/intro 重定向到 2026-07-28；不要混用旧协议示例。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -881,7 +928,7 @@
       "digest": {
         "resourceId": "paper-react",
         "title": "ReAct：通过环境反馈更新行动",
-        "oneSentence": "让模型交错生成计划依据和行动，并用真实观察修正后续决策。",
+        "oneSentence": "ReAct 在观察后调整行动，语言记录和工具执行对环境的作用不同；外层确定性约束与内层有限行动循环可组合，适用性取决于任务是否需要动态决策。",
         "prerequisites": [
           "LLM prompting",
           "工具执行循环"
@@ -892,10 +939,10 @@
           "论文实验和 Appendix trajectories"
         ],
         "takeaways": [
-          "ReAct 将 reasoning 与 task-specific actions 交错组织，行动获取外部信息，推理负责跟踪计划和处理异常。",
-          "少样本提示包含完整轨迹：推理、动作及环境返回的观察，而不是只有最终答案。",
-          "作者比较 reason-only、act-only 与 ReAct，展示二者在指定问答和交互环境中的互补作用。",
-          "作者也公开失败例，轨迹可供人检查和修正；可解释格式不能消除行动错误。"
+          "ReAct 在观察后调整行动，语言记录和工具执行对环境的作用不同。",
+          "外层确定性约束与内层有限行动循环可组合，适用性取决于任务是否需要动态决策。",
+          "无信息重复、权限拒绝与结果未知应走不同分支，不能统称重试。",
+          "对照必须固定任务、模型和预算，并分别检验答案、证据与终止行为。"
         ],
         "pitfalls": [
           "把 2022–2023 论文的成绩当作当前模型、工具和任务的普遍排名。",
@@ -903,16 +950,24 @@
           "只看文字推理是否流畅，不检查证据是否支持动作或答案。"
         ],
         "practice": [
-          "用固定的小资料库实现最多五步的检索循环，保存 action、参数、真实 observation 和最终引用。",
-          "在相同题目上比较一次生成、固定检索、交错检索三种方案，记录成功率与调用数。",
-          "加入空结果或过期信息，观察 Agent 是否调整查询或报告证据不足。"
+          "同一 query 已搜索三次且结果未增加证据，第四次应该继续吗？设计一个可以区分检索失败与推理失败的对照。"
         ],
         "selfCheck": [
           "一次行动怎样改变下一次决策的上下文？",
-          "reason-only 与 act-only 的失败分别是什么？",
-          "观察结果可信是否足以保证最终答案可信？"
+          "用固定的小资料库实现最多五步的检索循环，保存 action、参数、真实 observation 和最终引用。",
+          "同一 query 已搜索三次且结果未增加证据，第四次应该继续吗？设计一个可以区分检索失败与推理失败的对照。"
         ],
         "sourceLinks": [
+          {
+            "title": "ReAct 原论文摘要",
+            "url": "https://arxiv.org/abs/2210.03629",
+            "supports": "核心范式与摘要范围；指定正文范围另列"
+          },
+          {
+            "title": "ReAct 全文指定章节",
+            "url": "https://arxiv.org/html/2210.03629v3",
+            "supports": "本轮读取 §2、§3.1、§3.3；未复现实验"
+          },
           {
             "id": "project",
             "title": "ReAct authors' project",
@@ -920,20 +975,12 @@
             "section": "Abstract / Prompting / Failure example",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "paper",
-            "title": "ReAct paper",
-            "url": "https://arxiv.org/abs/2210.03629",
-            "section": "ICLR camera-ready abstract and paper links",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "研究结果限定于论文的模型、任务和提示设定；实践建议是本站设计，未执行。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -996,7 +1043,7 @@
       "digest": {
         "resourceId": "paper-dspy",
         "title": "DSPy：把提示优化变成程序与指标",
-        "oneSentence": "先定义模块、数据和验收指标，再用优化器改进演示、提示或权重。",
+        "oneSentence": "Signature 描述任务语义，Module 组织程序，metric 定义优化目标，类型不保证事实正确；BootstrapFewShot、MIPROv2 与 GEPA 的可调对象和候选产生方式不同。",
         "prerequisites": [
           "Python 模块化",
           "训练/验证划分",
@@ -1008,10 +1055,10 @@
           "官方仓库的研究与文档入口"
         ],
         "takeaways": [
-          "论文将 LM pipeline 抽象为可组合的文本转换程序，用 signature 声明输入输出目标。",
-          "编译过程以数据和 metric 评估程序；BootstrapFewShot 收集能够共同满足指标的多阶段轨迹作为演示。",
-          "指标可以是 EM/F1，也可加入答案是否受检索证据支持等多个条件。",
-          "官方框架提供提示和权重优化算法，原论文的 teleprompter 术语与旧代码不代表所有当前 API。"
+          "Signature 描述任务语义，Module 组织程序，metric 定义优化目标，类型不保证事实正确。",
+          "BootstrapFewShot、MIPROv2 与 GEPA 的可调对象和候选产生方式不同。",
+          "优化调用成本与编译后推理成本分开报告；独立测试不进入候选选择。",
+          "先用对抗负例验收 metric，再判断优化后的高分是否有意义。"
         ],
         "pitfalls": [
           "只优化字符串匹配，得到格式合格但证据不足的答案。",
@@ -1019,16 +1066,36 @@
           "把编译理解为消除模型调用，或以为所有优化器都会修改权重。"
         ],
         "practice": [
-          "把一个学习资料 QA 流程拆成检索与回答模块，先固定证据正确性指标。",
-          "用独立训练/开发/测试划分比较手写提示和自动优化；保留调用预算与失败样本。",
-          "用新主题做迁移评测，检查优化是否只记住特定答案写法。"
+          "一个 RAG metric 只验最终答案包含参考关键词。优化后准确率从 60% 到 90%，可以推断什么？怎样改 metric 和实验？"
         ],
         "selfCheck": [
           "signature 与手写 prompt 的职责有什么区别？",
-          "什么样的 metric 会奖励错误行为？",
-          "如何判断改进来自优化而非验证集泄漏？"
+          "把一个学习资料 QA 流程拆成检索与回答模块，先固定证据正确性指标。",
+          "一个 RAG metric 只验最终答案包含参考关键词。优化后准确率从 60% 到 90%，可以推断什么？怎样改 metric 和实验？"
         ],
         "sourceLinks": [
+          {
+            "title": "DSPy 原论文摘要",
+            "url": "https://arxiv.org/abs/2310.03714",
+            "supports": "可组合语言模型程序与数据驱动优化的核心方向"
+          },
+          {
+            "title": "DSPy 当前官方仓库",
+            "url": "https://github.com/stanfordnlp/dspy",
+            "supports": "程序化框架与优化方向；本轮读取 README，不含优化器运行"
+          },
+          {
+            "title": "DSPy 全文指定机制段落",
+            "url": "https://arxiv.org/html/2310.03714v1",
+            "supports": "Signature、Predict trace 与 bootstrapping 相关正文；非优化实测"
+          },
+          {
+            "title": "DSPy optimizer docs",
+            "url": "https://dspy.ai/3.2.0/learn/optimization/optimizers/",
+            "supports": "BootstrapFewShot、MIPROv2、GEPA 的优化对象与步骤",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
           {
             "id": "paper",
             "title": "DSPy original paper",
@@ -1036,20 +1103,12 @@
             "section": "Programming model / Compilation / Appendix E",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "repo",
-            "title": "DSPy official repository",
-            "url": "https://github.com/stanfordnlp/dspy",
-            "section": "README / Citation & Reading More",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "dspy.ai 优化器页本次仅返回极少文本，具体 API 未据此核验；以原论文与仓库说明概念。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -1093,7 +1152,7 @@
       "digest": {
         "resourceId": "eval-gaia",
         "title": "GAIA：检验跨工具的答案与证据链",
-        "oneSentence": "正确答案需要推理、浏览、多模态处理和工具组合，而不是仅靠流畅文本。",
+        "oneSentence": "GAIA 的工具、多模态和推理需求需按题目拆开，不能从总分归因单项能力；附件记录 hash 与页码/字段/时间段，OCR 和视觉信息不是等价输入。",
         "prerequisites": [
           "工具 Agent",
           "资料浏览与解析",
@@ -1105,10 +1164,10 @@
           "当前数据格式说明"
         ],
         "takeaways": [
-          "GAIA 题目要求推理、多模态处理、浏览和工具使用等组合能力，原论文针对一般助手评测。",
-          "官方数据卡按三个难度等级组织任务，各等级包含公开开发集与答案/元数据不公开的测试集。",
-          "部分题目携带附件，数据包含任务与附件路径；评测不能只读取问题文字。",
-          "2025 年格式更新将 splits 改为 Parquet，以适配 HF datasets 4.x，不宜照搬旧 code-based loader。"
+          "GAIA 的工具、多模态和推理需求需按题目拆开，不能从总分归因单项能力。",
+          "附件记录 hash 与页码/字段/时间段，OCR 和视觉信息不是等价输入。",
+          "数值容差、单位和文本归一化属于评分合同，先验证 grader 负例。",
+          "数据访问条件、污染、题库与网络版本以及每题重复 trial 一起决定可比性。"
         ],
         "pitfalls": [
           "把开发集长期调参后的成绩作为未见任务能力。",
@@ -1116,23 +1175,18 @@
           "将受 gate 的验证/测试内容复制为公开网站题库；数据卡要求避免可抓取再分发。"
         ],
         "practice": [
-          "获得官方访问许可后，在受限本地环境抽取开发集小样本做失败分类，网站只记录题目 ID 与自写分析。",
-          "为每题记录所用工具、附件、证据位置和答案归一化规则。",
-          "比较基础回答与增加特定工具的版本，明确调用预算与失败差异。"
+          "从两张表按商品名而非商品 ID 合并得到“正确总额”。这条轨迹能算成功吗？写出三类附件 grader 负例。"
         ],
         "selfCheck": [
           "为什么只报告整体准确率不足以诊断系统？",
-          "开发集与测试集怎样隔离？",
-          "附件和动态网页变化如何影响复现？"
+          "获得官方访问许可后，在受限本地环境抽取开发集小样本做失败分类，网站只记录题目 ID 与自写分析。",
+          "从两张表按商品名而非商品 ID 合并得到“正确总额”。这条轨迹能算成功吗？写出三类附件 grader 负例。"
         ],
         "sourceLinks": [
           {
-            "id": "card",
-            "title": "GAIA official dataset card",
+            "title": "GAIA 官方数据卡",
             "url": "https://huggingface.co/datasets/gaia-benchmark/GAIA",
-            "section": "Gating / Data and leaderboard / Dataset format update",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "supports": "题目结构、级别、附件与访问条件；本轮仅读公开数据卡"
           },
           {
             "id": "paper",
@@ -1143,10 +1197,10 @@
             "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "仅公开数据卡和论文已打开；未登录接受数据条件或下载 gated 文件。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -1171,7 +1225,7 @@
       "digest": {
         "resourceId": "eval-tau-family",
         "title": "τ-bench 系列：规则、状态与重复运行可靠性",
-        "oneSentence": "评测既要看真实状态达成，也要看持续遵守规则和引导用户的能力。",
+        "oneSentence": "终态、领域规则和对话质量分层验收，合法轨迹不必逐字匹配参考动作；动态用户与 dual-control 环境会改变状态，需要澄清与版本核对。",
         "prerequisites": [
           "工具调用",
           "状态转换",
@@ -1183,11 +1237,10 @@
           "当前仓库的版本与 grading note"
         ],
         "takeaways": [
-          "原 τ-bench 结合用户模拟器、领域 API 和 policy 文档，验证动态对话中的任务完成。",
-          "原论文奖励涉及最终数据库状态与必要信息输出，不能仅凭最后一句成功宣告验收。",
-          "pass^k 表示同一任务 k 次独立运行全部成功的概率再跨任务平均；不是至少一次成功的 pass@k。",
-          "τ² 引入用户与 Agent 都能改变共享环境的 dual-control，用消融区分推理与沟通协调问题。",
-          "当前同名仓库已提供 τ³；banking_knowledge 的 v1.0.1 grading 修正使前后分数不可直接比较。"
+          "终态、领域规则和对话质量分层验收，合法轨迹不必逐字匹配参考动作。",
+          "动态用户与 dual-control 环境会改变状态，需要澄清与版本核对。",
+          "pass@k 与 pass^k 分别估计至少一次与全部成功；逐题计算组合指标。",
+          "τ、τ²、τ³ 及不同 domain/grader 不能混作同一个分数。"
         ],
         "pitfalls": [
           "未固定用户模拟器、任务版本、试验次数或工具环境就比较模型。",
@@ -1195,16 +1248,26 @@
           "以对话自然度替代数据库/策略验收，漏掉不合法或不完整动作。"
         ],
         "practice": [
-          "用自建订单模拟域定义目标状态、允许动作与需确认的规则，先运行十个固定任务。",
-          "每题重复至少五次，分别统计平均成功率与全次成功比例，并保存轨迹。",
-          "比较有用户协作与全部信息直接提供两种场景，区分缺信息、沟通和执行失败。"
+          "一题 4 次试验成功 2 次，求 k=2 的 pass@k 与 pass^k。若数据库已正确改变，但未经必要确认，应怎样记录？"
         ],
         "selfCheck": [
           "为何好听的回复也可能得零分？",
-          "pass^k 与 pass@k 的业务含义有何差别？",
-          "怎样让 dual-control 的实验结果可比较？"
+          "用自建订单模拟域定义目标状态、允许动作与需确认的规则，先运行十个固定任务。",
+          "一题 4 次试验成功 2 次，求 k=2 的 pass@k 与 pass^k。若数据库已正确改变，但未经必要确认，应怎样记录？"
         ],
         "sourceLinks": [
+          {
+            "title": "τ 系列当前仓库",
+            "url": "https://github.com/sierra-research/tau2-bench",
+            "supports": "当前 τ³ release、领域与评分变更；旧版本结果需单独核对"
+          },
+          {
+            "title": "τ Original Paper",
+            "url": "https://arxiv.org/abs/2406.12045",
+            "supports": "终态评测与重复可靠性的研究起点",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
           {
             "id": "tau",
             "title": "Original τ-bench paper",
@@ -1220,20 +1283,12 @@
             "section": "Dual-control / User simulator / Ablations",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "repo",
-            "title": "τ-bench official repository",
-            "url": "https://github.com/sierra-research/tau2-bench",
-            "section": "τ³ / v1.0.1 grading update / Compatibility",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "本站资源 ID 延续 eval-tau-family；必须分开标注 τ、τ²、τ³ 与评分版本。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -1296,7 +1351,7 @@
       "digest": {
         "resourceId": "eval-terminalbench",
         "title": "Terminal-Bench：用环境产物评估 Agent 工作",
-        "oneSentence": "在固定沙箱里让 Agent 完成任务，再由独立 verifier 检查产物和状态。",
+        "oneSentence": "instruction、环境和 verifier 分别定义任务、起点与成功，参考解不能泄漏；每个 trial 从隔离初始环境运行，失败题与环境故障均需保留。",
         "prerequisites": [
           "Linux/容器基础",
           "代码 Agent",
@@ -1308,10 +1363,10 @@
           "Viewer 的 trajectory 与 verifier logs"
         ],
         "takeaways": [
-          "本次官方首页展示 Terminal-Bench 4.0，并将结果定义为任务 resolution rate，图示说明带 95% 置信区间。",
-          "当前官方运行入口使用 Harbor；4.0 包含需要 GPU 的任务，示例使用具备 GPU 的 sandbox。",
-          "Harbor 自建任务把 instruction、配置、environment、solution 和 verifier 分开，验收检查真实产物。",
-          "官方教程先用 Oracle solution 验证题目可解，再运行真实 Agent，并在 viewer 检查轨迹与验证日志。"
+          "instruction、环境和 verifier 分别定义任务、起点与成功，参考解不能泄漏。",
+          "每个 trial 从隔离初始环境运行，失败题与环境故障均需保留。",
+          "verifier 位于可信边界，验业务行为与 artifact，而非关键词或 exit code。",
+          "固定镜像、测试、预算和版本，报告失败分类与重复运行。"
         ],
         "pitfalls": [
           "混用不同 benchmark 数据版本、Agent harness、模型和资源预算的分数。",
@@ -1319,29 +1374,43 @@
           "把需要 GPU 的完整基准直接当成普通本机 smoke test，环境失败会污染结论。"
         ],
         "practice": [
-          "在临时容器自建一个数据修复任务，要求生成特定文件与结构，并编写独立验收。",
-          "验证正确解法能通过、空解法和格式正确但内容错误的解法不能通过。",
-          "固定模型、工具权限和时间预算重复运行，报告成功率、成本与失败原因。"
+          "Agent 修改了 tests/test.sh 使其始终写 reward=1，最终验真通过。实验哪里失效？怎样修复验收？"
         ],
         "selfCheck": [
           "Oracle 通过证明什么，不能证明什么？",
-          "怎样设计不能被表面输出蒙混的验收？",
-          "模型、harness 和环境在榜单比较中各有什么影响？"
+          "在临时容器自建一个数据修复任务，要求生成特定文件与结构，并编写独立验收。",
+          "Agent 修改了 tests/test.sh 使其始终写 reward=1，最终验真通过。实验哪里失效？怎样修复验收？"
         ],
         "sourceLinks": [
+          {
+            "title": "Harbor 官方任务格式",
+            "url": "https://github.com/harbor-framework/harbor/blob/main/docs/content/docs/tasks/index.mdx",
+            "supports": "测试与 reward 文件格式；本轮读取公开文档索引节选"
+          },
+          {
+            "title": "Terminal-Bench",
+            "url": "https://www.tbench.ai/run",
+            "supports": "当前运行入口；不代表本轮执行了 benchmark"
+          },
+          {
+            "title": "Harbor task overview",
+            "url": "https://docs.harborframework.com/tasks/overview",
+            "supports": "任务、环境、verifier 与 reward 合同",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
+          {
+            "title": "Harbor verifier",
+            "url": "https://docs.harborframework.com/tasks/verifier",
+            "supports": "可信验真脚本与产物",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
           {
             "id": "site",
             "title": "Terminal-Bench official site",
             "url": "https://www.tbench.ai/",
             "section": "4.0 / Resolution rate / CI / Contamination notice",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
-          },
-          {
-            "id": "run",
-            "title": "Terminal-Bench Run",
-            "url": "https://www.tbench.ai/run",
-            "section": "Harbor / GPU sandbox / Viewer",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
           },
@@ -1354,10 +1423,10 @@
             "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "核验的是 2026-10-11 的 4.0 页面；旧资源不可自动标成此版本，题目与评分版本必须记录。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -1909,7 +1978,7 @@
       "digest": {
         "resourceId": "mem0",
         "title": "Mem0：从存储偏好到有证据的记忆",
-        "oneSentence": "先定义谁的记忆、来自哪里、何时有效，再评测检索和回答是否使用正确事实。",
+        "oneSentence": "记忆是抽取、验证、写入、索引、检索与使用的数据管线，不是把摘要存起来；有效时间、主体和原始证据决定当前可用性，相似度不能解决矛盾。",
         "prerequisites": [
           "向量/关键词检索",
           "多会话应用",
@@ -1921,10 +1990,10 @@
           "LongMemEval 能力维度"
         ],
         "takeaways": [
-          "README 的基本流程为按 user_id 过滤检索相关记忆，生成回复，再把对话加入 memory。",
-          "当前 README 描述 2026 年新算法为 ADD-only 提取，并结合语义、关键词、实体与时间信号检索。",
-          "README 明确其展示的托管平台成绩含 OSS SDK 没有的专有优化，不应宣称本地 SDK 能复现相同分数。",
-          "LongMemEval 原始评测关注信息提取、多会话推理、知识更新、时间推理和拒答，帮助区分记住与正确使用。"
+          "记忆是抽取、验证、写入、索引、检索与使用的数据管线，不是把摘要存起来。",
+          "有效时间、主体和原始证据决定当前可用性，相似度不能解决矛盾。",
+          "当前 additive 写入、异步可见性与 infer=False 要按实际产品/版本核验。",
+          "过期隐藏、删除与派生缓存清理不同，必须验证完整链路。"
         ],
         "pitfalls": [
           "缺少 user_id 或权限过滤，语义相近并不能证明同一用户可访问。",
@@ -1932,23 +2001,35 @@
           "沿用旧 UPDATE/DELETE 说明假定新默认算法覆盖旧事实，未处理时间与冲突。"
         ],
         "practice": [
-          "自建两用户、多会话、偏好变更的合成数据，检查隔离、更新、历史查询和拒答。",
-          "每条记忆保留来源消息、发生时间、确认状态，回答时记录使用了哪些记忆。",
-          "比较无记忆、原文检索与事实记忆；同时统计答对率、错误引用、token 与延迟。"
+          "用户说“去年用 Java，今年主要用 Python”，抽取器只存“喜欢 Java”。应该修哪几层？"
         ],
         "selfCheck": [
           "相似度最高的记忆为什么可能不该被使用？",
-          "ADD-only 系统怎样区分现在与过去？",
-          "提取错误和检索错误怎样分开诊断？"
+          "自建两用户、多会话、偏好变更的合成数据，检查隔离、更新、历史查询和拒答。",
+          "用户说“去年用 Java，今年主要用 Python”，抽取器只存“喜欢 Java”。应该修哪几层？"
         ],
         "sourceLinks": [
           {
-            "id": "repo",
-            "title": "Mem0 official repository",
+            "title": "Mem0 官方仓库",
             "url": "https://github.com/mem0ai/mem0",
-            "section": "New Memory Algorithm / Managed caveat / Quickstart filters",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "supports": "开源记忆能力与厂商报告的范围"
+          },
+          {
+            "title": "Mem0 open source overview",
+            "url": "https://docs.mem0.ai/open-source/overview",
+            "supports": "开源方案说明"
+          },
+          {
+            "title": "Mem0 自托管 REST 文档",
+            "url": "https://github.com/mem0ai/mem0/blob/main/docs/open-source/features/rest-api.mdx",
+            "supports": "自托管端点与 Platform 接口区别；本轮读取公开索引节选"
+          },
+          {
+            "title": "Mem0 Add",
+            "url": "https://docs.mem0.ai/core-concepts/memory-operations/add",
+            "supports": "当前 additive / infer=False 与产品可见性范围",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
           },
           {
             "id": "memory-eval",
@@ -1959,10 +2040,10 @@
             "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "新算法描述来自当前 README，托管与 OSS 的配置和能力应分开核验。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -2127,7 +2208,7 @@
       "digest": {
         "resourceId": "verl",
         "title": "verl：从算法目标到训练与 Rollout 数据流",
-        "oneSentence": "把奖励、采样、更新和基础设施逐段检查，才能定位 RL 的真实失败来源。",
+        "oneSentence": "采样、当前与参考策略作用不同，策略比率分母是采样策略；GRPO 的组内相对优势、归一化、KL 与 token/sequence 聚合共同决定训练目标。",
         "prerequisites": [
           "PyTorch",
           "PPO/GRPO",
@@ -2139,10 +2220,11 @@
           "PPO architecture / Multi-turn rollout"
         ],
         "takeaways": [
-          "verl 将训练与 rollout 后端组织为可组合基础设施，README 列出 FSDP/Megatron 等训练与 vLLM/SGLang 等生成后端。",
-          "支持 SFT、PPO、GRPO 等后训练方法以及函数奖励和模型奖励；算法名称不是可直接互换的配置。",
-          "多轮工具调用、搜索工具与实验追踪有独立入口，需要追踪环境反馈和模型生成边界。",
-          "recipe 要指定所需 verl 版本或 commit，滚动配方还记录相关子模块 SHA；复现需要整套版本信息。"
+          "采样、当前与参考策略作用不同，策略比率分母是采样策略。",
+          "GRPO 的组内相对优势、归一化、KL 与 token/sequence 聚合共同决定训练目标。",
+          "轨迹与 token、logprob、动作 mask、奖励和策略版本必须逐样本对齐。",
+          "global batch、rollout n、minibatch 与 microbatch 不等价，并行配置与显存瓶颈分别分析。",
+          "先手算和检查一批数据，再做小规模 GPU 训练与独立评测。"
         ],
         "pitfalls": [
           "只看 reward 均值，不看长度、截断、错误、优势分布和工具成功率。",
@@ -2150,31 +2232,25 @@
           "看到支持多种硬件就假设任意本地机器可完成指定训练。"
         ],
         "practice": [
-          "画出 prompt→rollout→reward→advantage→policy update 的数据形状与拥有者。",
-          "在已具备适配 GPU 的环境上跑最小固定配置；无 GPU 时先用合成样本验证奖励与 mask。",
-          "对一个多轮任务记录成功、超时、工具错误和截断比例，核对总奖励对应轨迹。"
+          "A=-1、r=0.6、ε=0.2 时 PPO 裁剪代理目标是多少？将 seq-mean 改为 token-mean 后，长度不同的轨迹权重怎样变化？"
         ],
         "selfCheck": [
           "PPO 与 GRPO 的优势估计区别是什么？",
-          "生成引擎与训练引擎怎样保持策略版本一致？",
-          "复现实验应记录哪些 SHA、模型与数据配置？"
+          "画出 prompt→rollout→reward→advantage→policy update 的数据形状与拥有者。",
+          "A=-1、r=0.6、ε=0.2 时 PPO 裁剪代理目标是多少？将 seq-mean 改为 token-mean 后，长度不同的轨迹权重怎样变化？"
         ],
         "sourceLinks": [
           {
-            "id": "repo",
-            "title": "verl official repository",
-            "url": "https://github.com/verl-project/verl",
-            "section": "Key Features / Getting Started / Recipe requirements",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "title": "verl GRPO 官方说明",
+            "url": "https://verl.readthedocs.io/en/latest/algo/grpo.html",
+            "supports": "组内优势、rollout 数量与 loss 配置；页面版本范围需另行核对"
           },
           {
-            "id": "grpo",
-            "title": "verl GRPO documentation",
-            "url": "https://verl.readthedocs.io/en/latest/algo/grpo.html",
-            "section": "adv_estimator / rollout sample count / loss aggregation / KL",
-            "verification": "本轮直接读取官方配置说明；算法机制同时核对原论文",
-            "verifiedAt": "2026-10-11"
+            "title": "verl repository",
+            "url": "https://github.com/verl-project/verl",
+            "supports": "配置、actor/rollout 和版本数据流",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
           },
           {
             "id": "advantage",
@@ -2185,10 +2261,10 @@
             "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "支持列表来自本次 README，具体后端兼容性应按选定配置核对。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -2232,7 +2308,7 @@
       "digest": {
         "resourceId": "agent-lightning",
         "title": "Agent Lightning：在真实 Harness 中采集训练轨迹",
-        "oneSentence": "先理清执行轨迹怎样转为策略样本，再讨论训练后的能力提升。",
+        "oneSentence": "训练解耦仍需 rollout、请求、token、logprob、reward 与策略版本的严格关联；重新分词、streaming 丢片段和重试重复会破坏训练样本，不是仅加一个代理地址。",
         "prerequisites": [
           "PPO/GRPO",
           "rollout 数据",
@@ -2244,10 +2320,10 @@
           "官方 Quick Start 和配置"
         ],
         "takeaways": [
-          "v1.0 把 Agent 的工具、上下文、控制流和环境保留在 harness 内，通过模型代理接入训练。",
-          "Trainer 使用 verl/vLLM 构建样本并更新策略；API Gateway 代理请求并采集数据；Controller 启动 Agent 运行。",
-          "技术报告把 retokenization、样本合并、优势计算、损失归一化和后端调度列为训练稳定性问题。",
-          "仓库明确 v1.0 完全重构，旧版本应看 legacy branch，不能把早期接入方式直接套入当前代码。"
+          "训练解耦仍需 rollout、请求、token、logprob、reward 与策略版本的严格关联。",
+          "重新分词、streaming 丢片段和重试重复会破坏训练样本，不是仅加一个代理地址。",
+          "grader 奖励绑定任务终态，失败样本与终止原因必须保留。",
+          "异步采样陈旧程度与训练部署环境一致性需要测量，不能无限消费旧策略数据。"
         ],
         "pitfalls": [
           "只采集最终答案与总奖励，无法追踪哪次工具调用或哪段 token 被优化。",
@@ -2255,23 +2331,32 @@
           "直接引用作者 benchmark 提升作为自己的复现实验，忽略模型、任务和预算。"
         ],
         "practice": [
-          "先用只读计算器小任务采集一条完整轨迹，标出模型输出、工具观察和奖励关联。",
-          "对代理前后 token 序列、样本边界和请求标识做一致性检查，再接入小规模训练。",
-          "固定 harness 与环境，仅改变策略，比较成功率、调用成本和失败类型。"
+          "模型响应重新分词后 token 数从 20 变成 23，却仍附 20 个旧 logprob，能否补三个零继续训练？"
         ],
         "selfCheck": [
           "三组件的数据流怎样闭环？",
-          "执行 harness 为什么不能随训练配置任意改变？",
-          "样本合并和 loss normalization 怎样影响长短轨迹的权重？"
+          "先用只读计算器小任务采集一条完整轨迹，标出模型输出、工具观察和奖励关联。",
+          "模型响应重新分词后 token 数从 20 变成 23，却仍附 20 个旧 logprob，能否补三个零继续训练？"
         ],
         "sourceLinks": [
           {
-            "id": "repo",
-            "title": "Agent Lightning official repository",
+            "title": "Agent Lightning v1.0 当前仓库",
             "url": "https://github.com/microsoft/agent-lightning",
-            "section": "v1.0 note / Architecture / Examples",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "supports": "重构版本、三组件职责与 legacy 范围；未运行训练"
+          },
+          {
+            "title": "v1.0 Basics",
+            "url": "https://microsoft.github.io/agent-lightning/stable/05-basics/",
+            "supports": "rollout、Gateway、Controller 与训练样本",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
+          },
+          {
+            "title": "Trainer configuration",
+            "url": "https://microsoft.github.io/agent-lightning/stable/20-trainer-configuration/",
+            "supports": "trace aggregation、优势、归一化和异步配置",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
           },
           {
             "id": "report",
@@ -2282,10 +2367,10 @@
             "verifiedAt": "2026-10-11"
           }
         ],
-        "versionNote": "导读对应已核验的 v1.0 架构；GPU 环境与训练尚未执行。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -2310,7 +2395,7 @@
       "digest": {
         "resourceId": "paper-ragen",
         "title": "RAGEN：多轮 Agent RL 的轨迹与训练崩塌",
-        "oneSentence": "在长时序和随机反馈中，轨迹分布与稳定性往往比单个奖励公式更关键。",
+        "oneSentence": "多轮轨迹的终止奖励存在信用分配问题，critic 与交互粒度有各自误差和成本；高奖励变异筛选改变训练分布，低方差不能一律判为无用任务。",
         "prerequisites": [
           "策略梯度",
           "多轮环境",
@@ -2322,10 +2407,10 @@
           "Rollout shaping 与奖励消融"
         ],
         "takeaways": [
-          "研究关注长时序决策和随机环境反馈，提出轨迹层面的 StarPO 与模块化 RAGEN 系统。",
-          "作者在四个风格化环境中观察 Echo Trap：奖励方差骤降与梯度尖峰伴随训练退化。",
-          "StarPO-S 结合轨迹过滤、critic 和梯度稳定化处理上述退化现象。",
-          "论文发现初始状态多样性、适中交互粒度与更频繁采样有助于 rollout；其奖励结论限定于该实验设定。"
+          "多轮轨迹的终止奖励存在信用分配问题，critic 与交互粒度有各自误差和成本。",
+          "高奖励变异筛选改变训练分布，低方差不能一律判为无用任务。",
+          "Echo Trap 的诊断需联合奖励、梯度、行为覆盖和环境正确性。",
+          "稳定化收益必须在同预算、多 seed、独立任务与逐项消融中验证。"
         ],
         "pitfalls": [
           "把单轮数学 RL 的稳定配置直接用于长多轮交互，不检查有效决策数和轨迹分布。",
@@ -2333,29 +2418,29 @@
           "把论文中的 reasoning-aware reward 结论当成所有 Agent RL 都必须人工奖励推理文本。"
         ],
         "practice": [
-          "在小型导航或状态机环境设计三种初始状态分布，观察策略是否学会可迁移行为。",
-          "画出 reward 均值/方差、动作熵、梯度范数和重复率，寻找退化同时出现的信号。",
-          "固定环境与预算比较一个稳定化组件的开关，保留每个 seed 的结果而非只挑最好曲线。"
+          "全失败任务被低方差筛掉后，训练成功率上升，可以认为能力提升吗？怎样验证筛选策略？"
         ],
         "selfCheck": [
           "训练 reward 上升时，什么证据仍可能表明策略退化？",
-          "为什么多轮 rollout 的粒度影响探索？",
-          "论文结论能外推到你的任务的哪些部分？"
+          "在小型导航或状态机环境设计三种初始状态分布，观察策略是否学会可迁移行为。",
+          "全失败任务被低方差筛掉后，训练成功率上升，可以认为能力提升吗？怎样验证筛选策略？"
         ],
         "sourceLinks": [
           {
-            "id": "paper",
-            "title": "RAGEN original paper",
+            "title": "RAGEN 原论文摘要",
             "url": "https://arxiv.org/abs/2504.20073",
-            "section": "Abstract / StarPO / Echo Trap / Rollout findings",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "supports": "摘要概览；指定正文范围另列"
+          },
+          {
+            "title": "RAGEN 全文指定章节",
+            "url": "https://arxiv.org/html/2504.20073v2",
+            "supports": "本轮读取 §4.2、§4.3、相关低方差分析；未复现训练"
           }
         ],
-        "versionNote": "本次以原论文摘要核验主要发现；未宣称复现全文实验或在真实生产任务确认结论。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -2380,7 +2465,7 @@
       "digest": {
         "resourceId": "search-r1",
         "title": "Search-R1：把检索交互纳入策略优化",
-        "oneSentence": "检索内容是观察，模型生成查询和答案是动作，两者需要不同训练处理。",
+        "oneSentence": "检索服务与搜索策略分层诊断，用人工 query/证据进行可干预对照；查询、控制标记与答案是动作，工具正文是观察；action 与 attention mask 不同。",
         "prerequisites": [
           "RAG",
           "PPO/GRPO",
@@ -2392,10 +2477,10 @@
           "仓库 retrieval server 与训练示例"
         ],
         "takeaways": [
-          "Search-R1 用 RL 优化交错推理与多轮搜索，模型决定查询，搜索结果被加入后续上下文。",
-          "论文对外部检索 token 做 loss mask，使策略梯度仅优化模型生成 token；观察仍供条件推理使用。",
-          "PPO 用学习到的 value/GAE，GRPO 用多输出奖励形成相对 baseline，不需要额外 value 模型。",
-          "实现将检索服务与训练管线分开，支持本地稀疏/稠密检索及在线搜索；检索环境是实验配置的一部分。"
+          "检索服务与搜索策略分层诊断，用人工 query/证据进行可干预对照。",
+          "查询、控制标记与答案是动作，工具正文是观察；action 与 attention mask 不同。",
+          "奖励、预算和任务验收分开，答案匹配不等于证据支持。",
+          "固定语料、后端、轮数与预算比较三种策略，先推理与数据验收再训练。"
         ],
         "pitfalls": [
           "把检索文本当模型动作计算策略损失，使优化目标与真实采样过程不符。",
@@ -2403,37 +2488,31 @@
           "只用终局答案匹配奖励，忽视引用、搜索成本和对证据不足的处理。"
         ],
         "practice": [
-          "用一条带两次检索的轨迹标出 action tokens 与 observation tokens，手动验证 mask 和损失计数。",
-          "以固定语料比较无检索、固定 RAG 与自主多轮检索，报告正确率、检索次数和支持证据。",
-          "保持检索服务版本不变，再改变策略；加入空结果与冲突结果检查恢复和拒答。"
+          "检索正文不计算动作 loss，为什么仍会影响后续 query 的梯度？若把 observation 从 attention 中也删掉，会改变什么？"
         ],
         "selfCheck": [
           "被 mask 的检索 token 还怎样影响模型？",
-          "多轮自主检索与固定一次 RAG 的决策区别是什么？",
-          "怎样避免答案奖励让模型学会刷分而不是可靠用工具？"
+          "用一条带两次检索的轨迹标出 action tokens 与 observation tokens，手动验证 mask 和损失计数。",
+          "检索正文不计算动作 loss，为什么仍会影响后续 query 的梯度？若把 observation 从 attention 中也删掉，会改变什么？"
         ],
         "sourceLinks": [
           {
-            "id": "paper",
-            "title": "Search-R1 original paper",
-            "url": "https://arxiv.org/html/2503.09516",
-            "section": "3.1 Loss masking / PPO / GRPO / 3.2 / 5.4",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "title": "Search-R1 官方仓库",
+            "url": "https://github.com/PeterGriffinJin/Search-R1",
+            "supports": "当前 README 的推理、训练与历史环境范围"
           },
           {
-            "id": "repo",
-            "title": "Search-R1 authors' repository",
-            "url": "https://github.com/PeterGriffinJin/Search-R1",
-            "section": "Quickstart / Search engine service / Supported retrievers",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "title": "Search-R1 paper §3.1",
+            "url": "https://arxiv.org/html/2503.09516",
+            "supports": "动作/观察 loss mask 与 PPO/GRPO 搜索训练",
+            "verifiedAt": "2026-10-13",
+            "verification": "已读取所列机制相关原始资料；模型、训练和生产系统成绩未复现。"
           }
         ],
-        "versionNote": "方法导读对应原论文与作者仓库；复现需固定 Search-R1、verl、语料与检索服务版本。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -2458,7 +2537,7 @@
       "digest": {
         "resourceId": "paper-deepseek-r1",
         "title": "DeepSeek-R1：区分 RL 推理、冷启动与蒸馏",
-        "oneSentence": "研究训练阶段如何塑造推理行为，并把推理模型能力与工具 Agent 系统能力分开。",
+        "oneSentence": "R1-Zero、R1 多阶段训练与蒸馏学生有不同初始化、数据与优化信号；正确性、格式与偏好目标不能互相替代，奖励与样本筛选也会被利用。",
         "prerequisites": [
           "SFT",
           "策略优化与奖励",
@@ -2470,10 +2549,10 @@
           "Evaluation protocol 与 Usage Recommendations"
         ],
         "takeaways": [
-          "R1-Zero 从基础模型直接进行 RL，没有以 SFT 作初始步骤；作者报告重复、可读性与语言混合等问题。",
-          "R1 引入冷启动数据，官方描述包含两阶段 RL 和两阶段 SFT，以结合推理探索和偏好对齐。",
-          "Distill 系列使用 R1 生成的数据对 Qwen/Llama 系列较小模型微调，不能把蒸馏称为从零完整复现 R1 RL。",
-          "官方基准使用指定生成长度和采样设定，并建议多次测试取平均；推理成本与协议是评测的一部分。"
+          "R1-Zero、R1 多阶段训练与蒸馏学生有不同初始化、数据与优化信号。",
+          "正确性、格式与偏好目标不能互相替代，奖励与样本筛选也会被利用。",
+          "模板、采样、长度、量化和推理服务共同决定实际表现与成本。",
+          "区分 pass@1 与预算内成功，按题型和失败机制评测，不把作者结果当实时排名。"
         ],
         "pitfalls": [
           "从数学/代码推理成绩推断模型已可靠掌握工具选择、权限与长期任务。",
@@ -2481,29 +2560,24 @@
           "把 R1 原始报告、后续 checkpoint 与蒸馏模型的结论混在一起。"
         ],
         "practice": [
-          "画出 R1-Zero、R1 与 Distill 的数据/优化阶段图，逐项说明哪些环节改权重。",
-          "在固定 token 和采样预算下比较一个可运行小模型的直接回答与推理回答，统计错误和成本。",
-          "再加入检索工具，单独评估协议正确率与引用质量，判断模型与系统各自贡献。"
+          "蒸馏学生输出很长且有教师风格，可否说明它复现了教师的 RL 能力？怎样比较？"
         ],
         "selfCheck": [
           "冷启动主要要解决哪类行为问题？",
-          "蒸馏与策略 RL 的监督信号有何区别？",
-          "推理能力为何不等于 Agent 可靠性？"
+          "画出 R1-Zero、R1 与 Distill 的数据/优化阶段图，逐项说明哪些环节改权重。",
+          "蒸馏学生输出很长且有教师风格，可否说明它复现了教师的 RL 能力？怎样比较？"
         ],
         "sourceLinks": [
           {
-            "id": "repo",
-            "title": "DeepSeek-R1 official repository",
+            "title": "DeepSeek-R1 官方仓库",
             "url": "https://github.com/deepseek-ai/DeepSeek-R1",
-            "section": "Introduction / Model Summary / Distillation / Evaluation / Usage",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "supports": "模型路径、蒸馏说明与 README 评测条件；未执行模型"
           }
         ],
-        "versionNote": "总结原始 R1 仓库所述训练路线，不推断所有后续 DeepSeek 模型采用同样流程。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -2738,7 +2812,7 @@
       "digest": {
         "resourceId": "hello-agents",
         "title": "HelloAgents：用课程骨架建立个人实验路线",
-        "oneSentence": "利用中文课程串起基础、框架、记忆、协议、RL 与项目，同时为每章保留独立实验记录。",
+        "oneSentence": "课程按基础、执行和深化的能力依赖阅读，先补根因相关机制；源码追踪关注数据形状、状态增量、异常和终止，框架默认行为须核对。",
         "prerequisites": [
           "Python",
           "LLM API 基本概念"
@@ -2749,10 +2823,10 @@
           "记忆/上下文/协议/评测及毕业设计"
         ],
         "takeaways": [
-          "课程从 Agent/LLM 基础进入 ReAct 等范式、平台与框架，再构建自己的 Agent 框架。",
-          "高级部分明确包括记忆与检索、上下文工程、通信协议、Agentic RL 和性能评测。",
-          "综合案例包括旅行助手、深度研究和赛博小镇，之后以完整应用毕业设计检验知识组合。",
-          "仓库提供配套 code，并建议亲手运行、调试和修改；README 不证明所有案例在当前环境都可直接运行。"
+          "课程按基础、执行和深化的能力依赖阅读，先补根因相关机制。",
+          "源码追踪关注数据形状、状态增量、异常和终止，框架默认行为须核对。",
+          "相同模型、工具和预算比较自研与框架，不能由代码短推断能力强。",
+          "预测、运行、失败和独立复习构成可复现学习记录，课程标题数不等于掌握。"
         ],
         "pitfalls": [
           "按章节打卡却没有保存输入、输出、失败与修改，缺少能力证据。",
@@ -2760,29 +2834,24 @@
           "直接复制教材依赖，忽视上游框架版本变化与案例成本。"
         ],
         "practice": [
-          "对已有 ML/LLM 经验先做一份章节能力诊断，基础概念可快速略读。",
-          "选择同一个学习助手项目，把 ReAct、记忆、MCP 和评测逐章加入并做前后比较。",
-          "毕业设计提交可复现实验、架构图和失败分析，而不是只交演示截图。"
+          "一个 agent 总重复搜索。你会先加记忆还是先查循环？给出五步诊断。"
         ],
         "selfCheck": [
           "框架应用和从零框架分别教会你什么？",
-          "记忆、上下文和检索的边界能否用实例解释？",
-          "如何用一个项目证明你掌握了多个章节？"
+          "对已有 ML/LLM 经验先做一份章节能力诊断，基础概念可快速略读。",
+          "一个 agent 总重复搜索。你会先加记忆还是先查循环？给出五步诊断。"
         ],
         "sourceLinks": [
           {
-            "id": "repo",
-            "title": "Datawhale Hello-Agents",
+            "title": "HelloAgents 当前课程仓库",
             "url": "https://github.com/datawhalechina/hello-agents",
-            "section": "Content navigation / How to learn / code / Community Blog",
-            "verification": "原始来源正文已实际打开",
-            "verifiedAt": "2026-10-11"
+            "supports": "章节结构与项目范围；本站路线为面向有经验学习者的选读建议"
           }
         ],
-        "versionNote": "本次核验 README 的课程导航与学习指引；未宣称逐章执行所有代码。",
-        "verifiedAt": "2026-10-11",
+        "versionNote": "核心机制、原创案例、错误边界与练习；配套 CPU 机制实验可运行。未运行本项目真实模型、完整 benchmark、训练或生产集成；每条来源列出支持范围。",
+        "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
-        "practiceStatus": "本站设计的练习建议，尚未执行；不是原论文复现实验结果。",
+        "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
         "pitfallStatus": "结合原文限制与工程推断的学习提醒，不代表作者逐字结论。"
       }
     },
@@ -3756,7 +3825,12 @@
         }
       ],
       "deliverable": "一份最小实现 + 执行轨迹 + 架构取舍笔记",
-      "project": "research"
+      "project": "research",
+      "studyUnits": [
+        "lesson-llm-contract",
+        "digest-paper-react",
+        "lesson-harness"
+      ]
     },
     {
       "id": "w2",
@@ -3785,7 +3859,10 @@
         }
       ],
       "deliverable": "工具契约文档 + 异常测试 + 对照结果",
-      "project": "research"
+      "project": "research",
+      "studyUnits": [
+        "lesson-tool-reliability"
+      ]
     },
     {
       "id": "w3",
@@ -3814,7 +3891,10 @@
         }
       ],
       "deliverable": "带引用的研究助手 + 数据划分 + 检索报告",
-      "project": "research"
+      "project": "research",
+      "studyUnits": [
+        "lesson-retrieval-rag"
+      ]
     },
     {
       "id": "w4",
@@ -3843,7 +3923,10 @@
         }
       ],
       "deliverable": "状态图 + 恢复演示 + 隔离测试",
-      "project": "durable"
+      "project": "durable",
+      "studyUnits": [
+        "digest-langgraph"
+      ]
     },
     {
       "id": "w5",
@@ -3872,7 +3955,12 @@
         }
       ],
       "deliverable": "记忆消融实验 + 失败轨迹 + 成本表",
-      "project": "durable"
+      "project": "durable",
+      "studyUnits": [
+        "lesson-context-engineering",
+        "lesson-long-term-memory",
+        "digest-mem0"
+      ]
     },
     {
       "id": "w6",
@@ -3901,7 +3989,11 @@
         }
       ],
       "deliverable": "协议实验仓库 + 工具/任务契约 + 技能示例",
-      "project": "durable"
+      "project": "durable",
+      "studyUnits": [
+        "digest-mcp",
+        "lesson-agent-security"
+      ]
     },
     {
       "id": "w7",
@@ -3931,7 +4023,13 @@
         }
       ],
       "deliverable": "可复现评测包 + 回归报告 + 指标说明",
-      "project": "evalops"
+      "project": "evalops",
+      "studyUnits": [
+        "lesson-evaluation-statistics",
+        "digest-eval-gaia",
+        "digest-eval-tau-family",
+        "digest-eval-terminalbench"
+      ]
     },
     {
       "id": "w8",
@@ -3962,7 +4060,11 @@
         }
       ],
       "deliverable": "小样本实验 + 可回放轨迹 + 失败分类",
-      "project": "coding"
+      "project": "coding",
+      "studyUnits": [
+        "digest-deep-agents",
+        "lesson-harness"
+      ]
     },
     {
       "id": "w9",
@@ -3991,7 +4093,10 @@
         }
       ],
       "deliverable": "三种架构对照 + 协作 trace + 取舍结论",
-      "project": "durable"
+      "project": "durable",
+      "studyUnits": [
+        "lesson-multi-agent"
+      ]
     },
     {
       "id": "w10",
@@ -4024,7 +4129,17 @@
         }
       ],
       "deliverable": "专题复现报告 + 代码 + 适用边界",
-      "project": "evalops"
+      "project": "evalops",
+      "studyUnits": [
+        "lesson-agent-rl",
+        "digest-verl",
+        "digest-agent-lightning",
+        "digest-paper-ragen",
+        "digest-search-r1",
+        "digest-paper-deepseek-r1",
+        "digest-jev",
+        "digest-paper-dspy"
+      ]
     },
     {
       "id": "w11",
@@ -4053,7 +4168,11 @@
         }
       ],
       "deliverable": "主项目交付包 + 稳定性报告 + 运维手册",
-      "project": "evalops"
+      "project": "evalops",
+      "studyUnits": [
+        "lesson-production-system-design",
+        "lesson-inference-serving"
+      ]
     },
     {
       "id": "w12",
@@ -4082,7 +4201,11 @@
         }
       ],
       "deliverable": "作品集 + 模拟面试复盘 + 下一轮问题清单",
-      "project": "evalops"
+      "project": "evalops",
+      "studyUnits": [
+        "lesson-evaluation-statistics",
+        "digest-hello-agents"
+      ]
     }
   ],
   "projects": [
@@ -4112,7 +4235,11 @@
         "比较检索与生成错误；记录成功率、成本和延迟",
         "发布可复现代码、失败样本和 case study"
       ],
-      "acceptance": "每条结论可追溯到证据；无证据问题有合理处理；优化以独立任务集验证。"
+      "acceptance": "每条结论可追溯到证据；无证据问题有合理处理；优化以独立任务集验证。",
+      "studyUnits": [
+        "lesson-retrieval-rag",
+        "digest-paper-react"
+      ]
     },
     {
       "id": "durable",
@@ -4140,7 +4267,11 @@
         "接入只读 MCP 工具与技能；验证访问边界",
         "同预算对照单 Agent 与多 Agent，分析协作收益"
       ],
-      "acceptance": "故障可恢复，用户数据隔离；同预算消融证明架构的价值与边界。"
+      "acceptance": "故障可恢复，用户数据隔离；同预算消融证明架构的价值与边界。",
+      "studyUnits": [
+        "lesson-harness",
+        "lesson-evaluation-statistics"
+      ]
     },
     {
       "id": "coding",
@@ -4168,7 +4299,11 @@
         "记录补丁、测试结果与完整 trace，分析失败",
         "比较工具/上下文改动，公开实验范围与成本"
       ],
-      "acceptance": "以实际测试判定修复成功；固定 harness/任务版本；结果可以被复现。"
+      "acceptance": "以实际测试判定修复成功；固定 harness/任务版本；结果可以被复现。",
+      "studyUnits": [
+        "lesson-harness",
+        "lesson-evaluation-statistics"
+      ]
     },
     {
       "id": "evalops",
@@ -4196,7 +4331,11 @@
         "加入异步队列、并发限流、容器化与回归检查",
         "整理架构、失败、优化证据与项目答辩材料"
       ],
-      "acceptance": "指标定义明确且可重复；能定位回归；有运维手册与两个项目 case study。"
+      "acceptance": "指标定义明确且可重复；能定位回归；有运维手册与两个项目 case study。",
+      "studyUnits": [
+        "lesson-harness",
+        "lesson-evaluation-statistics"
+      ]
     }
   ],
   "questions": [
@@ -4208,7 +4347,12 @@
         "从控制权与动态决策解释两者。",
         "结合一个任务说明自治何时值得引入。",
         "讨论可预测性、成本与评测方式。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n控制权决定边界：workflow 的下一步由显式流程确定，agent 在授权动作空间里根据观察选择。已知事务流程用固定状态机，开放检索才引入有限循环；两者可组合。\n\n**反例与边界**\n\n取消订单被画成自由循环，模型不断重复写操作，并不会比固定校验/审批/提交更好。\n\n**怎样验证**\n\n同任务、模型、工具与总预算比较流程和循环，分别记录任务正确、证据、重复动作、耗时与成本。",
+      "studyUnits": [
+        "lesson-harness"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q2",
@@ -4218,7 +4362,12 @@
         "区分模型消息、工具请求与执行结果。",
         "处理多工具、schema 错误和异常。",
         "限制步数、时间、token，避免无限重试。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n状态保存目标、消息、观察、待确认操作、预算和终止理由。循环是模型动作建议→结构/业务/权限校验→执行→观察→独立完成验真。合法 JSON 不代表业务正确。\n\n**反例与边界**\n\n工具 timeout 后把它当“未提交”并换 ID 重试，可能产生重复副作用。\n\n**怎样验证**\n\n正常、未知工具、非法参数、空观察、截断、权限拒绝、超时和无限重复建立固定 fixture；先验协议，再接模型。",
+      "studyUnits": [
+        "lesson-llm-contract"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q3",
@@ -4228,7 +4377,12 @@
         "描述行动与观察如何影响下一次决策。",
         "对照无工具/固定流程基线，控制预算。",
         "分析工具环境和任务定义，而不只背论文成绩。"
-      ]
+      ],
+      "answer": "**核心思路**\n\nReAct 根据环境观察调整行动；语言记录不直接改变环境，工具才执行动作或获取证据。它适合需要动态信息收集的任务，外层仍强制权限和预算。\n\n**反例与边界**\n\n连续收到相同无关搜索结果却仍机械重试，输出长思考不等于增加知识。\n\n**怎样验证**\n\n固定模型、输入页面、工具和总预算，对照直接回答、一次检索和有限循环；用人工证据干预区分检索与整合错误。",
+      "studyUnits": [
+        "digest-paper-react"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q4",
@@ -4238,7 +4392,12 @@
         "区分遗漏、干扰、陈旧状态与长度约束。",
         "说明摘要、检索记忆和外部状态的取舍。",
         "设计长任务评测与消融。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n上下文包含目标、约束、工具与证据，大窗口不保证有效使用。噪声、位置、重复和摘要丢条件都可能干扰；精确业务状态不只放在摘要。\n\n**反例与边界**\n\n压缩把“默认不允许”改成“默认允许”，后续措辞流畅但判断倒置。\n\n**怎样验证**\n\n同预算比较完整历史、最近消息、结构摘要与按需读取，测证据、约束、缺口和成本；关键限制回读原文。",
+      "studyUnits": [
+        "lesson-context-engineering"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q5",
@@ -4248,7 +4407,12 @@
         "定义事实来源、时间、置信度与用户隔离。",
         "控制写入门槛和污染；允许修正与删除。",
         "检验记忆是否帮助而非增加偏差。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n把原始证据、抽取事实和当前有效视图分开，保留用户、有效时间和版本。写入、冲突、索引、检索、撤回与删除是整条管线。\n\n**反例与边界**\n\n较旧后台抽取晚写入，若按写入时间覆盖当前偏好，会恢复成过时事实。\n\n**怎样验证**\n\n测 A/B 用户隔离、迟到、冲突、有效期、撤回和备份恢复；删除后检查原记录、索引、缓存和摘要。",
+      "studyUnits": [
+        "lesson-long-term-memory"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q6",
@@ -4258,7 +4422,12 @@
         "工具/数据连接与 Agent 间协作分别解释。",
         "描述 client/server 与远程任务生命周期。",
         "说明鉴权、版本和信任边界。"
-      ]
+      ],
+      "answer": "**核心思路**\n\nMCP 统一能力/资源/提示接口，A2A 处理 agent 间消息、任务和产物。协议连接和能力描述不证明对象授权。当前版本需独立核对请求元数据与任务生命周期。\n\n**反例与边界**\n\nMCP 工具标 readOnly 就直接公开用户数据，或 A2A stream 断开就断言任务取消，都是边界混淆。\n\n**怎样验证**\n\n分别验兼容性、参数、权限、错误、任务查询与副作用；保存协议/SDK 版本，不混用旧版生命周期。",
+      "studyUnits": [
+        "digest-mcp"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q7",
@@ -4268,7 +4437,12 @@
         "固定数据集与查询划分；定义相关性。",
         "对比关键词、向量、混合和重排。",
         "同时分析召回、排序、延迟与成本。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n固定语料、切块、ACL、标签与预算；对照词项、稠密、rank 融合和候选重排。RRF 用排序而非直接相加不同比例分数。\n\n**反例与边界**\n\n重排 top-2 中没有正确文档，不能靠重排找回未召回候选；向量相似也不是真实性。\n\n**怎样验证**\n\n逐 k 测 Recall/MRR/nDCG，再测答案与引用支持、拒答和 p95 成本；人工证据作为生成对照。",
+      "studyUnits": [
+        "lesson-retrieval-rag"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q8",
@@ -4278,7 +4452,12 @@
         "先评估证据是否被召回。",
         "再检查答案是否忠实使用证据。",
         "给出引用、拒答和端到端指标。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n先用人工 query 测检索，再把人工相关证据给同一生成器；查看错误发生在召回、解析、重排、上下文还是答案整合。\n\n**反例与边界**\n\n答案碰巧正确但引用不支持，不等于 RAG 成功；模型记忆可掩盖检索缺失。\n\n**怎样验证**\n\n保存 query、候选、最终证据和 claim 引用，加入无答案、冲突、精确版本及越权文档，固定模型与评分器。",
+      "studyUnits": [
+        "lesson-retrieval-rag"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q9",
@@ -4288,7 +4467,12 @@
         "定义训练样本、动作与执行反馈。",
         "解释奖励稀疏、信用分配与数据质量。",
         "设计开发/测试划分与成本可承受的实验。"
-      ]
+      ],
+      "answer": "**核心思路**\n\nSFT 学示范的合法动作与分布，RL 用环境奖励改变策略；必须有可信 grader 与可复现环境。不同初始化、数据预算和交互次数不能随意比较。\n\n**反例与边界**\n\n格式奖励上涨但 agent 刷工具次数，终态成功下降；奖励优化不替代工具权限。\n\n**怎样验证**\n\n相同基座/工具/测试/预算比较 SFT、RL 与组合，核对 mask、reward hacking、独立任务、多个 seed 及成本。",
+      "studyUnits": [
+        "lesson-agent-rl"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q10",
@@ -4298,7 +4482,12 @@
         "固定 program、数据划分与优化预算。",
         "对照人工提示与未优化基线。",
         "用保留集与多次运行检验收益和方差。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n明确优化对象、数据与 metric；候选选择只看训练/验证，独立测试保留。按来源分组避免近重复泄漏，优化预算与推理预算分开。\n\n**反例与边界**\n\n关键词 metric 被垃圾文本拿高分，或者在测试集反复调 prompt，都不能证明泛化。\n\n**怎样验证**\n\n跑错引用、空引用、错实体等评分负例，保存编译产物、模型、候选得分；跨领域/时间测试观察退化。",
+      "studyUnits": [
+        "digest-paper-dspy"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q11",
@@ -4308,6 +4497,18 @@
         "比较贪心执行、plan-and-execute 与搜索。",
         "定义状态、动作、启发式和预算。",
         "说明状态空间、工具反馈与搜索成本。"
+      ],
+      "answer": "**核心思路**\n\n规划搜索适用于可比较候选、可评价中间状态且允许探索/回溯的任务。定义状态、动作、候选生成、评分、扩展与停止；固定总预算。\n\n**反例与边界**\n\n不可逆真实写操作不能像纸面解题树一样随意回滚；错误自评分还会引导搜索坏分支。\n\n**怎样验证**\n\n先用可回溯的固定环境对照直线推理与宽度/深度受限搜索，记录任务成功、评分器错误、节点数和成本。",
+      "studyUnits": [
+        "digest-paper-react"
+      ],
+      "reviewedAt": "2026-10-13",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2305.10601",
+          "title": "原研究摘要与元信息",
+          "scope": "已读摘要，未复现论文与模型实验；参考思路含本站原创分析。"
+        }
       ]
     },
     {
@@ -4318,6 +4519,18 @@
         "分析错误反馈、自证偏差与记忆污染。",
         "区分额外尝试带来的收益与反思本身。",
         "做同预算消融并保留失败案例。"
+      ],
+      "answer": "**核心思路**\n\n反思把反馈变成下一次上下文，而非天然更新模型权重。反馈必须可信，反思可错误归因、覆盖原本正确答案、扩大上下文和成本。\n\n**反例与边界**\n\n没有外部证据，只让模型自我批评三次，可能把正确答案改错。\n\n**怎样验证**\n\n固定任务、反馈来源与预算，比较无反思/外部反馈/自反馈，保留从对变错与从错变对样例，独立 grader 验证。",
+      "studyUnits": [
+        "lesson-evaluation-statistics"
+      ],
+      "reviewedAt": "2026-10-13",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2303.11366",
+          "title": "原研究摘要与元信息",
+          "scope": "已读摘要，未复现论文与模型实验；参考思路含本站原创分析。"
+        }
       ]
     },
     {
@@ -4328,7 +4541,12 @@
         "区分 I/O 与 CPU 工作。",
         "设计 semaphore、队列、超时和退避。",
         "处理取消传播、部分失败和资源释放。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n分开每用户、全局与下游并发，排队有截止时间，单次调用超时，取消传播；退避+抖动与总重试预算控制负载。\n\n**反例与边界**\n\n三层各总尝试 3 次，最坏下游 27 次；并发越大可能限流更多、尾时延更差。\n\n**怎样验证**\n\n测稳定与突发负载、429/5xx、慢调用与取消，保留请求/提交计数和 p95；非幂等写保持身份并查询未知结果。",
+      "studyUnits": [
+        "lesson-tool-reliability"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q14",
@@ -4338,7 +4556,12 @@
         "定义任务/动作标识与幂等键。",
         "分离规划与执行，保存执行状态。",
         "处理超时后结果未知与重复提交。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n第一次意图生成稳定 ID，与规范化参数和业务版本绑定；唯一约束与业务写、回执同事务。跨服务依赖远端幂等或状态查询/对账。\n\n**反例与边界**\n\n每次网络重试换 ID，或先查后写无唯一约束，并发时都会绕过去重。\n\n**怎样验证**\n\n提交前失败、写后丢响应、同键并发、参数冲突、保留期和查询不可用逐一注入，记录写请求与业务结果。",
+      "studyUnits": [
+        "lesson-tool-reliability"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q15",
@@ -4348,7 +4571,12 @@
         "保存消息、状态、版本、任务与工具结果。",
         "解释恢复边界与副作用去重。",
         "用故障注入验证恢复和隔离。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n检查点保存状态值、待执行节点、必要配置与历史；不恢复函数任意行。业务 ID、草稿版本、批准和回执另建合同，未确认动作保留。\n\n**反例与边界**\n\ninterrupt 恢复重跑节点；内存 saver 重建为空；远端已提交未确认时检查点不能消除重复。\n\n**怎样验证**\n\n真实 SDK 先验路由/合并，再跨进程恢复，注入写后硬退出，比较调用数与唯一业务行，另外测审批旧版本拒绝。",
+      "studyUnits": [
+        "digest-langgraph"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q16",
@@ -4358,7 +4586,12 @@
         "记录任务、模型/工具 span、时间与状态。",
         "保留版本、成本和错误分类。",
         "脱敏输入，支持失败回放和关联日志。"
-      ]
+      ],
+      "answer": "**核心思路**\n\nTrace 对一次任务关联 attempt、thread、operation、模型/工具/语料版本；span 描述模型、检索、工具与验真段，记录时延/错误/终止。\n\n**反例与边界**\n\n只记录“模型完成”无法定位附件、权限或写后故障；把凭证和私有全文打印到日志又引入泄漏。\n\n**怎样验证**\n\n用正常与故障轨迹核对跨服务上下文传播、并发关联、取消和日志脱敏，任务成功与服务指标分别记录。",
+      "studyUnits": [
+        "lesson-production-system-design"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q17",
@@ -4368,7 +4601,12 @@
         "将网页内容视为数据，分析注入路径。",
         "隔离凭据、限制工具能力与写操作。",
         "在必要执行点人工确认并记录审计。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n不可信网页是材料，不授权工具；可信会话身份、scope、对象归属、参数和网络能力由服务端强制。即使模型被影响也应拒绝越权。\n\n**反例与边界**\n\n网页声称自己是管理员、工具 annotation 声称 readOnly，都不能替换认证与访问控制。\n\n**怎样验证**\n\n把注入后的非法候选直接送执行器，测缺 scope、跨用户、旧审批、重定向与秘密流出；模型策略和执行不变量分别计量。",
+      "studyUnits": [
+        "lesson-agent-security"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q18",
@@ -4378,7 +4616,12 @@
         "先定义任务价值与可接受预算。",
         "定位模型、检索、工具和队列瓶颈。",
         "用缓存、并发、路由与预算控制做对照。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n分段量排队、prefill、decode、工具与验真；成功、预算内可靠性、成本与尾时延共同形成目标，不能只优化平均响应。\n\n**反例与边界**\n\n前缀缓存改善 TTFT 却不缩短长 decode；增加重试提高成功也可能提高成本和 p95。\n\n**怎样验证**\n\n固定长度分布、任务、并发和缓存冷热，做配置消融；失败费用计入总成本/成功任务，不删超时试验。",
+      "studyUnits": [
+        "lesson-inference-serving"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q19",
@@ -4388,7 +4631,12 @@
         "优先检查实际结果与业务约束。",
         "区分代码、模型与人工判定。",
         "校验误判，避免只匹配单一措辞。"
-      ]
+      ],
+      "answer": "**核心思路**\n\ngrader 从需求独立判断业务行为、终态、证据和约束；规则与模型 judge 各有盲点，版本化。信任边界防 agent 改评分器。\n\n**反例与边界**\n\nexit 0、含关键词、写 reward=1 都可在任务错误时出现；正确答案错引用也要识别。\n\n**怎样验证**\n\n用正确等价、相近错误、错对象、缺确认、空结果和恶意产物负例验评分，再运行模型与完整 benchmark。",
+      "studyUnits": [
+        "lesson-evaluation-statistics"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q20",
@@ -4398,7 +4646,12 @@
         "说明多次中至少一次成功与重复稳定成功的差别。",
         "固定采样与运行次数，报告方差。",
         "讨论产品一次执行时的风险与成本。"
-      ]
+      ],
+      "answer": "**核心思路**\n\npass@k 强调 k 次至少一成功，pass^k 强调全部成功，逐题组合估计不同。n=4,c=2,k=2 时分别 5/6 与 1/6。\n\n**反例与边界**\n\n全局平均成功率直接做幂忽略题难度；挑最好一次展示掩盖不稳定。\n\n**怎样验证**\n\n每题固定 n trial，保留失败原因、grader、用户模拟器与预算；报告单次、全次成功和成本，不混 benchmark 版本。",
+      "studyUnits": [
+        "digest-eval-tau-family"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q21",
@@ -4408,7 +4661,12 @@
         "冻结任务集、环境与基线版本。",
         "对比整体指标和任务类别分布。",
         "回放失败，形成回归样本与回滚条件。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n提示/模型/工具/检索版本共同决定系统行为。固定保留任务和评分器，基线与新版按题配对，主要门槛预定义。\n\n**反例与边界**\n\n只选三个改得更好的开发样例，或同时换 judge，无法知道回归和归因。\n\n**怎样验证**\n\n覆盖成功、边界、拒答、权限与恢复，报告从对变错/错变对、成本和 p95；小范围发布后观测并可回退配置。",
+      "studyUnits": [
+        "lesson-evaluation-statistics"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q22",
@@ -4418,6 +4676,18 @@
         "分析位置、风格、长度与模型偏好。",
         "用人工标注样本检查一致性与误判。",
         "在关键结果上结合执行式检查。"
+      ],
+      "answer": "**核心思路**\n\n模型 judge 与人工标签可能不一致，有位置、长度、风格与自偏好风险；评分提示与模型版本属于实验配置。\n\n**反例与边界**\n\n啰嗦错误答案因长度更高得分，或调换回答顺序后偏好反转，说明评分器而非 agent 改善。\n\n**怎样验证**\n\n盲审人工样本，交换次序、控制长度、注入空/错引用负例，衡量一致性并分歧复核；必要时规则与人工联合验真。",
+      "studyUnits": [
+        "lesson-evaluation-statistics"
+      ],
+      "reviewedAt": "2026-10-13",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2306.05685",
+          "title": "原研究摘要与元信息",
+          "scope": "已读摘要，未复现论文与模型实验；参考思路含本站原创分析。"
+        }
       ]
     },
     {
@@ -4428,7 +4698,12 @@
         "需求、权限与知识更新先于模型选型。",
         "描述检索、重排、生成、引用与评测链路。",
         "处理多租户、成本、降级和可观测性。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n企业问答先定义资料生命周期和 ACL；分块、版本、混合召回、重排、claim 引用与拒答贯通；可信身份进入检索与工具。\n\n**反例与边界**\n\n只在输出遮住越权内容，模型已经读到资料；缓存旧结论也可能跨用户泄漏。\n\n**怎样验证**\n\n固定来源与任务集，检索/生成干预对照，测缺答案、冲突版本、权限、删除、引用支持和任务成本。",
+      "studyUnits": [
+        "lesson-retrieval-rag"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q24",
@@ -4438,7 +4713,12 @@
         "拆分任务状态、执行器与工具服务。",
         "设计队列、checkpoint、取消和预算。",
         "分析长上下文、重复行动与质量验证。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n长运行研究用任务状态、持久检查点、预算、资料版本和未确认动作；产物需证据。定期发现是入口，正文阅读、总结、练习和复习才是知识补充。\n\n**反例与边界**\n\n无限循环采集链接、网页变化后仍复用旧摘要、写后崩溃盲重放都破坏可持续性。\n\n**怎样验证**\n\n测试暂停/恢复、来源缺失/冲突、预算、取消和重复投递，保留旧学习记录与原文定位，推荐根据未解问题和到期复习。",
+      "studyUnits": [
+        "lesson-production-system-design"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q25",
@@ -4448,7 +4728,12 @@
         "定义角色、共享数据与冲突解决。",
         "与单 Agent/固定流程作同预算比较。",
         "处理失败传播、通信开销与权限。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n审查系统分清独立检查与共享写入，子任务有证据/缺口/预算合同；主代理验冲突与任务要求。代码修改需版本和顺序保护。\n\n**反例与边界**\n\n多个 agent 重复同源观点形成多数票，或同时覆盖文件，不会使结果更可靠。\n\n**怎样验证**\n\n同任务、模型和总预算比较单代理、并行审查与 supervisor，测覆盖、误报、冲突、重复和关键路径。",
+      "studyUnits": [
+        "lesson-multi-agent"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q26",
@@ -4458,7 +4743,12 @@
         "定义沙箱、文件/网络权限和凭据边界。",
         "测试作为结果验证，固定仓库与任务版本。",
         "记录补丁、日志、资源上限与回放。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n执行环境固定镜像/依赖/工作目录/网络与资源，工具能力最小化；agent 产物和可信 verifier 分开。每 trial 从干净起点运行。\n\n**反例与边界**\n\nagent 改 tests 使 reward 恒为 1，或上次试验残留正确文件，得到的是隔离漏洞。\n\n**怎样验证**\n\n正常、缺依赖、恶意测试改写、路径/网络、超时和重复运行回归，核对 artifact hash、输出、退出码与实际业务结果。",
+      "studyUnits": [
+        "digest-eval-terminalbench"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q27",
@@ -4468,7 +4758,12 @@
         "给出具体任务、失败轨迹与指标。",
         "解释定位过程、被否定的假设和改动。",
         "讲清复验、残余问题与下一次实验。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n描述具体输入、期望不变量、观察证据、候选根因和一个可干预对照；区分已证实与假设，承认未覆盖边界。\n\n**反例与边界**\n\n只说框架不稳定却没有版本、trace 和故障窗口，无法解释技术判断。\n\n**怎样验证**\n\n例如写后崩溃：保留操作 ID、检查点 next、业务行和调用数，改变幂等协议再测；用反例支持结论而非成功截图。",
+      "studyUnits": [
+        "lesson-harness"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q28",
@@ -4478,7 +4773,12 @@
         "从任务、团队、部署与控制要求出发。",
         "给出最小实现与替代框架的证据。",
         "说明版本锁定、迁移成本与边界。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n先从状态/路由/工具/中断/恢复等合同选择框架，比较学习、实现、部署和升级成本；没有动态复杂度时手写流程可作基线。\n\n**反例与边界**\n\n库更流行、代码更短，不证明权限、恢复或任务收益；默认行为可能跨版本变化。\n\n**怎样验证**\n\n同模型、工具、任务和总预算比较原生/框架，测故障与实际结果，固定 SDK 和迁移回归，不把本机通路当生产认证。",
+      "studyUnits": [
+        "digest-langgraph"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q29",
@@ -4488,7 +4788,12 @@
         "展示数据、代码、评测与部署链路。",
         "用真实成功率/成本/时延解释迭代。",
         "说明用户问题、技术取舍与维护方式。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n能力证据是可复现任务、核心实现、假设、对照、失败与边界，不是数量、截图或笼统职位标签。学习记录优先服务自己持续深化。\n\n**反例与边界**\n\n只贴成功率却没有数据/评分器/失败任务，也不能证明算法到系统的因果收益。\n\n**怎样验证**\n\n提供最小可运行实验、配置和独立结果，先解释机制，再说哪些集成未验证；不编造自己的经历或训练成绩。",
+      "studyUnits": [
+        "lesson-evaluation-statistics"
+      ],
+      "reviewedAt": "2026-10-13"
     },
     {
       "id": "q30",
@@ -4498,7 +4803,12 @@
         "从失败分布与产品价值选择假设。",
         "定义基线、变量、预算与停止条件。",
         "写出可否证的结论与后续动作。"
-      ]
+      ],
+      "answer": "**核心思路**\n\n优先验证对当前结论影响最大的未知或失败根因，定义能区分两种解释的最小实验；一次改一个变量并给可观察结果。\n\n**反例与边界**\n\n同时换模型、提示、检索和工具，分数提高仍无法归因，也浪费预算。\n\n**怎样验证**\n\n写假设、输入/版本、变量、指标、失败条件和停止预算；运行后保留预测与观察，下次独立复习说明理解变化。",
+      "studyUnits": [
+        "lesson-evaluation-statistics"
+      ],
+      "reviewedAt": "2026-10-13"
     }
   ],
   "guides": [
@@ -4530,6 +4840,11 @@
           "留下什么",
           "一段可运行代码、一条正常轨迹、一条失败轨迹，以及关于状态、权限和停止条件的说明。"
         ]
+      ],
+      "studyUnits": [
+        "lesson-llm-contract",
+        "digest-paper-react",
+        "lesson-harness"
       ]
     },
     {
@@ -4560,6 +4875,10 @@
           "留下什么",
           "一张消融结果表、一个记忆污染样本、一次删除/修正记录，以及你选择当前策略的理由。"
         ]
+      ],
+      "studyUnits": [
+        "lesson-context-engineering",
+        "lesson-long-term-memory"
       ]
     },
     {
@@ -4590,6 +4909,10 @@
           "留下什么",
           "一个可复现 eval runner、grader 文档、失败分类和回归报告。把自己跑过的结果与来源论文结果分开记录。"
         ]
+      ],
+      "studyUnits": [
+        "lesson-evaluation-statistics",
+        "digest-eval-tau-family"
       ]
     },
     {
@@ -4620,6 +4943,11 @@
           "留下什么",
           "一张边界图、最小服务器与客户端、错误测试，以及版本与鉴权说明。"
         ]
+      ],
+      "studyUnits": [
+        "digest-mcp",
+        "lesson-multi-agent",
+        "lesson-agent-security"
       ]
     },
     {
@@ -4651,6 +4979,10 @@
           "留下什么",
           "一页决策记录：选择、替代方案、证据、风险和下一次复核日期。"
         ]
+      ],
+      "studyUnits": [
+        "digest-langgraph",
+        "digest-deep-agents"
       ]
     },
     {
@@ -4681,6 +5013,10 @@
           "留下什么",
           "两个 case study、一份评测报告、一段可恢复运行演示，以及能讲清的失败案例。"
         ]
+      ],
+      "studyUnits": [
+        "lesson-evaluation-statistics",
+        "lesson-production-system-design"
       ]
     }
   ],
