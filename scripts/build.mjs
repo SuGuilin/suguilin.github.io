@@ -26,14 +26,16 @@ const routes = [
   ['/about/', 'about', '关于工作台', 'SuGuilin 的个人 Agent 学习工作台：持续研究，记录过程，构建产品。', 'info'],
   ['/guide/', 'guide', '学习手记', '围绕 Agent 核心问题的原创实践导读与一手资料。', 'file']
 ];
-const navigation = ['home','study','plan','roadmap','radar','lab','journal','interview','assistant'].map(id=>routes.find(r=>r[1]===id)).map(([url, id, title, , icon]) => `<a href="${url}" data-nav data-route="${id}"><span data-icon="${icon}"></span>${title}${id === 'radar' ? '<span class="new-dot" title="资料已核实"></span>' : ''}</a>`).join('\n');
+const navLink=id=>{const [url,,title,,icon]=routes.find(r=>r[1]===id);return `<a href="${url}" data-nav data-route="${id}"><span data-icon="${icon}"></span>${id==='study'?'专题学习':title}</a>`;};
+const navigation = ['home','plan','study','journal'].map(navLink).join('\n');
+const explorationNavigation = ['roadmap','lab','interview','assistant'].map(navLink).join('\n');
 for (const [url, id, title, description] of routes) {
   const dir = path.join(root, url);
   await mkdir(dir, {recursive: true});
-  const html = template.replaceAll('{{navigation}}', navigation).replaceAll('{{title}}', title).replaceAll('{{description}}', description).replaceAll('{{path}}', url).replaceAll('{{resourceCount}}', String(data.resources.length));
+  const html = template.replaceAll('{{navigation}}', navigation).replaceAll('{{explorationNavigation}}', explorationNavigation).replaceAll('{{title}}', title).replaceAll('{{description}}', description).replaceAll('{{path}}', url).replaceAll('{{resourceCount}}', String(data.resources.length));
   await writeFile(path.join(dir, 'index.html'), html);
 }
-await writeFile(path.join(root, '404.html'), template.replaceAll('{{navigation}}', navigation).replaceAll('{{title}}', '页面未找到').replaceAll('{{description}}', '返回 SuGuilin Agent 工作台继续学习。').replaceAll('{{path}}', '/404.html').replaceAll('{{resourceCount}}', String(data.resources.length)));
+await writeFile(path.join(root, '404.html'), template.replaceAll('{{navigation}}', navigation).replaceAll('{{explorationNavigation}}', explorationNavigation).replaceAll('{{title}}', '页面未找到').replaceAll('{{description}}', '返回 SuGuilin Agent 工作台继续学习。').replaceAll('{{path}}', '/404.html').replaceAll('{{resourceCount}}', String(data.resources.length)));
 const oldMap = await readFile(path.join(root, 'sitemap.txt'), 'utf8').catch(() => '');
 const urls = new Set([...oldMap.trim().split(/\s+/).filter(Boolean).map(url => url.replace(/^http:/, 'https:')), ...routes.map(([url]) => 'https://suguilin.github.io' + url), 'https://suguilin.github.io/blog/']);
 for (const guide of data.guides) urls.add('https://suguilin.github.io/guide/?id=' + guide.id);

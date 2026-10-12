@@ -25,13 +25,20 @@
       </a>
       <div class="sidebar-navigation">
       <nav class="primary-nav" aria-label="主要页面">
-        <span class="nav-caption">学习工作区</span>
+        <span class="nav-caption">学习与记录</span>
         {{navigation}}
       </nav>
-      <nav class="secondary-nav" aria-label="资料与设置">
-        <span class="nav-caption">资料与记录</span>
+      <nav class="secondary-nav" aria-label="资料">
+        <span class="nav-caption">资料</span>
         <a href="/library/" data-nav data-route="library"><span data-icon="books"></span>知识库<span class="nav-count" id="resource-count">{{resourceCount}}</span></a>
         <a href="/saved/" data-nav data-route="saved"><span data-icon="bookmark"></span>收藏夹<span class="nav-count" id="saved-count">0</span></a>
+        <a href="/radar/" data-nav data-route="radar"><span data-icon="radar"></span>技术雷达</a>
+      </nav>
+      <details class="nav-exploration">
+        <summary>路线、实践与面试</summary>
+        <nav class="secondary-nav" aria-label="路线与深化">{{explorationNavigation}}</nav>
+      </details>
+      <nav class="secondary-nav nav-settings" aria-label="其他页面">
         <a href="/blog/"><span data-icon="archive"></span>历史博客<span data-icon="external" class="nav-end"></span></a>
         <a href="/about/" data-nav data-route="about"><span data-icon="info"></span>关于工作台</a>
         <a href="/account/" data-nav data-route="account"><span data-icon="shield"></span>账号与备份</a>

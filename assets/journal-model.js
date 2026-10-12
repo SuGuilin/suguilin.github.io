@@ -20,7 +20,16 @@ export function journalTitle(note){
     ? note.title.replace(/ · 待解答问题$/,'')||note.title : note.title;
 }
 export function journalNoteParts(note){
-  if(!readAnnotation(note))return questionNoteParts(note);
+  if(!readAnnotation(note)){
+    const parts=questionNoteParts(note);
+    if(note.kind==='学习复盘'&&/ · 学习复盘$/.test(note.title)){
+      const marker='\n\n## 上次作答（供事后比较）\n\n',start=note.body.indexOf(marker),end=note.body.lastIndexOf('\n\n[回到学习单元](/study/?id=');
+      if(start>=0&&end>start&&note.body.indexOf(marker,start+marker.length)===-1&&/^\n\n\[回到学习单元\]\(\/study\/\?id=[a-zA-Z0-9_-]+(?:#[a-zA-Z0-9_-]+)?\)\n\n原始来源：\[[^\n]+\]\(https?:\/\/[^\n]+\)/.test(note.body.slice(end))){
+        return {...parts,body:note.body.slice(0,start)+note.body.slice(end),comparison:note.body.slice(start+marker.length,end)};
+      }
+    }
+    return parts;
+  }
   const footer=note.body.match(/\n\n\[回到标注位置\]\(\/study\/\?id=[a-zA-Z0-9_-]+#[a-zA-Z0-9_-]+\)\n\n原始来源：[^\n]+\n阅读范围：[^\n]+(?=\n\n|$)/);
   return footer?{body:note.body.slice(0,footer.index)+note.body.slice(footer.index+footer[0].length),context:footer[0].trim(),question:''}:{body:note.body,context:'',question:''};
 }
@@ -28,6 +37,11 @@ export function journalPreview(note){
   if(['待解答问题','已解决问题'].includes(note.kind)&&/^## 待解答的问题\n/.test(note.body))return notePreview(questionNoteParts(note).question);
   const annotation=readAnnotation(note);
   if(annotation){const thought=note.body.match(/## 我的(?:思考|疑问)\n\n([\s\S]*?)(?=\n\n\[回到标注位置\]|$)/)?.[1]?.trim();return notePreview(thought||annotation.quote);}
+  if(['学习笔记','学习复盘'].includes(note.kind)&&note.title.endsWith(' · '+note.kind)&&note.body.includes('[回到学习单元](/study/')){
+    const reflection=note.body.match(/(?:^|\n)## 我的理解与疑问\n\n([\s\S]*?)(?=\n\n(?:自评：|## 上次作答（供事后比较）|\[回到学习单元\])|$)/)?.[1]?.trim();
+    const answer=note.body.match(/^## 我的作答\n\n### [^\n]+\n\n([\s\S]*?)(?=\n\n(?:### |## |\[回到学习单元\])|$)/)?.[1]?.trim();
+    if(reflection||answer)return notePreview(reflection||answer);
+  }
   return notePreview(note.kind==='资料收件箱'?(note.body.match(/## 已读取的信息\n+([\s\S]*?)(?=\n##|$)/)?.[1]||note.body):journalReadingBody(note));
 }
 export function journalReadingBody(note){

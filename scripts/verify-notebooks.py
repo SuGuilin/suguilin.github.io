@@ -49,6 +49,10 @@ for name in names:
                 assert report['same_thread_approved'] and not report['other_thread_approved']
                 assert report['new_saver_state'] == {}
             elif name == 'decision-calibration.ipynb':
+                report = json.loads(Path('calibration_report.json').read_text())
+                assert report['experiment'] == 'decision-calibration' and report['model_evaluated'] is False
+                assert report['baseline']['selective'][1]['accepted'] == 2
+                assert report['changed']['selective'][1]['errors'] == 1
                 assert abs(namespace['brier'](namespace['labels'], namespace['probabilities']) - 0.1671875) < 1e-12
                 accepted = namespace['selective'](namespace['changed'], namespace['probabilities'], 0.9)
                 assert accepted['coverage'] == 0.25 and accepted['accepted_error'] == 0.5

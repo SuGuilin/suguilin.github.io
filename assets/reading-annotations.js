@@ -11,7 +11,7 @@ export class ReadingAnnotations{
     document.addEventListener('click',e=>{const b=e.target.closest('[data-annotation]');if(b){e.preventDefault();try{this.action(b);}catch(error){study.notify(error.message);}}});
   }
   records(unit){return this.study.getState().notes.map(readAnnotation).filter(a=>a?.unitId===unit.id);}
-  markup(unit){const records=this.records(unit);return `<section id="study-marks" class="reading-marks"><div class="section-heading"><h2>我的标注与思考</h2>${records.length?'<span><span data-annotation-count>'+records.length+'</span> 条</span>':''}</div>${records.length?'':'<p class="small-note">选中正文可标注、记笔记或提问。</p>'}<div data-annotation-list>${this.list(records)}</div></section><div class="reading-selection-bar" role="region" aria-label="选文操作" hidden><span data-selected-quote></span><div><button data-annotation="mark">标注重点</button><button data-annotation="note">记笔记</button><button data-annotation="ask">选文提问</button><button data-annotation="dismiss" aria-label="关闭选文操作">×</button></div></div>`;}
+  markup(unit){const records=this.records(unit);return `<section id="study-marks" class="reading-marks"><div class="section-heading"><h2>我的标注与思考</h2><span data-annotation-total ${records.length?'':'hidden'}><span data-annotation-count>${records.length||''}</span> 条</span></div><p class="small-note" data-annotation-empty ${records.length?'hidden':''}>选中正文可标注、记笔记或提问。</p><div data-annotation-list>${this.list(records)}</div></section><div class="reading-selection-bar" role="region" aria-label="选文操作" hidden><span data-selected-quote></span><div><button data-annotation="mark">标注重点</button><button data-annotation="note">记笔记</button><button data-annotation="ask">选文提问</button><button data-annotation="dismiss" aria-label="关闭选文操作">×</button></div></div>`;}
   list(records){return records.length?records.map(a=>`<article class="annotation-row"><span>${esc(a.note.kind)} · <span data-mark-status="${a.note.id}">已保存</span></span><blockquote>${esc(a.quote)}</blockquote>${annotationThought(a.note)?`<p class="annotation-thought">${esc(annotationThought(a.note))}</p>`:''}<div><a href="#${a.section}" data-reading-link>回到正文 ↑</a><a href="/journal/?id=${a.note.id}&edit=1" data-nav>编辑笔记 ↗</a><button data-annotation="discuss" data-note="${a.note.id}">继续讨论 ↗</button></div></article>`).join(''):'';}
   sectionFor(node){for(let el=node.nodeType===1?node:node.parentElement;el?.closest('.study-reader');el=el.parentElement)if(validReadingSection(el.id)&&el.id!=='study-marks'&&el.id!=='study-reflection')return el;return null;}
   capture(){
@@ -58,5 +58,6 @@ export class ReadingAnnotations{
       const status=article.querySelector('[data-mark-status="'+a.note.id+'"]');if(status)status.textContent=matched?'正文已标注':'正文已变化，选文仍保留';
     }
     for(const count of document.querySelectorAll('[data-annotation-count]'))count.textContent=records.length||'';
+    const empty=article.querySelector('[data-annotation-empty]'),total=article.querySelector('[data-annotation-total]');if(empty)empty.hidden=!!records.length;if(total)total.hidden=!records.length;
   }
 }
