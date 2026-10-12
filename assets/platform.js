@@ -43,7 +43,7 @@ export class LearningPlatform {
     try{if(this.syncEngine){this.syncEngine.capture(this.getState());clearTimeout(this.syncDelay);this.syncDelay=setTimeout(()=>this.syncEngine?.sync(),600);}else localStorage.setItem(STORAGE_KEY,JSON.stringify(this.getState()));return true;}
     catch{this.updateStatus({status:'error',message:'本机存储已满，请立即导出备份。'});this.notify('未能保存到本机，请导出备份。');return false;}
   }
-  updateStatus(status){this.status={...this.status,...status};const text=this.statusText();for(const el of document.querySelectorAll('[data-sync-label]'))el.textContent=text;const b=document.querySelector('#account-entry');if(b){b.classList.toggle('sync-error',['error','conflict'].includes(status.status));b.title=text;}if(location.pathname==='/account/'&&!document.querySelector('#login-form,#otp-form'))this.onRender();}
+  updateStatus(status){this.status={...this.status,...status};const text=this.statusText();for(const el of document.querySelectorAll('[data-sync-label]'))el.textContent=el.closest('#account-entry')&&['local','unconfigured','deployment-pending','guest'].includes(this.status.status)?'本机保存':text;const b=document.querySelector('#account-entry');if(b){b.classList.toggle('sync-error',['error','conflict'].includes(status.status));b.title=text;}if(location.pathname==='/account/'&&!document.querySelector('#login-form,#otp-form'))this.onRender();}
   statusText(){return {unconfigured:'本机保存 · 云端待连接','deployment-pending':'本机保存 · 云端暂未启用',local:'本机保存',guest:'本机保存 · 未登录',syncing:'正在同步',pending:`等待同步 · ${this.status.count??0} 项`,synced:'已同步',conflict:`有 ${this.status.conflicts??0} 项冲突`,error:'同步未完成 · 本机已保留'}[this.status.status]||'本机保存';}
   storageLabel(){return this.session?'账号私有记录 · '+this.statusText():'仅保存在此浏览器';}
   accountView(){

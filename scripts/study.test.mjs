@@ -64,7 +64,7 @@ test('Colab notebooks execute all cells and demonstrate recovery and correlated 
 });
 test('Conflicting backup answers remain recoverable without creating an orphan plan or duplicating imports',()=>{
   const u=unit();const initial=scheduleUnit({...defaultState(),studyUnits:[u]},u,now);
-  initial.studyProgress[0].answers=[{id:'e1',text:'older reasoning'}];
+  initial.studyProgress[0].answers=[{id:'e1',text:'older reasoning'}];initial.studyProgress[0].updatedAt=now.toISOString();
   const edited=structuredClone(initial);edited.studyProgress[0].answers[0].text='newer reasoning';edited.studyProgress[0].updatedAt='2026-10-12T08:00:00Z';
   const result=mergeBackupStates(edited,initial);assert.equal(result.conflicts,1);assert.equal(result.state.studyProgress.length,1);assert.equal(result.state.studyProgress[0].answers[0].text,'newer reasoning');assert.ok(result.state.notes.some(n=>n.body.includes('older reasoning')));
   const repeated=mergeBackupStates(result.state,initial);assert.equal(repeated.conflicts,0);assert.deepEqual(repeated.state,result.state);

@@ -42,6 +42,7 @@ html:has(.study-reader){scroll-behavior:auto}
 .study-prose .table-scroll{margin:18px 0 20px}
 .study-prose table{font-size:var(--reading-secondary);line-height:1.75;table-layout:auto;min-width:0;margin:0}
 .study-prose th,.study-prose td{padding:12px 14px;font-size:inherit;vertical-align:top;overflow-wrap:normal;word-break:normal}
+.markdown-body th,.markdown-body td{overflow-wrap:normal;word-break:normal}
 .reading-essentials{padding:26px 0;margin:36px 0;background:transparent;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0}
 .essential-point{gap:16px;margin:0 0 17px;align-items:start}
 .essential-point:last-child{margin-bottom:0}
