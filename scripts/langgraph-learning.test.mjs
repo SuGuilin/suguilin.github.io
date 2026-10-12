@@ -64,3 +64,8 @@ test('Recall labels use the learner local day across the UTC midnight boundary',
     process.env.TZ='America/Los_Angeles';assert.match(StudyWorkspace.prototype.recallReader.call({fontSize:18},unit,p),/上次学习 2026-10-12/);
   }finally{if(previous===undefined)delete process.env.TZ;else process.env.TZ=previous;}
 });
+test('Topic exports retain their prior journals and discussions while excluding other subjects',()=>{
+  const at='2026-10-13T00:00:00.000Z',base={kind:'学习复盘',tags:'',createdAt:at,updatedAt:at},related={...base,id:'earlier',title:'之前的作答',body:'旧答案与实验记录\n\n[回到学习单元](/study/?id=digest-langgraph#study-reflection)'},other={...base,id:'other-note',title:'另一专题',body:'别人的来源\n\n[回到学习单元](/study/?id=digest-jev#study-reflection)'};
+  const chat={id:'chat',title:'讨论',updatedAt:at,messages:[]},state={...defaultState(),studyProgress:[newProgress(unit)],notes:[related,other],conversations:[{...chat,studyUnitId:unit.id},{...chat,id:'other-chat',studyUnitId:'digest-jev'}]};
+  const backup=progressBackup(state,unit.id);assert.deepEqual(backup.notes,[related]);assert.deepEqual(backup.conversations,[state.conversations[0]]);assert.equal(mergeBackupStates(defaultState(),backup).state.notes[0].body,related.body);
+});

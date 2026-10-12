@@ -43,7 +43,7 @@ export class JournalWorkspace{
     const create=params.get('new')==='1',editing=params.get('edit')==='1',inbox=params.get('kind')==='inbox';
     const unit=this.getUnits().find(u=>u.id===params.get('unit'));
     const header=this.pageTitle('','学习日志','',this.link('/journal/?new=1'+(unit?'&unit='+unit.id:''),this.icon('plus')+' 新建记录','button button-small button-dark')+this.link('/account/','备份','text-link'));
-    const tabs=`<nav class="journal-view-tabs" aria-label="学习日志栏目">${this.link('/journal/','全部记录','text-link '+(!inbox&&!unit?'active':''))}${this.link('/journal/?kind=inbox','资料收件箱','text-link '+(inbox?'active':''))}${unit?this.link('/study/?id='+unit.id,esc(unit.title)+' ↗','journal-unit-filter'):''}</nav>`;
+    const tabs=`<nav class="journal-view-tabs" aria-label="学习日志栏目">${this.link('/journal/','全部记录','text-link '+(!inbox&&!unit?'active':''))}${this.link('/journal/?kind=inbox','资料收件箱','text-link '+(inbox?'active':''))}${unit?this.link('/study/?id='+unit.id,'回到专题 ↗','journal-unit-filter'):''}</nav>`;
     const available=types.filter(t=>t===params.get('type')||filterJournal(this.getNotes(),{inbox,unit:unit?.id||''}).some(n=>n.kind===t));
     const controls=create||editing||!this.getNotes().length?'':`<div class="journal-filters"><label class="search-field">${this.icon('search')}<input type="search" id="journal-search" aria-label="搜索学习记录" placeholder="搜索自己的解释、问题或标签" value="${esc(params.get('q')||'')}" maxlength="200"></label><label class="sr-only" for="journal-type">记录类型筛选</label><select id="journal-type"><option value="">全部类型</option>${available.map(t=>`<option ${params.get('type')===t?'selected':''}>${t}</option>`).join('')}</select></div>`;
     return header+tabs+controls+`<div data-journal-content>${this.content(params)}</div>`;

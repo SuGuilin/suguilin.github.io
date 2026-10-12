@@ -1,10 +1,14 @@
 // Pure helpers keep personal work recoverable across reading, notes and backups.
 import {validReadingSection,currentAttempt} from './study-model.js';
 import {defaultState,validateState} from './state.js';
+import {noteUnitId} from './learning-signals.js';
+export function journalEntryURL(id,unit=''){
+  const q=new URLSearchParams({id});if(unit)q.set('unit',unit);return '/journal/?'+q;
+}
 export function progressBackup(state,id){
   const progress=state.studyProgress.find(p=>p.id===id);
   if(!progress)throw new Error('本篇没有已保存的学习进度');
-  return validateState({...defaultState(),studyUnits:state.studyUnits.filter(u=>u.id===id),studyProgress:[progress]});
+  return validateState({...defaultState(),studyUnits:state.studyUnits.filter(u=>u.id===id),studyProgress:[progress],notes:state.notes.filter(n=>noteUnitId(n)===id),conversations:state.conversations.filter(c=>c.studyUnitId===id)});
 }
 export function learningSources(unit,{lessons=[],resources=[],readings=[]}={}){
   if(!unit)return [];
