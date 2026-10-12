@@ -33,7 +33,7 @@ export function studyQuestion(unit, progress, exerciseId = '', sectionTitle = ''
 export function questionWithContext(question, unit, {sources=[]}={}) {
   if (!question.trim()) throw new Error('先写下你的问题');
   if (!unit) return question.trim();
-  return `${question.trim()}\n\n---\n学习单元：${unit.title}\n关键要点：\n${unit.takeaways.map(t => '- ' + t.point).join('\n')}\n阅读范围：${unit.source.scope}\n来源：${sources.length?sources.slice(0,8).map(s=>s.title+'：'+s.url+'\n支持范围：'+(s.supports||s.section||unit.source.scope)).join('\n'):unit.source.url}\n\n请区分来源支持的事实与推断；先解释机制和边界，再给出一个最小验证方法。`;
+  return `${question.trim()}\n\n---\n学习单元：${unit.title}\n关键要点：\n${unit.takeaways.map(t => '- ' + t.point).join('\n')}\n阅读范围：${unit.source.scope}\n来源：${sources.length?sources.slice(0,16).map(s=>s.title+'：'+s.url+'\n支持范围：'+(s.supports||s.section||unit.source.scope)).join('\n'):unit.source.url}\n\n请区分来源支持的事实与推断；先解释机制和边界，再给出一个最小验证方法。`;
 }
 export function saveStudySnapshot(state, unit, progress, {now = new Date(), review = '', question = '', section = 'study-reflection', previous = null, id = crypto.randomUUID()} = {}) {
   progress=currentAttempt(progress);

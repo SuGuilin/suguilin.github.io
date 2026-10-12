@@ -38,14 +38,38 @@ export function calibrationReportNote(text){
   return body;
 }
 export const notebookReports={
+  'langgraph-control-flow.ipynb':{experiment:'langgraph-control-flow',filename:'langgraph_flow_report.json'},
+  'agent-research-checks.ipynb':{experiment:'agent-research-checks',filename:'mechanism_report.json'},
+  ...Object.fromEntries(['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving'].map(id=>[id+'.ipynb',{experiment:'lesson-'+id,filename:'mechanism_report.json'}])),
   'langgraph-durable-workflow.ipynb':{experiment:'langgraph-durable-workflow',filename:'langgraph_report.json'},
   'durable-agent.ipynb':{experiment:'durable-agent',filename:'recovery_report.json'},
   'decision-calibration.ipynb':{experiment:'decision-calibration',filename:'calibration_report.json'}
 };
 export function appendPracticeReport(reflection,text,expectedExperiment='durable-agent'){
-  const note=expectedExperiment==='langgraph-durable-workflow'?langgraphReportNote(text):expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
+  const note=mechanismChecks[expectedExperiment]?mechanismReportNote(text,expectedExperiment):expectedExperiment==='langgraph-durable-workflow'?langgraphReportNote(text):expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
   if(!note)throw new Error('本篇暂不支持此实验记录');
   if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
+}
+export const mechanismChecks={
+  'lesson-llm-contract':{strict_types:'严格类型',calendar_validation:'日历语义',finite_money:'有限金额',unknown_fields:'未知字段拒绝'},
+  'lesson-retrieval-rag':{rank_fusion:'rank 融合',recall_at_k:'召回指标',acl_before_context:'上下文前权限过滤'},
+  'lesson-context-engineering':{mandatory_preserved:'必要状态保留',budget_bound:'预算范围',overflow_explicit:'预算不足显式失败'},
+  'lesson-agent-security':{trusted_identity:'可信身份',object_authorization:'对象授权',scope_enforced:'scope 拒绝'},
+  'lesson-multi-agent':{evidence_required:'证据字段',conflict_rejected:'冲突拒绝',global_budget:'总预算',failure_retained:'子任务失败拒绝'},
+  'lesson-inference-serving':{kv_baseline:'KV 算式',failed_cost_included:'失败费用计入',tail_latency:'尾部指标'},
+  'langgraph-control-flow':{exclusive_route:'独占路由',static_edge_counterexample:'静态边反例',send_join:'Send 归并',tool_result:'ToolNode 结果',private_stream_visible:'内部字段流出反例',filtered_stream:'流白名单',retry_attempts:'重试次数',pending_writes:'成功写入复用',trusted_context:'可信上下文'},
+  'agent-research-checks':{clipped_objective:'正负优势裁剪',zero_variance:'零方差',action_observation_mask:'动作与观察 mask',rollout_identity:'轨迹身份',reliability_estimators:'可靠性组合指标',attachment_contract:'附件合同',metric_negative_cases:'评分器负例',loop_termination:'循环终止',risk_cost:'回退代价'}
+};
+export function mechanismReportNote(text,expected){
+  if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的实验 JSON');
+  let r;try{r=JSON.parse(text);}catch{throw new Error('实验记录不是有效 JSON');}
+  const spec=mechanismChecks[expected],sdk=expected==='langgraph-control-flow';
+  if(!spec||r?.experiment!==expected)throw new Error('实验类型不匹配');
+  if(sdk){if(r.model_called!==false||typeof r.version!=='string'||!/^\d+\.\d+\.\d+$/.test(r.version))throw new Error('SDK 版本或运行范围不匹配');}
+  else if(r.scope!=='stdlib fixtures; no model/service')throw new Error('实验运行范围不匹配');
+  if(!r.checks||typeof r.checks!=='object'||Array.isArray(r.checks)||Object.keys(r.checks).length!==Object.keys(spec).length||!Object.keys(spec).every(k=>typeof r.checks[k]==='boolean'))throw new Error('实验检查项不完整');
+  if(r.my_explanation!==undefined&&typeof r.my_explanation!=='string')throw new Error('实验解释须为文本');
+  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(spec).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
 }
 export function langgraphReportNote(text){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的 langgraph_report.json');
