@@ -58,3 +58,9 @@ test('Leaving an arrangement keeps the original progress if export or persistenc
   context.platform.download=()=>{throw Error('export failed');};
   await assert.rejects(StudyWorkspace.prototype.action.call(context,{dataset:{study:'export-remove',id:unit.id}}),/export failed/);assert.equal(current,original);
 });
+test('Recall labels use the learner local day across the UTC midnight boundary',()=>{
+  const previous=process.env.TZ,initial=newProgress(unit);initial.answers=[{id:'e1',text:'检查点保存线程内执行状态'}];const p=recordReview(initial,'hard',15,new Date('2026-10-12T16:30:00Z'));
+  try{process.env.TZ='Asia/Shanghai';assert.match(StudyWorkspace.prototype.recallReader.call({fontSize:18},unit,p),/上次学习 2026-10-13/);
+    process.env.TZ='America/Los_Angeles';assert.match(StudyWorkspace.prototype.recallReader.call({fontSize:18},unit,p),/上次学习 2026-10-12/);
+  }finally{if(previous===undefined)delete process.env.TZ;else process.env.TZ=previous;}
+});
