@@ -57,6 +57,20 @@ test('Annotation journals separate generated titles, thoughts and source context
   assert.equal(journalPreview(mark),quote.slice(0,150));
   assert.equal(filterJournal([note],{query:unit.source.scope}).length,1);
 });
+test('Recall journals fold previous evidence for reading while keeping edits, search and backup content intact',()=>{
+  const previous={...newProgress(unit),answers:[{id:unit.exercises[0].id,text:'旧作答的具体证据'}],reflection:'旧实验记录 0.2797'};
+  const current={...newProgress(unit),answers:[{id:unit.exercises[0].id,text:'这次独立解释'}],reflection:'新的理解'};
+  const note=saveStudySnapshot(defaultState(),unit,current,{review:'good',previous,now,id:'compare'}).note;
+  note.body+='\n\n## 后续补充\n\n我自己添加的内容';
+  const original=structuredClone(note),parts=journalNoteParts(note);
+  assert.match(parts.body,/这次独立解释/);assert.match(parts.body,/后续补充/);assert.ok(!parts.body.includes('旧实验记录'));
+  assert.match(parts.comparison,/旧作答的具体证据/);assert.match(parts.comparison,/0.2797/);assert.match(journalReadingBody(note),/回到学习单元/);
+  assert.equal(filterJournal([note],{query:'旧实验记录'}).length,1);assert.deepEqual(note,original);
+  assert.equal(journalPreview(note),'新的理解');
+  const onlyAnswer=saveStudySnapshot(defaultState(),unit,{...current,reflection:''},{now,id:'answer-only'}).note;assert.equal(journalPreview(onlyAnswer),'这次独立解释');
+  assert.equal(journalNoteParts({...note,title:'我自定义的复盘'}).comparison,undefined);
+  assert.equal(journalNoteParts({...note,body:note.body.split('[回到学习单元]')[0]}).comparison,undefined);
+});
 
 test('Today recommendations use the remaining time after recorded learning, without altering stored budgets or backend models',()=>{
   const reviewed=recordReview({...newProgress(unit),answers:[{id:'e1',text:'回答'}]},'hard',30,now);

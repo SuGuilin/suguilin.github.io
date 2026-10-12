@@ -1,5 +1,11 @@
 // Pure helpers keep personal work recoverable across reading, notes and backups.
 import {validReadingSection,currentAttempt} from './study-model.js';
+export function learningSources(unit,{lessons=[],resources=[],readings=[]}={}){
+  if(!unit)return [];
+  const original=lessons.find(l=>l.id===unit.id)?.sources??resources.find(r=>'digest-'+r.id===unit.id)?.digest?.sourceLinks??[unit.source];
+  const current=readings.find(r=>r.id===unit.id)?.sources??[];
+  return [...current,...original].filter((s,i,all)=>all.findIndex(t=>t.url===s.url)===i);
+}
 export function studyReturnURL(unit, section = 'study-reflection', recall=false) {
   return '/study/?id=' + encodeURIComponent(unit.id) + (recall?'&mode=recall':'') + '#' + (validReadingSection(section) ? section : 'study-reflection');
 }

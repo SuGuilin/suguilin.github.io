@@ -3650,6 +3650,78 @@
       "relatedUrls": [
         "https://github.com/Tasselszcx/Tasselszcx"
       ]
+    },
+    {
+      "id": "tencent-adp-harness-practice",
+      "title": "腾讯云 ADP：云端 Agent Harness 设计实践",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "Harness",
+        "持久状态",
+        "权限"
+      ],
+      "description": "对照云端运行时如何划分状态、工具、权限与反馈职责。团队的架构判断需要结合自己的任务验证。",
+      "whenToLearn": "在学习恢复、权限和可观测性时，先定位一个具体失败，再对照文中的职责边界。",
+      "url": "https://adp.tencent.com/zh/blog/agent-harness-engineering-adp-practice",
+      "source": "腾讯云 ADP 团队",
+      "verification": "实际读取公开工程文章相关正文；未部署 ADP 或复现团队结果。",
+      "verifiedAt": "2026-10-12",
+      "priority": "frontier"
+    },
+    {
+      "id": "langchain-deepagent-eval-practice",
+      "title": "LangChain：如何评测 Deep Agents",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "评测",
+        "Harbor",
+        "重复运行"
+      ],
+      "description": "作者把端到端评测放到不同任务域，并强调重复运行。适合检查自己的评测是否只覆盖一条成功路径。",
+      "whenToLearn": "理解评测统计后，对照任务范围、运行预算和重复次数，再设计自己的小任务集。",
+      "url": "https://www.langchain.com/blog/how-we-benchmark-deep-agents",
+      "source": "LangChain 团队",
+      "verification": "实际读取 2026-07-23 官方文章；作者实验未在本站复现。",
+      "verifiedAt": "2026-10-12",
+      "priority": "frontier"
+    },
+    {
+      "id": "anthropic-managed-agent-architecture",
+      "title": "Anthropic：Session、Harness 与 Sandbox 解耦",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "Harness",
+        "Session",
+        "Sandbox"
+      ],
+      "description": "区分可恢复的事件日志、上下文构造与执行环境，理解凭证和工具代理的边界。",
+      "whenToLearn": "完成 Harness 与恢复专题后，追踪一条状态在日志、上下文和环境之间如何移动。",
+      "url": "https://www.anthropic.com/engineering/managed-agents",
+      "source": "Anthropic Engineering",
+      "verification": "实际读取 2026-04-08 官方架构文章相关段落；未接入托管服务。",
+      "verifiedAt": "2026-10-12",
+      "priority": "frontier"
+    },
+    {
+      "id": "google-behavioral-agent-evals",
+      "title": "Google Developers：Agent 行为评测与回归",
+      "category": "engineering",
+      "level": "进阶",
+      "tags": [
+        "行为评测",
+        "回归",
+        "Harness"
+      ],
+      "description": "用可观察的中间行为诊断回归，并与端到端评测配合；不能只按最终文本判断系统正确。",
+      "whenToLearn": "遇到工具选择、验证遗漏或模型升级回归时，为具体行为定义一次可检验条件。",
+      "url": "https://developers.googleblog.com/en/the-anatomy-of-harness-engineering-how-to-evaluate-iterate-and-guard-ai-coding-agents/",
+      "source": "Google Developers Blog",
+      "verification": "实际读取公开文章中的行为评测与局限；未执行其 SDK 示例。",
+      "verifiedAt": "2026-10-12",
+      "priority": "frontier"
     }
   ],
   "curriculum": [

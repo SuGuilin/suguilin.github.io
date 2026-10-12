@@ -15,4 +15,34 @@ export function recoveryReportNote(text){
   if(report.my_explanation?.trim())body+='\n\n我的解释：\n'+report.my_explanation.trim().slice(0,2500);
   return body;
 }
-export function appendPracticeReport(reflection,text){const note=recoveryReportNote(text);if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};}
+const probability=value=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=1;
+export function calibrationReportNote(text){
+  if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的 calibration_report.json');
+  let report;try{report=JSON.parse(text);}catch{throw new Error('实验记录不是有效 JSON');}
+  if(report?.experiment!=='decision-calibration'||report.data_scope!=='synthetic binary classification'||report.model_evaluated!==false||!count(report.samples)||!report.samples||typeof report.change!=='string'||report.change.length>500)throw new Error('这不是本篇支持的离线概率实验记录');
+  const rows=[];let thresholds;
+  for(const [key,label] of [['baseline','修改前'],['changed','修改后']]){
+    const result=report[key];
+    if(!probability(result?.brier)||!Array.isArray(result.selective)||!result.selective.length||result.selective.length>10)throw new Error('概率实验的指标不完整');
+    const current=result.selective.map(s=>s?.threshold);
+    if(new Set(current).size!==current.length||thresholds&&JSON.stringify(current)!==JSON.stringify(thresholds))throw new Error('前后实验的阈值必须一致');
+    thresholds=current;
+    for(const s of result.selective){
+      if(!probability(s.threshold)||s.threshold<0.5||!count(s.accepted)||s.accepted>report.samples||!count(s.errors)||s.errors>s.accepted||!probability(s.coverage)||Math.abs(s.coverage-s.accepted/report.samples)>1e-9|| (s.accepted?s.accepted_error===null||!probability(s.accepted_error)||Math.abs(s.accepted_error-s.errors/s.accepted)>1e-9:s.accepted_error!==null))throw new Error('概率实验的覆盖率、错误率或计数不一致');
+      rows.push(`| ${label} | ${result.brier.toFixed(4)} | ${s.threshold} | ${s.accepted}/${report.samples}（${(s.coverage*100).toFixed(1)}%） | ${s.errors}/${s.accepted}${s.accepted?'（'+(s.accepted_error*100).toFixed(1)+'%）':'（无自动处理样本）'} |`);
+    }
+  }
+  let body=`## 代码实践 · 概率与回退\n\n范围：${report.samples} 个合成二元样本，未调用或评测 Jev。阈值使用最大类别概率，不是 TypeSafe confidence。\n\n改动：${report.change}\n\n| 实验 | Brier | 概率阈值 | 自动处理 / 总样本（覆盖率） | 错误 / 自动处理（错误率） |\n| --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBrier 越低越好；这里的样本量不能支持模型性能或生产阈值结论。`;
+  if(report.my_interpretation!==undefined&&typeof report.my_interpretation!=='string')throw new Error('实验解释须为文本');
+  if(report.my_interpretation?.trim())body+='\n\n我的解释：\n'+report.my_interpretation.trim().slice(0,2500);
+  return body;
+}
+export const notebookReports={
+  'durable-agent.ipynb':{experiment:'durable-agent',filename:'recovery_report.json'},
+  'decision-calibration.ipynb':{experiment:'decision-calibration',filename:'calibration_report.json'}
+};
+export function appendPracticeReport(reflection,text,expectedExperiment='durable-agent'){
+  const note=expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
+  if(!note)throw new Error('本篇暂不支持此实验记录');
+  if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
+}

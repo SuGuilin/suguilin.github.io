@@ -135,6 +135,7 @@ body.reader-focus .reading-toolbar{top:0}body.reader-focus .study-reader-aside{t
 .notebook-row>div{flex-basis:100%}
 .notebook-row .text-link{font-size:13px;min-height:32px;display:inline-flex;align-items:center}
 .notebook-import-help{font-size:var(--reading-secondary);line-height:1.75;color:var(--muted);margin:4px 0}
+.notebook-row .notebook-import-help{flex-basis:100%;margin:0}
 .annotation-row{padding:0 0 0 16px;margin:20px 0 24px;border-left-color:var(--control-border)}
 .annotation-row>span{font-size:13px;line-height:1.75}
 .annotation-row blockquote,.annotation-row .annotation-thought{font-size:var(--reading-size,18px);line-height:var(--reading-leading);font-weight:400;letter-spacing:0}
@@ -142,6 +143,10 @@ body.reader-focus .reading-toolbar{top:0}body.reader-focus .study-reader-aside{t
 .annotation-row .annotation-thought{margin:12px 0;color:var(--ink);white-space:pre-wrap}
 .annotation-row>div{font-size:14px;line-height:1.75;gap:8px 18px}
 .annotation-row>div a,.annotation-row>div button{font-size:inherit;min-height:32px;display:inline-flex;align-items:center;color:var(--accent)}
+.study-reader .reading-marks{padding:24px 0 0}
+.reading-marks [hidden]{display:none}
+.reading-marks .annotation-row:last-child{margin-bottom:0}
+.reading-marks+.study-reflection{margin-top:28px;padding-top:24px}
 .study-reader .markdown-body p,.study-reader .markdown-body li,.study-reader .markdown-body blockquote,.study-reader .recall-start p{font-size:var(--reading-size,18px);line-height:var(--reading-leading)}
 .study-reader .markdown-body ul,.study-reader .markdown-body ol{font-size:var(--reading-size,18px);line-height:var(--reading-leading)}
 .study-reader .mechanism-detail p,.study-reader .mechanism-check>p{font-size:var(--reading-size,18px);line-height:var(--reading-leading)}
