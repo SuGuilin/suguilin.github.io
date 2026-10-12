@@ -12,7 +12,12 @@ export function studyReturnURL(unit, section = 'study-reflection', recall=false)
 export function studyQuestion(unit, progress, exerciseId = '', sectionTitle = '') {
   progress=currentAttempt(progress);
   const exercise = unit.exercises.find(e => e.id === exerciseId);
-  if (exercise) return `关于「${unit.title}」的这道练习：\n${exercise.prompt}\n\n我的作答：\n${progress.answers.find(a => a.id === exerciseId)?.text.trim().slice(0, 3000) || '还未作答'}\n\n请先指出推理中需要澄清的地方，用一个追问帮助我继续思考。`.slice(0, 6000);
+  if (exercise) {
+    const request='\n\n请先指出推理中需要澄清的地方，用一个追问帮助我继续思考。',label='\n\n本篇笔记与实验观察：\n';
+    const introduction=`关于「${unit.title}」的这道练习：\n${exercise.prompt}\n\n我的作答：\n${progress.answers.find(a => a.id === exerciseId)?.text.trim().slice(0, 3000) || '还未作答'}`.slice(0,6000-request.length);
+    const room=6000-introduction.length-request.length-label.length,observations=progress.reflection.trim().slice(0,Math.max(0,Math.min(3500,room)));
+    return introduction+(observations?label+observations:'')+request;
+  }
   return `我正在学习「${unit.title}」${sectionTitle ? '，读到「' + sectionTitle.slice(0, 150) + '」' : ''}。${progress.reflection.trim()?'\n\n当前学习笔记与实验观察：\n'+progress.reflection.trim().slice(0,3500):''}\n\n我的问题是：`;
 }
 export function questionWithContext(question, unit, {sources=[]}={}) {

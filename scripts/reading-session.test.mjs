@@ -28,7 +28,7 @@ test('Exercise questions include the actual prompt and answer, remain within API
   const result=saveStudySnapshot(defaultState(),unit,p,{question:handoff,section:'exercise-e1',now,id:'question'});assert.equal(result.note.kind,'待解答问题');assert.ok(result.note.body.includes(studyReturnURL(unit,'exercise-e1')));
 });
 test('Reading bookmarks and course context survive old/new backups, cloud documents and Obsidian exports',()=>{
-  const p={...newProgress(unit),readingSection:'chapter-2',answers:[{id:'e1',text:'可恢复的实际作答'}]};
+  const p={...newProgress(unit),updatedAt:now.toISOString(),readingSection:'chapter-2',answers:[{id:'e1',text:'可恢复的实际作答'}]};
   const state={...defaultState(),studyProgress:[p],conversations:[{id:'chat-1',studyUnitId:unit.id,title:'练习讨论',updatedAt:now.toISOString(),messages:[{role:'user',content:'这次超时能否重放？',status:'complete'}]}]};
   const valid=validateState(state);assert.equal(valid.studyProgress[0].readingSection,'chapter-2');assert.equal(valid.conversations[0].studyUnitId,unit.id);
   assert.deepEqual(fromDocuments([...toDocuments(valid).values()]),valid);assert.deepEqual(mergeBackupStates(defaultState(),valid).state,valid);
