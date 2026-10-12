@@ -4269,8 +4269,9 @@
       ],
       "acceptance": "故障可恢复，用户数据隔离；同预算消融证明架构的价值与边界。",
       "studyUnits": [
-        "lesson-harness",
-        "lesson-evaluation-statistics"
+        "digest-langgraph",
+        "lesson-tool-reliability",
+        "lesson-multi-agent"
       ]
     },
     {
@@ -4302,7 +4303,8 @@
       "acceptance": "以实际测试判定修复成功；固定 harness/任务版本；结果可以被复现。",
       "studyUnits": [
         "lesson-harness",
-        "lesson-evaluation-statistics"
+        "lesson-agent-security",
+        "digest-eval-terminalbench"
       ]
     },
     {
@@ -4333,8 +4335,9 @@
       ],
       "acceptance": "指标定义明确且可重复；能定位回归；有运维手册与两个项目 case study。",
       "studyUnits": [
-        "lesson-harness",
-        "lesson-evaluation-statistics"
+        "lesson-evaluation-statistics",
+        "digest-eval-tau-family",
+        "digest-eval-terminalbench"
       ]
     }
   ],
