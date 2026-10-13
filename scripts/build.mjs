@@ -2,10 +2,14 @@ import {readFile, writeFile, mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
+import {build} from 'esbuild';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// Topic readings and the curriculum are JSON modules embedded in this bundle.
+// Rebuild them here as well, so a content edit cannot publish with an old app.
+await build({entryPoints:[path.join(root,'assets/workspace.js')],outfile:path.join(root,'assets/app.js'),bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,legalComments:'eof'});
 const sourceTemplate = await readFile(path.join(root, 'src/shell.html'), 'utf8');
-const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json','content/study-units.json','assets/experience.css','assets/reader.css','assets/workflow.css'].map(file=>readFile(path.join(root,file))));
+const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json','content/study-units.json','content/topic-readings.json','content/study-curriculum.json','assets/experience.css','assets/reader.css','assets/workflow.css'].map(file=>readFile(path.join(root,file))));
 const assetVersion=createHash('sha256').update(Buffer.concat(versionFiles)).digest('hex').slice(0,12);
 const template=sourceTemplate.replaceAll('{{assetVersion}}',assetVersion);
 const data = JSON.parse(await readFile(path.join(root, 'content/workspace.json'), 'utf8'));
