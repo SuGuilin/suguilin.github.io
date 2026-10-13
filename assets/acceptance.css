@@ -10,6 +10,7 @@
 .interview-toolbar .search-field{width:240px;max-width:100%;margin:0}
 .interview-toolbar .search-field input{min-width:0;width:100%}
 .question-list .question>summary{padding:19px 16px;gap:14px;min-height:64px}
+.question-list{gap:0}.question-list .question{padding:0}
 .question-list .question>summary strong{font-size:14px;line-height:1.6;font-weight:550}
 .question-list .question-body{font-size:15px;line-height:1.6;padding:8px 24px 20px 52px}
 .question-list .question-body>p{margin:0 0 10px;color:var(--muted);font-size:13px}

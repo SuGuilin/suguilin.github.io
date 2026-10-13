@@ -5,9 +5,20 @@ import {interviewSelection,interviewFilterURL,createInterviewScreens} from '../a
 import {filterCatalogResources,resourceLearningUnit,resourceSourceKind} from '../assets/catalog-view.js';
 import {sourcePerspectives} from '../assets/source-perspectives.js';
 import {appendPracticeReport,mechanismChecks} from '../assets/practice-reports.js';
+import {questionWithContext} from '../assets/study-session.js';
 const data=JSON.parse(await readFile('content/workspace.json','utf8'));
 const units=JSON.parse(await readFile('content/study-units.json','utf8')).units;
 const lessons=JSON.parse(await readFile('content/lessons.json','utf8')).lessons;
+
+test('Official-site question copies retain the exact note or reading position and reject external return destinations',()=>{
+  const unit=units.find(u=>u.id==='lesson-finetuning-foundations');
+  assert.ok(questionWithContext('我的问题',unit,{returnPath:'/journal/?id=own-note&unit='+unit.id}).includes('https://suguilin.github.io/journal/?id=own-note'));
+  assert.ok(questionWithContext('我的问题',unit,{returnPath:'/study/?id='+unit.id+'&mode=recall#exercise-e2'}).includes('&mode=recall#exercise-e2'));
+  for(const returnPath of ['https://evil.test/journal/','//evil.test/study/','javascript:alert(1)','https://user:pass@suguilin.github.io/journal/']){
+    const text=questionWithContext('我的问题',unit,{returnPath});assert.ok(!text.includes(returnPath));assert.ok(text.includes('https://suguilin.github.io/study/'));
+  }
+  assert.equal(questionWithContext('独立问题',null),'独立问题');
+});
 
 test('Interview category and search compose, survive URL reopening and never hide a direct question',()=>{
   const url=interviewFilterURL(new URLSearchParams('question=q1'),{category:'后训练',q:'DPO'});
