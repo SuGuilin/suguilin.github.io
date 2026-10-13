@@ -56,7 +56,7 @@ for name in names:
                 assert report['new_saver_state'] == {}
             elif name == 'langgraph-durable-workflow.ipynb':
                 report = json.loads(Path('langgraph_report.json').read_text())
-                assert report['versions'] == {'langgraph': '1.2.14', 'langgraph-checkpoint': '4.2.0', 'langgraph-checkpoint-sqlite': '3.1.1'}
+                assert report['versions'] == {'langgraph': '1.2.15', 'langgraph-checkpoint': '4.3.0', 'langgraph-checkpoint-sqlite': '3.1.1'}
                 assert report['after_crash'] == {'next': ['save'], 'business_rows': 1, 'write_attempts': 1, 'before_interrupt': 2}
                 assert report['recovered'] == {'next': [], 'business_rows': 1, 'write_attempts': 2, 'before_interrupt': 2}
                 assert report['rejected']['business_rows'] == report['rejected']['write_attempts'] == 0
@@ -72,7 +72,7 @@ for name in names:
                 assert accepted['coverage'] == 0.25 and accepted['accepted_error'] == 0.5
             elif name=='langgraph-control-flow.ipynb':
                 report=json.loads(Path('langgraph_flow_report.json').read_text())
-                assert report['version']=='1.2.14' and report['model_called'] is False
+                assert report['version']=='1.2.15' and report['model_called'] is False
                 assert len(report['checks'])==9 and all(report['checks'].values())
                 assert namespace['calls']=={'good':1,'bad':2} and namespace['batch']['total']==29
             elif name=='mcp-tool-contract.ipynb':
