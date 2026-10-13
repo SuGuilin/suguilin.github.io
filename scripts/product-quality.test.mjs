@@ -22,6 +22,16 @@ test('Account status refreshes after configuration settles without activating si
   }finally{globalThis.fetch=originalFetch;}
 });
 
+test('Deferred configuration does not replace a question or reader that the learner is already interacting with',async()=>{
+  const originalFetch=globalThis.fetch,originalLocation=globalThis.location;
+  try{
+    globalThis.location={pathname:'/interview/'};
+    globalThis.fetch=async()=>new Response(JSON.stringify({supabaseUrl:'https://test-project.supabase.co',supabasePublishableKey:'sb_publishable_unit_test_only',assistantFunction:'study-assistant',enableSignIn:false}));
+    let renders=0;const context={client:null,onRender:()=>renders++,updateStatus:()=>{}};
+    await LearningPlatform.prototype.init.call(context);assert.equal(renders,0);assert.equal(context.client,null);
+  }finally{globalThis.fetch=originalFetch;if(originalLocation===undefined)delete globalThis.location;else globalThis.location=originalLocation;}
+});
+
 test('Official-site question copies retain the exact note or reading position and reject external return destinations',()=>{
   const unit=units.find(u=>u.id==='lesson-finetuning-foundations');
   assert.ok(questionWithContext('我的问题',unit,{returnPath:'/journal/?id=own-note&unit='+unit.id}).includes('https://suguilin.github.io/journal/?id=own-note'));
