@@ -25,6 +25,7 @@ test('Every authored topic has one knowledge home, connected explanations, pract
     for(const m of html.matchAll(/href="#(chapter-\d+)"/g))assert.ok(html.includes('id="'+m[1]+'"'),unit.id);
     for(const id of relatedTopics(unit.id)){assert.ok(units.some(u=>u.id===id));assert.ok(html.includes('/study/?id='+id));}
     for(const e of unit.exercises)assert.ok(html.includes('exercise-'+e.id));
+    if(html.includes('class="mechanism-overview"'))assert.ok(html.includes('class="mechanism-figure"'),unit.id+' has an empty self-test');
     assert.ok(learningSources(unit,{lessons,readings,resources}).length>=1);
   }
   const base=view.library(new URLSearchParams({topic:'base'}));

@@ -12,7 +12,8 @@ const run=promisify(execFile),require=createRequire(import.meta.url);
 test('A content-only rebuild replaces a stale embedded reading and updates all shell cache versions',async()=>{
   const root=await mkdtemp(path.join(tmpdir(),'suguilin-build-'));
   try{
-    for(const folder of ['scripts','assets','content','src'])await mkdir(path.join(root,folder));
+    for(const folder of ['scripts','assets','content','src','notebooks'])await mkdir(path.join(root,folder));
+    await writeFile(path.join(root,'notebooks/example.ipynb'),'old code');
     const script=(await readFile('scripts/build.mjs','utf8')).replace("from 'esbuild'",`from '${pathToFileURL(require.resolve('esbuild')).href}'`);
     await writeFile(path.join(root,'scripts/build.mjs'),script);
     await writeFile(path.join(root,'src/shell.html'),'<html data-content-version="{{assetVersion}}">{{title}}{{navigation}}{{explorationNavigation}}</html>');
@@ -29,5 +30,8 @@ test('A content-only rebuild replaces a stale embedded reading and updates all s
     assert.match(bundle,/verified-stdio-v2/);assert.ok(!bundle.includes('memory-only-v1'));
     const next=await readFile(path.join(root,'study/index.html'),'utf8');assert.notEqual(next,first);
     assert.equal(next.match(/data-content-version="([^"]+)"/)[1],(await readFile(path.join(root,'plan/index.html'),'utf8')).match(/data-content-version="([^"]+)"/)[1]);
+    await writeFile(path.join(root,'notebooks/example.ipynb'),'new code');
+    await run(process.execPath,[path.join(root,'scripts/build.mjs')]);
+    assert.notEqual(await readFile(path.join(root,'study/index.html'),'utf8'),next);
   }finally{await rm(root,{recursive:true,force:true});}
 });
