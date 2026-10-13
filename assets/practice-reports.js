@@ -64,6 +64,11 @@ export const mechanismChecks={
   'langgraph-control-flow':{exclusive_route:'独占路由',static_edge_counterexample:'静态边反例',send_join:'Send 归并',tool_result:'ToolNode 结果',private_stream_visible:'内部字段流出反例',filtered_stream:'流白名单',retry_attempts:'重试次数',pending_writes:'成功写入复用',trusted_context:'可信上下文'},
   'agent-research-checks':{clipped_objective:'正负优势裁剪',zero_variance:'零方差',action_observation_mask:'动作与观察 mask',rollout_identity:'轨迹身份',reliability_estimators:'可靠性组合指标',attachment_contract:'附件合同',metric_negative_cases:'评分器负例',loop_termination:'循环终止',risk_cost:'回退代价'}
 };
+export const mechanismCheckExtensions={
+  'lesson-inference-serving':{sampling_support:'top-p 支持集',speculative_distribution:'投机概率质量',kv_block_allocation:'块分配与浪费',quantization_clipping:'量化范围与夹值'},
+  'lesson-retrieval-rag':{graded_ranking:'MRR 与分级 nDCG',ann_recall:'ANN 与相关性口径',late_interaction:'MaxSim 聚合'},
+  'agent-research-checks':{loss_normalization:'长度归一化',kl_estimator:'参考 KL 样本估计'}
+};
 export function mechanismReportNote(text,expected){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的实验 JSON');
   let r;try{r=JSON.parse(text);}catch{throw new Error('实验记录不是有效 JSON');}
@@ -72,9 +77,12 @@ export function mechanismReportNote(text,expected){
   if(sdk){if(r.model_called!==false||typeof r.version!=='string'||!/^\d+\.\d+\.\d+$/.test(r.version))throw new Error('SDK 版本或运行范围不匹配');}
   else if(mcp){if(r.model_called!==false||r.version!=='2.3.0'||r.protocol!=='2026-07-28'||r.scope!=='official SDK; memory and stdio; no HTTP/auth')throw new Error('MCP 版本或运行范围不匹配');}
   else if(r.scope!=='stdlib fixtures; no model/service')throw new Error('实验运行范围不匹配');
-  if(!r.checks||typeof r.checks!=='object'||Array.isArray(r.checks)||Object.keys(r.checks).length!==Object.keys(spec).length||!Object.keys(spec).every(k=>typeof r.checks[k]==='boolean'))throw new Error('实验检查项不完整');
+  const extension=mechanismCheckExtensions[expected]??{},baseKeys=Object.keys(spec),extraKeys=Object.keys(extension),actualKeys=Object.keys(r.checks??{});
+  const legacy=actualKeys.length===baseKeys.length,expanded=extraKeys.length>0&&actualKeys.length===baseKeys.length+extraKeys.length;
+  const labels=expanded?{...spec,...extension}:spec;
+  if(!r.checks||typeof r.checks!=='object'||Array.isArray(r.checks)||!(legacy||expanded)||!Object.keys(labels).every(k=>typeof r.checks[k]==='boolean'))throw new Error('实验检查项不完整');
   if(r.my_explanation!==undefined&&typeof r.my_explanation!=='string')throw new Error('实验解释须为文本');
-  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':mcp?'真实 MCP SDK '+r.version+'，协议 '+r.protocol+'；内存与 stdio，无模型、HTTP/OAuth 或私有数据':expected==='lesson-finetuning-foundations'?'标准库数学与小矩阵梯度下降；未运行真实大模型、远端服务或完整 benchmark':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(spec).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
+  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':mcp?'真实 MCP SDK '+r.version+'，协议 '+r.protocol+'；内存与 stdio，无模型、HTTP/OAuth 或私有数据':expected==='lesson-finetuning-foundations'?'标准库数学与小矩阵梯度下降；未运行真实大模型、远端服务或完整 benchmark':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(labels).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}${legacy&&extraKeys.length?'\n\n旧版报告未包含扩展实验检查。':''}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
 }
 export function langgraphReportNote(text){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的 langgraph_report.json');

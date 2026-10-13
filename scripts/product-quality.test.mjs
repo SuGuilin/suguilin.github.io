@@ -4,12 +4,47 @@ import {readFile} from 'node:fs/promises';
 import {interviewSelection,interviewFilterURL,createInterviewScreens} from '../assets/interview.js';
 import {filterCatalogResources,resourceLearningUnit,resourceSourceKind} from '../assets/catalog-view.js';
 import {sourcePerspectives} from '../assets/source-perspectives.js';
-import {appendPracticeReport,mechanismChecks} from '../assets/practice-reports.js';
+import {appendPracticeReport,mechanismChecks,mechanismCheckExtensions} from '../assets/practice-reports.js';
+import {prerequisiteTopics,topicInterviewQuestions} from '../assets/study-curriculum.js';
+import {StudyWorkspace} from '../assets/study.js';
 import {questionWithContext} from '../assets/study-session.js';
 import {LearningPlatform} from '../assets/platform.js';
 const data=JSON.parse(await readFile('content/workspace.json','utf8'));
 const units=JSON.parse(await readFile('content/study-units.json','utf8')).units;
 const lessons=JSON.parse(await readFile('content/lessons.json','utf8')).lessons;
+
+test('A reader can open actual prerequisite lessons and interview followups without an enabled AI service',()=>{
+  const context={unit:id=>units.find(u=>u.id===id),getData:()=>data};
+  for(const unit of units){
+    for(const id of prerequisiteTopics(unit.id)){assert.notEqual(id,unit.id);assert.ok(context.unit(id));}
+    const markup=StudyWorkspace.prototype.prerequisitesMarkup.call(context,unit);
+    for(const id of prerequisiteTopics(unit.id))assert.ok(markup.includes('/study/?id='+id));
+    const questions=topicInterviewQuestions(unit.id,data.questions);
+    const interview=StudyWorkspace.prototype.interviewMarkup.call(context,unit);
+    for(const q of questions)assert.ok(interview.includes('/interview/?question='+q.id));
+  }
+  assert.deepEqual(prerequisiteTopics('custom-reading'),[]);
+  assert.equal(StudyWorkspace.prototype.prerequisitesMarkup.call(context,{id:'custom-reading',prerequisites:[]}), '');
+  assert.equal(StudyWorkspace.prototype.interviewMarkup.call(context,{id:'custom-reading'}), '');
+});
+
+test('Expanded experiments preserve old reports and failed checks but reject partial or unknown extensions',()=>{
+  for(const [id,extra] of Object.entries(mechanismCheckExtensions)){
+    const legacy={experiment:id,scope:'stdlib fixtures; no model/service',checks:Object.fromEntries(Object.keys(mechanismChecks[id]).map(k=>[k,true]))};
+    const old=appendPracticeReport('',JSON.stringify(legacy),id).text;
+    assert.match(old,/旧版报告未包含/);
+    const expanded=structuredClone(legacy);Object.assign(expanded.checks,Object.fromEntries(Object.keys(extra).map((k,i)=>[k,i!==0])));
+    const fresh=appendPracticeReport('已有解释',JSON.stringify(expanded),id).text;
+    assert.match(fresh,/已有解释/);assert.ok(fresh.includes(Object.values(extra)[0]+'：未通过'));
+    assert.ok(!fresh.includes('旧版报告未包含'));
+    const partial=structuredClone(expanded);delete partial.checks[Object.keys(extra)[0]];
+    assert.throws(()=>appendPracticeReport('',JSON.stringify(partial),id));
+    const unknown=structuredClone(expanded);unknown.checks.unknown=true;
+    assert.throws(()=>appendPracticeReport('',JSON.stringify(unknown),id));
+    const forged=structuredClone(expanded);forged.checks[Object.keys(extra)[0]]='true';
+    assert.throws(()=>appendPracticeReport('',JSON.stringify(forged),id));
+  }
+});
 
 test('Account status refreshes after configuration settles without activating sign-in or creating an auth client',async()=>{
   const originalFetch=globalThis.fetch;

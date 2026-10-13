@@ -15,11 +15,11 @@ export const learningNotebooks={
  'lesson-finetuning-foundations':[['finetuning-foundations.ipynb','SFT mask、LoRA 梯度与 DPO log-ratio','标准库梯度 · 25 分钟']],
  'digest-langgraph':[['langgraph-control-flow.ipynb','路由、工具、并行、子图、流式与故障','真实 SDK · 25 分钟'],['langgraph-durable-workflow.ipynb','状态合并、跨进程恢复与审批边界','真实 SDK + SQLite · 25–35 分钟']],
  'lesson-llm-contract':[['llm-contract.ipynb','结构、日期和金额的拒绝路径','标准库合同 · 15 分钟']],
- 'lesson-retrieval-rag':[['retrieval-rag.ipynb','RRF、Recall@k 与可见候选','离线排序 fixture · 15 分钟']],
+ 'lesson-retrieval-rag':[['retrieval-rag.ipynb','RRF、ANN / 相关性召回、nDCG 与 MaxSim','离线排序与矩阵 · 30 分钟']],
  'lesson-context-engineering':[['context-engineering.ipynb','预算与必要状态保留','成本单位 fixture · 15 分钟']],
  'lesson-agent-security':[['agent-security.ipynb','可信身份、scope 与越权拒绝','本地合同 · 15 分钟']],
  'lesson-multi-agent':[['multi-agent.ipynb','子任务证据、冲突与总预算','本地归并 fixture · 15 分钟']],
- 'lesson-inference-serving':[['inference-serving.ipynb','KV baseline、成本与尾部指标','离线算例 · 15 分钟']],
+ 'lesson-inference-serving':[['inference-serving.ipynb','采样、投机残差、KV 块分配与量化','标准库概率与内存 · 30 分钟']],
  'digest-deep-agents':[['context-engineering.ipynb','上下文装配与保留条件','基础合同 · 不运行 Deep Agents'],['multi-agent.ipynb','委派结果与冲突','基础合同 · 不调用模型']],
  'digest-mcp':[['mcp-tool-contract.ipynb','MCP 发现、调用与错误返回','真实 SDK 2.3.0 · 内存 + stdio'],['agent-security.ipynb','身份、scope 与对象归属','应用合同 · 不是 HTTP OAuth']],
  'digest-paper-react':[['agent-research-checks.ipynb','有限循环、无信息观察与停止','第 6 节 · 固定决策']],
@@ -39,7 +39,7 @@ export const learningNotebooks={
  'lesson-tool-reliability':[['durable-agent.ipynb','超时、幂等与查询恢复','内存模拟 + SQLite · 25 分钟']],
  'lesson-evaluation-statistics':[['paired-agent-evaluation.ipynb','配对评测与伪重复','合成数据 · 20 分钟']],
  'lesson-long-term-memory':[['agent-mechanism-checks.ipynb','有效时间与用户隔离','标准库 · 第 1 节']],
- 'lesson-agent-rl':[['agent-mechanism-checks.ipynb','动作位置与 loss mask','标准库 · 第 2 节']],
+ 'lesson-agent-rl':[['agent-mechanism-checks.ipynb','动作位置与 loss mask','标准库 · 第 2 节'],['agent-research-checks.ipynb','裁剪、归一化与参考 KL','标准库 · 第 1、2、8 节']],
  'lesson-production-system-design':[['agent-mechanism-checks.ipynb','过期 Worker 的版本检查','标准库 · 第 3 节']]
 };
 export function notebookPanel(unit){

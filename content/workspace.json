@@ -3517,13 +3517,20 @@
         {
           "url": "https://github.com/datawhalechina/all-in-rag",
           "observed": "已读课程目录与前置要求，包含系统评估、Graph RAG优化及社区Extra Chapter；第十章项目二仍标规划中，不能承诺课程全部完结。"
+        },
+        {
+          "url": "https://github.com/datawhalechina/all-in-rag/blob/main/docs/chapter2/05_text_chunking.md",
+          "observed": "已读固定/递归/语义等分块策略、段落合并与代码示例；原文示例chunk_size=200而注释写100，旧导入接口需要按依赖版本核对，不直接作为本站运行配方。"
         }
       ],
-      "verifiedAt": "2026-10-11",
+      "verifiedAt": "2026-10-13",
       "access": "readable",
-      "verification": "已读课程目录与前置要求，包含系统评估、Graph RAG优化及社区Extra Chapter；第十章项目二仍标规划中，不能承诺课程全部完结。",
+      "verification": "本轮已读README目录与分块章节正文；分块示例的注释/接口仍需按版本检查。未运行全部仓库案例，不把课程覆盖等同于本站实现。",
       "priority": "explore",
-      "relatedUrls": []
+      "relatedUrls": [],
+      "studyUnits": [
+        "lesson-retrieval-rag"
+      ]
     },
     {
       "id": "openai-deprecation-watch",
@@ -3941,6 +3948,47 @@
       "studyUnits": [
         "lesson-production-system-design",
         "lesson-multi-agent"
+      ]
+    },
+    {
+      "id": "mini-sglang",
+      "title": "Mini-SGLang：从可读源码理解服务调度",
+      "url": "https://github.com/sgl-project/mini-sglang",
+      "source": "项目官方GitHub",
+      "description": "沿请求、批次、KV和radix cache读服务代码；先核对Linux/CUDA要求，再设计负载实验。",
+      "category": "framework",
+      "level": "深化",
+      "tags": [
+        "推理",
+        "KV缓存",
+        "源码"
+      ],
+      "whenToLearn": "沿请求、批次、KV和radix cache读服务代码；先核对Linux/CUDA要求，再设计负载实验。",
+      "verification": "已读README、docs/structures.md架构入口；未运行引擎。当前README不支持macOS/Windows原生，不保证普通CPU或免费Colab能完成GPU性能实验。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-inference-serving"
+      ]
+    },
+    {
+      "id": "retrieval-comparison-2026",
+      "title": "六种RAG管线对照：从指标到证据范围",
+      "url": "https://arxiv.org/html/2609.38473v1",
+      "source": "作者原论文",
+      "description": "同文档池比较dense、改写、融合、重排、tool-call与late interaction；同时审查合成query和judge限制。",
+      "category": "evaluation",
+      "level": "深化",
+      "tags": [
+        "RAG",
+        "论文",
+        "配对评测"
+      ],
+      "whenToLearn": "同文档池比较dense、改写、融合、重排、tool-call与late interaction；同时审查合成query和judge限制。",
+      "verification": "已读v1方法、结果和限制；judge看不到检索原文，ColBERT同时换编码器。未复现成绩，不推出所有任务通用的最优管线。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-retrieval-rag",
+        "lesson-evaluation-statistics"
       ]
     }
   ],
@@ -4591,7 +4639,7 @@
         "对比关键词、向量、混合和重排。",
         "同时分析召回、排序、延迟与成本。"
       ],
-      "answer": "**核心思路**\n\n固定语料、切块、ACL、标签与预算；对照词项、稠密、rank 融合和候选重排。RRF 用排序而非直接相加不同比例分数。\n\n**反例与边界**\n\n重排 top-2 中没有正确文档，不能靠重排找回未召回候选；向量相似也不是真实性。\n\n**怎样验证**\n\n逐 k 测 Recall/MRR/nDCG，再测答案与引用支持、拒答和 p95 成本；人工证据作为生成对照。",
+      "answer": "**核心思路**\n\n固定语料、切块、ACL、标签与预算；对照词项、稠密、rank 融合和候选重排。RRF 用排序而非直接相加不同比例分数。\n\n**反例与边界**\n\n重排 top-2 中没有正确文档，不能靠重排找回未召回候选；向量相似也不是真实性。\n\n**怎样验证**\n\n逐 k 测 Recall/MRR/nDCG，再测答案与引用支持、拒答和 p95 成本；人工证据作为生成对照。\n\n**计算追问**\n\nexact=[a,b]、approx=[a,c]、人工相关={c}：ANN Recall@2=0.5，相关证据Recall@2=1。MRR只看首相关；相关度a=3/b=1，排序[b,a]的MRR=1，但指数gain nDCG约0.7098。报告过滤、去重、gain与无答案口径。",
       "studyUnits": [
         "lesson-retrieval-rag"
       ],
@@ -4621,7 +4669,7 @@
         "解释奖励稀疏、信用分配与数据质量。",
         "设计开发/测试划分与成本可承受的实验。"
       ],
-      "answer": "**核心思路**\n\nSFT 学示范的合法动作与分布，RL 用环境奖励改变策略；必须有可信 grader 与可复现环境。不同初始化、数据预算和交互次数不能随意比较。\n\n**反例与边界**\n\n格式奖励上涨但 agent 刷工具次数，终态成功下降；奖励优化不替代工具权限。\n\n**怎样验证**\n\n相同基座/工具/测试/预算比较 SFT、RL 与组合，核对 mask、reward hacking、独立任务、多个 seed 及成本。",
+      "answer": "**核心思路**\n\nSFT 学示范的合法动作与分布，RL 用环境奖励改变策略；必须有可信 grader 与可复现环境。不同初始化、数据预算和交互次数不能随意比较。\n\n**反例与边界**\n\n格式奖励上涨但 agent 刷工具次数，终态成功下降；奖励优化不替代工具权限。\n\n**怎样验证**\n\n相同基座/工具/测试/预算比较 SFT、RL 与组合，核对 mask、reward hacking、独立任务、多个 seed 及成本。\n\n**目标追问**\n\n两回答长度2/4、每token代理项−1/+1，sequence等权平均为0，token等权平均为1/3，再由loss负号转成最小化目标。current/old重要性比率与current/reference KL是不同项，保存rollout策略版本、mask、采样配置和分母。",
       "studyUnits": [
         "lesson-agent-rl"
       ],
@@ -4770,7 +4818,7 @@
         "定位模型、检索、工具和队列瓶颈。",
         "用缓存、并发、路由与预算控制做对照。"
       ],
-      "answer": "**核心思路**\n\n分段量排队、prefill、decode、工具与验真；成功、预算内可靠性、成本与尾时延共同形成目标，不能只优化平均响应。\n\n**反例与边界**\n\n前缀缓存改善 TTFT 却不缩短长 decode；增加重试提高成功也可能提高成本和 p95。\n\n**怎样验证**\n\n固定长度分布、任务、并发和缓存冷热，做配置消融；失败费用计入总成本/成功任务，不删超时试验。",
+      "answer": "**核心思路**\n\n分段量排队、prefill、decode、工具与验真；成功、预算内可靠性、成本与尾时延共同形成目标，不能只优化平均响应。\n\n**反例与边界**\n\n前缀缓存改善 TTFT 却不缩短长 decode；增加重试提高成功也可能提高成本和 p95。\n\n**怎样验证**\n\n固定长度分布、任务、并发和缓存冷热，做配置消融；失败费用计入总成本/成功任务，不删超时试验。\n\n**投机解码追问**\n\np=[0.6,0.3,0.1]，q=[0.2,0.5,0.3]，接受质量min(p,q)=[0.2,0.3,0.1]，拒绝残差只补第一项0.4，恢复目标分布。拒绝后直接从p采会变成[0.44,0.42,0.14]。接受率与完整一轮时间决定收益，不能默认加速；Notebook计算理想条件，真实引擎仍需负载与质量验证。",
       "studyUnits": [
         "lesson-inference-serving"
       ],
@@ -5012,7 +5060,7 @@
       "id": "q34",
       "category": "模型基础",
       "title": "KV cache、FlashAttention、PagedAttention 分别解决什么问题？",
-      "answer": "**核心思路**\n\nKV cache 复用历史每层 K/V 投影，FlashAttention 通过分块与在线 softmax 减少巨大注意力矩阵的 IO，PagedAttention 管理 KV 的分块存储和共享。它们分别涉及重算、计算 IO、内存管理，不能互相代替。\n\n**反例与边界**\n\n缓存后新 Q 仍需读取历史 KV；FlashAttention 并不自动把全注意力理论算术复杂度改为线性。\n\n**怎样验证**\n\n固定模型、长度、batch、dtype、硬件与版本，拆开 prefill/decode、吞吐、TTFT 和峰值内存；不要从一种优化名称直接宣称端到端收益。",
+      "answer": "**核心思路**\n\nKV cache 复用历史每层 K/V 投影，FlashAttention 通过分块与在线 softmax 减少巨大注意力矩阵的 IO，PagedAttention 管理 KV 的分块存储和共享。它们分别涉及重算、计算 IO、内存管理，不能互相代替。\n\n**反例与边界**\n\n缓存后新 Q 仍需读取历史 KV；FlashAttention 并不自动把全注意力理论算术复杂度改为线性。\n\n**怎样验证**\n\n固定模型、长度、batch、dtype、硬件与版本，拆开 prefill/decode、吞吐、TTFT 和峰值内存；不要从一种优化名称直接宣称端到端收益。\n\n**分配追问**\n\n教学块大小16、长度17/31各占2块，共64槽而只用48。块表与写时复制管分配/共享，FlashAttention管attention的IO，KV cache管历史状态复用；这些名称不能互换，实际总显存还含权重和workspace。",
       "rubric": [
         "三项优化对象不同",
         "计算复杂度边界",
@@ -5102,7 +5150,7 @@
       "id": "q40",
       "category": "工程",
       "title": "动态批处理和长输出为何影响 p95？",
-      "answer": "**核心思路**\n\nbatching 改善吞吐，却可能增加等待和串行步骤；长输入 prefill 与长输出 decode 对瓶颈影响不同。TTFT、每 token 时间、吞吐与端到端 p95 是不同指标。\n\n**反例与边界**\n\n拆开排队、prefill、decode、工具和传输；流式首 token 快不等于任务很快完成，取消后也要确认计算和费用是否继续。\n\n**怎样验证**\n\n固定负载分布、并发与冷/热缓存，记录成功率、失败成本及分位数，检验背压与公平性，不只跑单请求平均数。",
+      "answer": "**核心思路**\n\nbatching 改善吞吐，却可能增加等待和串行步骤；长输入 prefill 与长输出 decode 对瓶颈影响不同。TTFT、每 token 时间、吞吐与端到端 p95 是不同指标。\n\n**反例与边界**\n\n拆开排队、prefill、decode、工具和传输；流式首 token 快不等于任务很快完成，取消后也要确认计算和费用是否继续。\n\n**怎样验证**\n\n固定负载分布、并发与冷/热缓存，记录成功率、失败成本及分位数，检验背压与公平性，不只跑单请求平均数。\n\n**分离服务追问**\n\n传512MiB KV、有效链路10GiB/s，仅传输下界约50ms；若只省20ms排队，分离可能更慢。固定长度/负载/缓存冷热、记录链路和调度开销，再做是否拆分的判断，数字是算例而非集群测量。",
       "rubric": [
         "请求阶段分解",
         "吞吐/尾部取舍",
@@ -6913,6 +6961,39 @@
         "q27",
         "q40"
       ]
+    },
+    {
+      "id": "ant-autumn-application-sep",
+      "title": "记忆、上下文与服务可靠性的项目追问",
+      "company": "蚂蚁（作者自述）",
+      "author": "辣条吃多了_",
+      "dateText": "页面09-14 13:21（已编辑）；标题自述27届秋招一面9.8，未补推确切年份",
+      "url": "https://www.nowcoder.com/feed/main/detail/4247388b1f0e4e51b00962227843b24b?sourceSSR=post&weFlow=true",
+      "platform": "牛客",
+      "evidence": "作者自述 · 可见正文",
+      "verifiedAt": "2026-10-13",
+      "verification": "已读公开正文第1–14项；经历与企业归属未独立确认。原帖仅列方向，没有具体hot100题、企业答案或完整评分标准；不补造真题。",
+      "topics": [
+        "记忆",
+        "上下文",
+        "服务指标",
+        "可靠性",
+        "MCP"
+      ],
+      "questions": [
+        "如何解释项目的记忆、上下文与评测设计？",
+        "服务性能和高可用方案怎样用实际故障证据说明？",
+        "MCP与Skill机制如何连接到项目能力与执行边界？"
+      ],
+      "practice": "选自己的一条失败轨迹，分别说明上下文缺失、记忆写入、队列重试和验收证据。若没做过真实项目，如实用本站合同实验解释机制，并标明还未覆盖的系统条件。",
+      "questionRefs": [
+        "q4",
+        "q5",
+        "q6",
+        "q16",
+        "q24",
+        "q27"
+      ]
     }
   ],
   "interviewPracticeSources": [
@@ -7244,6 +7325,16 @@
       "question": "核心与 checkpoint 成套固定版本，重跑暂停、拒绝、跨进程恢复、工具和流式合同。",
       "scope": "真实 SDK + SQLite，无模型调用；旧报告保留原版本。",
       "query": "LangGraph durable execution checkpoint",
+      "verifiedAt": "2026-10-13"
+    },
+    {
+      "resourceId": "retrieval-comparison-2026",
+      "unitId": "lesson-retrieval-rag",
+      "title": "RAG的复杂管线是否真的更好：读近期受控比较",
+      "dateLabel": "2026年研究v1 · 方法/限制核对2026-10-13",
+      "question": "区分ANN与相关证据召回，手算MRR/nDCG/MaxSim，再审查judge是否真正看到证据。",
+      "scope": "已读论文与局限；运行原创排序/矩阵实验，未复现模型成绩。",
+      "query": "RAG late interaction evaluation",
       "verifiedAt": "2026-10-13"
     }
   ]
