@@ -38,6 +38,7 @@ export function calibrationReportNote(text){
   return body;
 }
 export const notebookReports={
+  'mcp-tool-contract.ipynb':{experiment:'mcp-tool-contract',filename:'mechanism_report.json'},
   'langgraph-control-flow.ipynb':{experiment:'langgraph-control-flow',filename:'langgraph_flow_report.json'},
   'agent-research-checks.ipynb':{experiment:'agent-research-checks',filename:'mechanism_report.json'},
   ...Object.fromEntries(['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving'].map(id=>[id+'.ipynb',{experiment:'lesson-'+id,filename:'mechanism_report.json'}])),
@@ -51,6 +52,7 @@ export function appendPracticeReport(reflection,text,expectedExperiment='durable
   if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
 }
 export const mechanismChecks={
+  'mcp-tool-contract':{discovery:'真实工具发现',structured_result:'结构化结果',invalid_input_rejected:'非法类型拒绝',business_error_retained:'业务错误保留',unknown_tool_rejected:'未知工具拒绝',subprocess_boundary:'stdio 子进程边界'},
   'lesson-llm-contract':{strict_types:'严格类型',calendar_validation:'日历语义',finite_money:'有限金额',unknown_fields:'未知字段拒绝'},
   'lesson-retrieval-rag':{rank_fusion:'rank 融合',recall_at_k:'召回指标',acl_before_context:'上下文前权限过滤'},
   'lesson-context-engineering':{mandatory_preserved:'必要状态保留',budget_bound:'预算范围',overflow_explicit:'预算不足显式失败'},
@@ -63,13 +65,14 @@ export const mechanismChecks={
 export function mechanismReportNote(text,expected){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的实验 JSON');
   let r;try{r=JSON.parse(text);}catch{throw new Error('实验记录不是有效 JSON');}
-  const spec=Object.hasOwn(mechanismChecks,expected)?mechanismChecks[expected]:null,sdk=expected==='langgraph-control-flow';
+  const spec=Object.hasOwn(mechanismChecks,expected)?mechanismChecks[expected]:null,sdk=expected==='langgraph-control-flow',mcp=expected==='mcp-tool-contract';
   if(!spec||r?.experiment!==expected)throw new Error('实验类型不匹配');
   if(sdk){if(r.model_called!==false||typeof r.version!=='string'||!/^\d+\.\d+\.\d+$/.test(r.version))throw new Error('SDK 版本或运行范围不匹配');}
+  else if(mcp){if(r.model_called!==false||r.version!=='2.3.0'||r.protocol!=='2026-07-28'||r.scope!=='official SDK; memory and stdio; no HTTP/auth')throw new Error('MCP 版本或运行范围不匹配');}
   else if(r.scope!=='stdlib fixtures; no model/service')throw new Error('实验运行范围不匹配');
   if(!r.checks||typeof r.checks!=='object'||Array.isArray(r.checks)||Object.keys(r.checks).length!==Object.keys(spec).length||!Object.keys(spec).every(k=>typeof r.checks[k]==='boolean'))throw new Error('实验检查项不完整');
   if(r.my_explanation!==undefined&&typeof r.my_explanation!=='string')throw new Error('实验解释须为文本');
-  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(spec).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
+  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':mcp?'真实 MCP SDK '+r.version+'，协议 '+r.protocol+'；内存与 stdio，无模型、HTTP/OAuth 或私有数据':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(spec).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
 }
 export function langgraphReportNote(text){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的 langgraph_report.json');
