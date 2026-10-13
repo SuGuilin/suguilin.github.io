@@ -30,6 +30,10 @@ html:has(.study-reader){scroll-behavior:auto}
 .topic-interview-links{border-top:1px solid var(--line);padding:14px 0;margin:8px 0}
 .topic-interview-links summary{font-size:14px;line-height:1.6;color:var(--accent);cursor:pointer}
 .study-reader h4{font-size:var(--reading-size,16px);line-height:1.6;font-weight:600;margin:18px 0 8px}
+.learning-context-links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:10px 0;font-size:13px;line-height:1.6}
+.learning-context-links a{padding:4px 0;color:var(--muted);overflow-wrap:anywhere}
+.learning-context-links a:hover,.learning-context-links .context-question{color:var(--accent)}
+.daily-feature .learning-context-links,.plan-today-row .learning-context-links{margin:8px 0 0}
 .study-reader .section-heading{display:flex;align-items:baseline;gap:16px;margin:0 0 20px}
 .study-reader .section-heading h2{margin:0}
 .study-reader .section-heading>span{font-size:13px;line-height:1.75;white-space:nowrap}

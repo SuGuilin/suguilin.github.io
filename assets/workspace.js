@@ -57,7 +57,7 @@ const releaseUpdates=new ReleaseUpdates({getData:()=>data});
 const study=new StudyWorkspace({getData:()=>data,getLessons:()=>lessons?.lessons??[],getReadings:()=>topicReadings,getCurated:()=>studyData?.units??[],getState:()=>state,setState:next=>{state=next;},persist,notify,render,navigate,modal,platform,updateCounts});
 const discovery=new KnowledgeDiscovery({getState:()=>state,setState:next=>{state=next;},persist,notify,study,getAccount:()=>platform.session?.user.id??'guest'});
 const product=createProductScreens({getData:()=>data,getLessons:()=>lessons,getState:()=>state,platform,icon,catalogHTML,guideCard});
-function persist(){return platform.persist();}
+function persist(){const saved=platform.persist();document.dispatchEvent(new Event('learning-records-changed'));return saved;}
 function toggleList(list,id,checked){const set=new Set(state[list]);checked===undefined?set.has(id)?set.delete(id):set.add(id):checked?set.add(id):set.delete(id);state[list]=[...set];persist();updateCounts();}
 function updateCounts(){$('#saved-count').textContent=state.saved.filter(id=>data.resources.some(r=>r.id===id)||study.units().some(u=>u.id===id)).length;$('#resource-count').textContent=data.resources.length;$$('[data-save]').forEach(button=>{const saved=state.saved.includes(button.dataset.save);button.classList.toggle('saved',saved);button.setAttribute('aria-pressed',String(saved));button.setAttribute('aria-label',`${saved?'取消收藏':'收藏'} ${data.resources.find(r=>r.id===button.dataset.save)?.title||'资料'}`);const label=button.querySelector('[data-save-label]');if(label)label.textContent=button.hasAttribute('data-save-creator')?(saved?'已关注 · 取消':'加入关注'):(saved?'已收藏 · 取消':'收藏资料');});}
 const resource = id => data.resources.find(r=>r.id===id);
@@ -147,7 +147,7 @@ const actionHandlers={
  'journal-old-draft':()=>{const draft=journal.conflictingDraft||journal.recoveryDraft;if(draft)copyText('# '+draft.note.title+'\n\n'+draft.note.body);},
  'journal-template':()=>{const title=$('#note-title').value||'本次实验';const body=$('#note-body');body.value=(body.value?body.value+'\n\n':'')+journalTemplate(title);draftDirty=true;$('#editor-status').textContent='模板已插入，保存后可回看。';draftDirty=!journal.saveDraft(body.closest('form'));body.focus();},
  'discuss-note':button=>{const note=state.notes.find(n=>n.id===button.dataset.id);if(note)platform.openAssistant(noteDiscussion(note,study.unit(noteUnitId(note))));},
- 'resolve-question':button=>{const note=state.notes.find(n=>n.id===button.dataset.id);if(!note)return;note.kind=note.kind==='待解答问题'?'已解决问题':'待解答问题';note.updatedAt=new Date().toISOString();const saved=persist();render();notify(saved?(note.kind==='已解决问题'?'已标记解决，可随时重新打开':'疑问已重新打开'):'本机保存失败，请立即导出备份');},
+ 'resolve-question':button=>{const note=state.notes.find(n=>n.id===button.dataset.id);if(!note)return;note.kind=note.kind==='待解答问题'?'已解决问题':'待解答问题';note.updatedAt=new Date().toISOString();const saved=persist();const params=new URLSearchParams(location.search);if(params.get('type')&&params.get('type')!==note.kind){params.delete('type');history.replaceState({},'',journal.url(params,note.id));}render();notify(saved?(note.kind==='已解决问题'?'已标记解决，可随时重新打开':'疑问已重新打开'):'本机保存失败，请立即导出备份');},
  'export-json':()=>platform.backup(),
  'export-note':button=>exportNote(button.dataset.id),
  'import':()=>platform.action({dataset:{platform:'restore'}}),
