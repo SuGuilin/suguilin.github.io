@@ -29,6 +29,9 @@ test('The topic context derives exact records and current attempts without mutat
   const recall=learningContext({...state,studyProgress:[fresh]},unit,{now});
   assert.equal(recall.practice.answered,0);assert.equal(recall.practice.reflection,false);assert.equal(recall.stage.id,'recalling');
   assert.equal(recall.notes.length,c.notes.length);assert.ok(recall.experiment);
+  const view={getState:()=>({...state,studyProgress:[fresh]}),contextMarkup:StudyWorkspace.prototype.contextMarkup,contextLinks:StudyWorkspace.prototype.contextLinks,exercisesMarkup:()=>'<section>本次空白作答</section>',reflectionMarkup:()=>''};
+  const markup=StudyWorkspace.prototype.recallReader.call(view,unit,fresh);
+  assert.match(markup,/2 篇记录/);assert.match(markup,/实验记录/);assert.ok(!markup.includes('上次作答 1/2'));
 });
 test('Continuations finish active attempts first and recommendation handoffs open the actual pending question',()=>{
   const state=fixture(),p=state.studyProgress[0],question=state.notes.find(n=>n.kind==='待解答问题');
