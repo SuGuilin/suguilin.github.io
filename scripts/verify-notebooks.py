@@ -10,7 +10,7 @@ import re
 
 root = Path(__file__).resolve().parent.parent
 names = ['durable-agent.ipynb', 'paired-agent-evaluation.ipynb', 'agent-mechanism-checks.ipynb', 'decision-calibration.ipynb']
-foundations=['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving']
+foundations=['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving','model-foundations','finetuning-foundations']
 names.extend([name+'.ipynb' for name in foundations]+['agent-research-checks.ipynb'])
 if '--sdk' in sys.argv:
     names.extend(['langgraph-interrupts.ipynb', 'langgraph-durable-workflow.ipynb','langgraph-control-flow.ipynb'])
@@ -96,7 +96,7 @@ for name in foundations:
     assert len(blocks)==1
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(blocks[0],lesson['id'],'exec'),{})
-print('Six foundation reading snippets: exact page code and negative paths passed')
+print('Eight foundation reading snippets: exact page code and negative paths passed')
 
 # Other readable Python blocks are runnable too; architecture pseudocode is
 # visibly labelled in the page and intentionally excluded from execution.

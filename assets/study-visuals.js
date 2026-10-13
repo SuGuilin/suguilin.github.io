@@ -11,6 +11,8 @@ export const mechanismDiagrams={
 };
 export function questionTitle(unit){return unit.title;}
 export const learningNotebooks={
+ 'lesson-model-foundations':[['model-foundations.ipynb','Attention、RoPE 与缓存的逐元素对照','标准库数学 · 25 分钟']],
+ 'lesson-finetuning-foundations':[['finetuning-foundations.ipynb','SFT mask、LoRA 梯度与 DPO log-ratio','标准库梯度 · 25 分钟']],
  'digest-langgraph':[['langgraph-control-flow.ipynb','路由、工具、并行、子图、流式与故障','真实 SDK · 25 分钟'],['langgraph-durable-workflow.ipynb','状态合并、跨进程恢复与审批边界','真实 SDK + SQLite · 25–35 分钟']],
  'lesson-llm-contract':[['llm-contract.ipynb','结构、日期和金额的拒绝路径','标准库合同 · 15 分钟']],
  'lesson-retrieval-rag':[['retrieval-rag.ipynb','RRF、Recall@k 与可见候选','离线排序 fixture · 15 分钟']],

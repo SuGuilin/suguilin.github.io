@@ -10,7 +10,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 await build({entryPoints:[path.join(root,'assets/workspace.js')],outfile:path.join(root,'assets/app.js'),bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,legalComments:'eof'});
 const sourceTemplate = await readFile(path.join(root, 'src/shell.html'), 'utf8');
 const notebooks=(await readdir(path.join(root,'notebooks'))).filter(name=>name.endsWith('.ipynb')).sort().map(name=>'notebooks/'+name);
-const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json','content/study-units.json','content/topic-readings.json','content/study-curriculum.json','assets/experience.css','assets/reader.css','assets/workflow.css',...notebooks].map(file=>readFile(path.join(root,file))));
+const versionFiles=await Promise.all(['assets/app.js','assets/workspace.css','assets/product.css','content/workspace.json','content/lessons.json','content/study-units.json','content/topic-readings.json','content/study-curriculum.json','assets/experience.css','assets/reader.css','assets/workflow.css','assets/acceptance.css',...notebooks].map(file=>readFile(path.join(root,file))));
 const assetVersion=createHash('sha256').update(Buffer.concat(versionFiles)).digest('hex').slice(0,12);
 const template=sourceTemplate.replaceAll('{{assetVersion}}',assetVersion);
 const data = JSON.parse(await readFile(path.join(root, 'content/workspace.json'), 'utf8'));

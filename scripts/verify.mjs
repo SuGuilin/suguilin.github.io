@@ -25,10 +25,10 @@ for(const item of [...data.curriculum,...data.guides,...data.projects,...data.qu
   for(const id of item.studyUnits)assert.ok(study.units.some(u=>u.id===id),`Missing topic ${id}`);
 }
 for(const q of data.questions)assert.ok(q.answer?.includes('核心思路')&&q.answer.includes('反例与边界')&&q.answer.includes('怎样验证'),`Missing substantive answer ${q.id}`);
-assert.equal(study.units.length,28);assert.equal(new Set(study.units.map(u=>u.id)).size,28);
+assert.equal(study.units.length,30);assert.equal(new Set(study.units.map(u=>u.id)).size,30);
 for(const unit of study.units){validateUnit(unit);assert.ok(unit.id.startsWith('lesson-')?lessons.lessons.some(l=>l.id===unit.id):ids.has(unit.id.replace(/^digest-/,'')),`Missing study reference ${unit.id}`);}
 for(const file of ['study-model.js','source-reader.js','learning-signals.js'])assert.equal(await readFile(path.join(root,'assets',file),'utf8'),await readFile(path.join(root,'supabase/functions/_shared',file),'utf8'),`Stale backend ${file}`);
-assert.equal(lessons.lessons.length,12);
+assert.equal(lessons.lessons.length,14);
 for(const l of lessons.lessons){assert.ok(l.content.length>700);assert.ok(l.sources.length>=3);for(const source of l.sources)assert.equal(new URL(source.url).protocol,'https:');}
 assert.equal(data.resources.filter(r=>r.digest).length,16);
 const readings=JSON.parse(await readFile(path.join(root,'content/topic-readings.json'),'utf8')).readings;
@@ -36,4 +36,4 @@ assert.equal(readings.length,16);assert.equal(new Set(readings.map(r=>r.id)).siz
 for(const reading of readings){assert.ok(study.units.some(u=>u.id===reading.id));assert.ok(reading.goal&&reading.scope&&reading.reviewedAt);assert.ok(reading.content.match(/^## /gm)?.length>=5);for(const source of reading.sources)assert.equal(new URL(source.url).protocol,'https:');}
 for(const r of data.interviewReports){assert.ok(r.author&&r.verification&&r.dateText);for(const id of r.questionRefs)assert.ok(data.questions.some(q=>q.id===id));}
 const config=JSON.parse(await readFile(path.join(root,'assets/public-config.json'),'utf8'));assert.ok(!JSON.stringify(config).includes('sb_secret_'));assert.ok(!Object.keys(config).some(k=>/service.?role|openai|access.?token/i.test(k)));
-console.log(`Verified ${ids.size} unique resources, 28 study units, all curriculum/project/guide references, shared backend modules, legacy routes and 15 page shells.`);
+console.log(`Verified ${ids.size} unique resources, 30 study units, all curriculum/project/guide references, shared backend modules, legacy routes and 15 page shells.`);

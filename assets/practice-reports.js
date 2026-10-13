@@ -41,7 +41,7 @@ export const notebookReports={
   'mcp-tool-contract.ipynb':{experiment:'mcp-tool-contract',filename:'mechanism_report.json'},
   'langgraph-control-flow.ipynb':{experiment:'langgraph-control-flow',filename:'langgraph_flow_report.json'},
   'agent-research-checks.ipynb':{experiment:'agent-research-checks',filename:'mechanism_report.json'},
-  ...Object.fromEntries(['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving'].map(id=>[id+'.ipynb',{experiment:'lesson-'+id,filename:'mechanism_report.json'}])),
+  ...Object.fromEntries(['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving','model-foundations','finetuning-foundations'].map(id=>[id+'.ipynb',{experiment:'lesson-'+id,filename:'mechanism_report.json'}])),
   'langgraph-durable-workflow.ipynb':{experiment:'langgraph-durable-workflow',filename:'langgraph_report.json'},
   'durable-agent.ipynb':{experiment:'durable-agent',filename:'recovery_report.json'},
   'decision-calibration.ipynb':{experiment:'decision-calibration',filename:'calibration_report.json'}
@@ -52,6 +52,8 @@ export function appendPracticeReport(reflection,text,expectedExperiment='durable
   if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
 }
 export const mechanismChecks={
+  'lesson-model-foundations':{stable_softmax:'稳定 softmax',causal_mask:'因果可见性',cache_equivalence:'缓存逐元素等价',rope_relative:'RoPE 相对位移',kv_heads:'KV 头数与内存',negative_inputs:'非法输入拒绝'},
+  'lesson-finetuning-foundations':{loss_mask:'监督位置与分母',lora_gradient:'LoRA 有限差分梯度',frozen_base:'冻结基础矩阵',dpo_reference:'DPO reference 与标签方向',group_split:'来源分组划分',negative_inputs:'非法输入拒绝'},
   'mcp-tool-contract':{discovery:'真实工具发现',structured_result:'结构化结果',invalid_input_rejected:'非法类型拒绝',business_error_retained:'业务错误保留',unknown_tool_rejected:'未知工具拒绝',subprocess_boundary:'stdio 子进程边界'},
   'lesson-llm-contract':{strict_types:'严格类型',calendar_validation:'日历语义',finite_money:'有限金额',unknown_fields:'未知字段拒绝'},
   'lesson-retrieval-rag':{rank_fusion:'rank 融合',recall_at_k:'召回指标',acl_before_context:'上下文前权限过滤'},

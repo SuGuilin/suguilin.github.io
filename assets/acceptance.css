@@ -1,0 +1,36 @@
+/* A compact interview desk: the question list is the primary workspace. */
+.interview-session-bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-block:1px solid var(--line);font-size:13px;color:var(--muted)}
+.interview-session-bar strong{color:var(--ink);font-weight:600;margin-right:5px}
+.interview-coverage{padding:12px 0;font-size:13px;color:var(--muted)}
+.interview-coverage summary,.source-verification summary{cursor:pointer}
+.interview-coverage nav{display:flex;flex-wrap:wrap;gap:9px 20px;margin-top:12px}
+.interview-provenance{font-size:12px;line-height:1.6;color:var(--muted);margin:0 0 16px}
+.interview-toolbar{align-items:center;gap:12px;margin-bottom:12px}
+.interview-toolbar .filter-bar{flex:1;flex-wrap:wrap;gap:4px}
+.interview-toolbar .search-field{width:240px;max-width:100%;margin:0}
+.interview-toolbar .search-field input{min-width:0;width:100%}
+.question-list .question>summary{padding:19px 16px;gap:14px;min-height:64px}
+.question-list .question>summary strong{font-size:14px;line-height:1.6;font-weight:550}
+.question-list .question-body{font-size:15px;line-height:1.6;padding:8px 24px 20px 52px}
+.question-list .question-body>p{margin:0 0 10px;color:var(--muted);font-size:13px}
+.question-reference .markdown-body{font-size:15px;line-height:1.6}
+.question-reference .markdown-body p{margin:10px 0}
+.report-related{display:grid;gap:7px}.report-related a{font-size:13px;line-height:1.6}
+.source-verification{margin-top:8px;font-size:12px;color:var(--muted)}
+.source-verification small{display:block;margin-top:8px;line-height:1.6}
+.catalog-source-control select{max-width:145px;min-height:36px;border:1px solid var(--control-border);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 9px;font:inherit;font-size:12px}
+.resource-catalog .toolbar{gap:12px;grid-template-columns:minmax(0,1fr) auto auto}
+.question-list .question-body li,.question-reference .markdown-body p,.question-reference .markdown-body li{line-height:1.6}
+.frontier-reading h3{font-size:19px;line-height:1.5}.frontier-reading p,.creator-source-list p{line-height:1.6}
+.frontier-reading>article{padding:20px 0;border-bottom:0}.frontier-reading>article:last-child{border-bottom:1px solid var(--line)}
+.guide-reader section p{font-size:15px;line-height:1.6}
+.discovery-cache-results{margin:16px 0;border-block:1px solid var(--line);padding:12px 0;font-size:13px;color:var(--muted)}.discovery-cache-results>summary{cursor:pointer}.discovery-cache-results[open]>summary{margin-bottom:14px}
+@media(max-width:700px){
+ .interview-session-bar{gap:10px;font-size:12px}.interview-session-bar .button{white-space:nowrap;padding:8px 10px}
+ .interview-toolbar{flex-wrap:wrap}.interview-toolbar .filter-bar{flex-basis:100%}.interview-toolbar .search-field{width:100%}
+ .question-list .question>summary{padding:16px 0;gap:10px}.question-list .question>summary strong{font-size:14px}
+ .question-list .question-body{padding:4px 0 20px 26px}.question-list .question-index{font-size:11px}
+ .question-list .question>summary .tag{font-size:10px;padding:3px 5px;white-space:nowrap}
+ .catalog-source-control{margin-right:auto}.catalog-source-control select{min-height:40px}
+ .resource-catalog .toolbar{grid-template-columns:minmax(0,1fr) auto}.resource-catalog .search-field{grid-column:1/-1;width:100%}.resource-catalog .view-switch{grid-column:2;grid-row:3}
+}
