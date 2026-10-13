@@ -7,6 +7,7 @@ import {learningContext,learningAction,dailyLearningQueue} from '../assets/learn
 import {saveStudySnapshot} from '../assets/study-session.js';
 import {saveAnnotation,learningRecommendations} from '../assets/learning-signals.js';
 import {StudyWorkspace} from '../assets/study.js';
+import {noteDiscussion} from '../assets/journal-model.js';
 const units=JSON.parse(await readFile('content/study-units.json','utf8')).units;
 const unit=units.find(u=>u.id==='lesson-inference-serving'),other=units.find(u=>u.id==='lesson-retrieval-rag');
 const now=new Date('2026-10-13T04:00:00Z');
@@ -60,4 +61,19 @@ test('Home recommendations, daily plan, reader and filtered journal share the sa
   assert.ok(context.card(unit,'',question.id).includes(action.url.replaceAll('&','&amp;')));
   const markup=context.contextMarkup(unit);assert.match(markup,/2 篇记录/);assert.match(markup,/1 个未解疑问/);assert.match(markup,/实验记录/);
   const exact=new URL(action.url,'https://suguilin.github.io');assert.equal(exact.searchParams.get('unit'),unit.id);
+});
+
+test('Reopening an old question carries current same-topic evidence while retaining its original identity and independent recall boundary',()=>{
+  const state=fixture(),note=state.notes.find(n=>n.kind==='待解答问题'),before=structuredClone(note);
+  const context=learningContext(state,unit,{now}),continued=noteDiscussion(note,unit,{learning:context});
+  assert.equal(continued.journalNoteId,note.id);assert.match(continued.question,/拒绝后为何/);
+  assert.match(continued.question,/区分prefill与decode/);assert.match(continued.question,/代码实践/);
+  assert.ok(continued.question.includes(context.experiment.id));assert.deepEqual(note,before);
+  assert.ok(continued.question.includes('https://suguilin.github.io/journal/?id='+context.experiment.id));
+  assert.equal(noteDiscussion(note,unit,{learning:learningContext(state,other,{now})}).question,noteDiscussion(note,unit).question);
+  const recalled={...state,studyProgress:[beginRecall(recordReview(state.studyProgress[0],'hard',10,now),now)]};
+  const fresh=noteDiscussion(note,unit,{learning:learningContext(recalled,unit,{now})});
+  assert.ok(!fresh.question.includes('区分prefill与decode'));assert.ok(fresh.question.includes(context.experiment.id));
+  const long=structuredClone(state);long.studyProgress[0].reflection='观察'.repeat(3000);
+  assert.ok(noteDiscussion({...note,body:note.body+'\n附加问题'.repeat(1800)},unit,{learning:learningContext(long,unit,{now})}).question.length<=6000);
 });

@@ -1,4 +1,4 @@
-import {validReadingSection} from './study-model.js';
+import {validReadingSection,currentAttempt} from './study-model.js';
 import {noteUnitId,readAnnotation} from './learning-signals.js';
 const kinds=['实验记录','源码研究','论文精读','学习复盘','学习笔记','待解答问题','已解决问题','重点标注','作者观点','面试复盘','项目记录','资料收件箱'];
 
@@ -67,10 +67,22 @@ export function noteLearningLink(note){
   if(!match)return null;
   return {id:match[2],url:match[1],section:validReadingSection(match[3])?match[3]:'study-reflection'};
 }
-export function noteDiscussion(note,unit){
+export function noteDiscussion(note,unit,{learning=null}={}){
   const q=journalNoteParts(note),ref=noteLearningLink(note),question=['待解答问题','已解决问题'].includes(note.kind)
     ? q.body.replace(/^## 待解答的问题\n+/, '').trim() : '这是我保存的'+note.kind+'：\n\n'+q.body+(q.comparison?'\n\n## 上次作答（供比较）\n\n'+q.comparison:'')+'\n\n请帮助我检查理解的假设与边界，先提出一个需要澄清的问题。';
-  return {title:unit?.title||note.title,studyUnit:unit,journalNoteId:note.id,section:ref?.section||'study-reflection',question:question.slice(0,6000)};
+  const updates=[];
+  if(unit&&learning?.unitId===unit.id&&['待解答问题','已解决问题'].includes(note.kind)){
+    const attempt=learning.progress&&currentAttempt(learning.progress);
+    const answers=unit.exercises.flatMap(e=>{const text=attempt?.answers.find(a=>a.id===e.id)?.text.trim();return text?[e.prompt+'\n'+text.slice(0,800)]:[];}).join('\n\n');
+    if(answers&&!question.includes(answers))updates.push('当前尝试的作答：\n'+answers.slice(0,1400));
+    const reflection=attempt?.reflection.trim();
+    if(reflection&&!question.includes(reflection))updates.push('当前笔记与实验观察：\n'+reflection.slice(0,1500));
+    const experiment=learning.experiment;
+    if(experiment&&experiment.id!==note.id)updates.push('最近保存的实验记录：https://suguilin.github.io/journal/?'+new URLSearchParams({id:experiment.id,unit:unit.id}));
+  }
+  const label='\n\n---\n继续讨论时的同专题材料（追加上下文，不是已验证答案）：\n',base=question.slice(0,updates.length?3400:6000);
+  const continued=updates.length?base+label+updates.join('\n\n').slice(0,6000-base.length-label.length):base;
+  return {title:unit?.title||note.title,studyUnit:unit,journalNoteId:note.id,section:ref?.section||'study-reflection',question:continued};
 }
 export function journalScope(params){
   for(const field of ['id','question','source','unit','lesson','week','project','guide']){

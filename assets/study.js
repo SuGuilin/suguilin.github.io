@@ -80,9 +80,11 @@ export class StudyWorkspace{
     return links.length?`<nav class="learning-context-links" aria-label="本专题的学习记录">${links.join('')}</nav>`:'';
   }
   refreshContexts(){
+    const position=this.captureReader();
     for(const el of document.querySelectorAll('[data-learning-context]')){
       const unit=this.unit(el.dataset.learningContext);if(unit)el.innerHTML=this.contextLinks(unit);
     }
+    if(position&&position.scroll>=80){const target=document.getElementById(position.section);if(target)window.scrollBy({top:target.getBoundingClientRect().top-position.offset,behavior:'instant'});}
   }
   prerequisitesMarkup(unit){
     const topics=prerequisiteTopics(unit.id).map(id=>this.unit(id)).filter(Boolean);
