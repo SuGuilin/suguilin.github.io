@@ -609,7 +609,7 @@
       "source": {
         "title": "LangGraph Graph API",
         "url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
-        "scope": "Graph API 核心机制；真实 SDK 1.2.14 控制流与 SQLite 跨进程实验已执行。固定决策，无真实模型、远端服务、多副本或完整版本迁移验证。",
+        "scope": "Graph API 核心机制；真实 SDK 1.2.15 控制流与 SQLite 跨进程实验已执行。固定决策，无真实模型、远端服务、多副本或完整版本迁移验证。",
         "accessedAt": "2026-10-12T08:00:00.000Z",
         "excerpt": ""
       },

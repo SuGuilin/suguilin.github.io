@@ -21,11 +21,11 @@ export class LearningPlatform {
   }
   async init(){
     try{const r=await fetch('/assets/public-config.json',{cache:'no-store'});if(!r.ok)throw new Error('连接配置未能载入');this.config=await r.json();
-      if(!this.config.supabaseUrl||!this.config.supabasePublishableKey){this.updateStatus({status:'unconfigured'});return;}
+      if(!this.config.supabaseUrl||!this.config.supabasePublishableKey){this.updateStatus({status:'unconfigured'});this.onRender();return;}
       const url=new URL(this.config.supabaseUrl),key=this.config.supabasePublishableKey;let publicKey=key.startsWith('sb_publishable_');
       if(!publicKey)try{publicKey=JSON.parse(atob(key.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role==='anon';}catch{}
       if(url.protocol!=='https:'||!url.hostname.endsWith('.supabase.co')||url.username||url.password||!publicKey||!/^[a-zA-Z0-9_-]+$/.test(this.config.assistantFunction)||this.config.synthesisFunction&&!/^[a-zA-Z0-9_-]+$/.test(this.config.synthesisFunction))throw new Error('连接配置不正确');
-      if(this.config.enableSignIn===false){this.updateStatus({status:'deployment-pending'});return;}
+      if(this.config.enableSignIn===false){this.updateStatus({status:'deployment-pending'});this.onRender();return;}
       this.client=createClient(url.origin,this.config.supabasePublishableKey,{auth:{flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
       this.client.auth.onAuthStateChange((event,session)=>{if(['SIGNED_IN','SIGNED_OUT','INITIAL_SESSION','TOKEN_REFRESHED'].includes(event))setTimeout(()=>this.accountChanged(session),0);});
       const {data,error}=await this.client.auth.getSession();if(error)throw error;await this.accountChanged(data.session);

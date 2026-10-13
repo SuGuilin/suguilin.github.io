@@ -6,9 +6,21 @@ import {filterCatalogResources,resourceLearningUnit,resourceSourceKind} from '..
 import {sourcePerspectives} from '../assets/source-perspectives.js';
 import {appendPracticeReport,mechanismChecks} from '../assets/practice-reports.js';
 import {questionWithContext} from '../assets/study-session.js';
+import {LearningPlatform} from '../assets/platform.js';
 const data=JSON.parse(await readFile('content/workspace.json','utf8'));
 const units=JSON.parse(await readFile('content/study-units.json','utf8')).units;
 const lessons=JSON.parse(await readFile('content/lessons.json','utf8')).lessons;
+
+test('Account status refreshes after configuration settles without activating sign-in or creating an auth client',async()=>{
+  const originalFetch=globalThis.fetch;
+  try{
+    for(const [config,status] of [[{},'unconfigured'],[{supabaseUrl:'https://test-project.supabase.co',supabasePublishableKey:'sb_publishable_unit_test_only',assistantFunction:'study-assistant',enableSignIn:false},'deployment-pending']]){
+      globalThis.fetch=async()=>new Response(JSON.stringify(config));let renders=0,observed;
+      const context={client:null,onRender:()=>renders++,updateStatus:value=>{observed=value.status;}};
+      await LearningPlatform.prototype.init.call(context);assert.equal(observed,status);assert.equal(renders,1);assert.equal(context.client,null);
+    }
+  }finally{globalThis.fetch=originalFetch;}
+});
 
 test('Official-site question copies retain the exact note or reading position and reject external return destinations',()=>{
   const unit=units.find(u=>u.id==='lesson-finetuning-foundations');

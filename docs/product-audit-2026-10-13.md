@@ -62,3 +62,13 @@
 沿 DPO 第 37 题进入后训练正文，正文 16px/25.6px。通过站内下载获得 finetuning-foundations.ipynb，SHA256 `1f27545a133d2b14a3c11d1355fa762974d4eb70c7fcc077304c70cee2eabd23`，与交付代码相同。实际执行所有格：LoRA 解析梯度/有限差分一致、基础矩阵不变，小矩阵 loss 从 0.2 降至约 4.94e-10；DPO 同差/正差/换标签 loss 为 0.6931/0.6444/0.7444。导入报告后 3 道作答仍为空；报告进入笔记、日志和提问上下文，复制含 LoRA/DPO 一手来源。所有数字属于教学计算，未进行真实大模型训练。
 
 验收记录明确为产品测试，不能当成用户掌握度或学习成绩。最终复查、备份与清理在下一段记录。
+
+## 实时版本追查与回归
+
+站内“检查最新发布”于 2026-10-13 12:50（本地时间）实际读到六个官方仓库：LangGraph 1.2.15、Deep Agents 0.7.24、Codex CLI rust-v0.162.1、Claude Code 2.1.296、Harbor 0.24.0、TRL 1.15.0。该记录是当时快照，按钮下次会重新读取。多包仓库的 latest 标签不代表所有 SDK 的统一版本。
+
+[LangGraph 1.2.15 发布说明](https://github.com/langchain-ai/langgraph/releases/tag/1.2.15) 已读取，涉及 cached writes、暂停/分支/DeltaChannel、ToolNode resume 和流式 interrupt。实际安装发现旧 checkpoint 4.2.0 不满足新核心的 `>=4.3.0` 要求。改用 core 1.2.15 + checkpoint 4.3.0 + SQLite 3.1.1 后，三个 SDK notebook 及正文示例完整通过；已更新交付代码、版本说明与雷达推荐。历史 1.2.14 报告保留原版本，导入仍可正常回看。
+
+账号页实际加载后仍可能留在“云端准备中”，原因是配置读取到 `enableSignIn:false` 后只更新状态徽标，没有重新渲染账号正文。补上配置完成后的前端刷新；未创建 Auth client、未启用登录、未开通账号、未修改公共配置或数据库。按 Supabase 技能核对官方 changelog/auth 文档，本次只涉及本站渲染生命周期；配置分支用无外部请求的测试验证。
+
+自有后训练验收进度与唯一日志已通过“导出并移出安排”保存在 `SuGuilin-progress-lesson-finetuning-foundations.json`。该备份只有本轮一个进度与一个日志，3 道作答均为空、没有复习评分或对话，不含原有记录；之后清理自有日志。原有 18 篇记录、4 个安排、0 个收藏保持，原安排日期 10-12/10-12/10-12/10-13 未变。精确笔记回链已实际复制并核对。

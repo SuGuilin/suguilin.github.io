@@ -240,8 +240,8 @@
       "whenToLearn": "单 Agent 跑通后，第 5–6 周把学习助手升级为可恢复工作流。",
       "url": "https://docs.langchain.com/oss/python/langgraph/overview",
       "source": "LangChain 官方文档",
-      "verification": "已核实为底层编排框架和运行时；可独立使用，不要求依赖 LangChain。",
-      "verifiedAt": "2026-10-11",
+      "verification": "已读核心文档与 1.2.15 官方发布；配套 LangGraph 1.2.15/checkpoint 4.3.0/SQLite 3.1.1 实验独立运行。",
+      "verifiedAt": "2026-10-13",
       "priority": "focus",
       "digest": {
         "resourceId": "langgraph",
@@ -340,9 +340,15 @@
             "section": "Core benefits",
             "verification": "原始来源正文已实际打开",
             "verifiedAt": "2026-10-11"
+          },
+          {
+            "title": "LangGraph 1.2.15 官方发布",
+            "url": "https://github.com/langchain-ai/langgraph/releases/tag/1.2.15",
+            "supports": "cached writes、暂停/分支与流式事件修复，依赖升级要求",
+            "verifiedAt": "2026-10-13"
           }
         ],
-        "versionNote": "Graph API 核心机制；真实 SDK 1.2.14 控制流与 SQLite 跨进程实验已执行。固定决策，无真实模型、远端服务、多副本或完整版本迁移验证。",
+        "versionNote": "Graph API 核心机制；真实 SDK 1.2.15 控制流与 SQLite 跨进程实验已执行。固定决策，无真实模型、远端服务、多副本或完整版本迁移验证。",
         "verifiedAt": "2026-10-13",
         "contentType": "editorial-source-grounded-digest",
         "practiceStatus": "CPU 机制实验已验证；真实模型、完整项目服务、benchmark 与训练未执行。",
@@ -7228,6 +7234,16 @@
       "question": "从 loss mask、初始化梯度和 reference log-ratio 开始，避免用方法名替代机制理解。",
       "scope": "标准库梯度与损失实验；未进行大模型训练。",
       "query": "LLM post training DPO GRPO",
+      "verifiedAt": "2026-10-13"
+    },
+    {
+      "resourceId": "langgraph",
+      "unitId": "digest-langgraph",
+      "title": "LangGraph 1.2.15：升级要验证恢复合同",
+      "dateLabel": "发布 2026-10-12 · 实验核对 2026-10-13",
+      "question": "核心与 checkpoint 成套固定版本，重跑暂停、拒绝、跨进程恢复、工具和流式合同。",
+      "scope": "真实 SDK + SQLite，无模型调用；旧报告保留原版本。",
+      "query": "LangGraph durable execution checkpoint",
       "verifiedAt": "2026-10-13"
     }
   ]
