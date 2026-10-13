@@ -74,7 +74,7 @@ export function mechanismReportNote(text,expected){
   else if(r.scope!=='stdlib fixtures; no model/service')throw new Error('实验运行范围不匹配');
   if(!r.checks||typeof r.checks!=='object'||Array.isArray(r.checks)||Object.keys(r.checks).length!==Object.keys(spec).length||!Object.keys(spec).every(k=>typeof r.checks[k]==='boolean'))throw new Error('实验检查项不完整');
   if(r.my_explanation!==undefined&&typeof r.my_explanation!=='string')throw new Error('实验解释须为文本');
-  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':mcp?'真实 MCP SDK '+r.version+'，协议 '+r.protocol+'；内存与 stdio，无模型、HTTP/OAuth 或私有数据':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(spec).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
+  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':mcp?'真实 MCP SDK '+r.version+'，协议 '+r.protocol+'；内存与 stdio，无模型、HTTP/OAuth 或私有数据':expected==='lesson-finetuning-foundations'?'标准库数学与小矩阵梯度下降；未运行真实大模型、远端服务或完整 benchmark':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(spec).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
 }
 export function langgraphReportNote(text){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的 langgraph_report.json');
