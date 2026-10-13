@@ -1,0 +1,63 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {defaultState,validateState,mergeBackupStates} from '../assets/state.js';
+import {newProgress,recordReview,beginRecall} from '../assets/study-model.js';
+import {learningContext,learningAction,dailyLearningQueue} from '../assets/learning-cycle.js';
+import {saveStudySnapshot} from '../assets/study-session.js';
+import {saveAnnotation,learningRecommendations} from '../assets/learning-signals.js';
+import {StudyWorkspace} from '../assets/study.js';
+const units=JSON.parse(await readFile('content/study-units.json','utf8')).units;
+const unit=units.find(u=>u.id==='lesson-inference-serving'),other=units.find(u=>u.id==='lesson-retrieval-rag');
+const now=new Date('2026-10-13T04:00:00Z');
+function fixture(){
+  const p={...newProgress(unit,'2026-10-13'),answers:[{id:'e2',text:'区分prefill与decode'}],reflection:'## 代码实践 · lesson-inference-serving\n\n范围：教学算式；未运行GPU'};
+  let state={...defaultState(),studyProgress:[p]};
+  state=saveStudySnapshot(state,unit,p,{now,id:'experiment'}).state;
+  state=saveAnnotation(state,unit,{section:'chapter-3',quote:'投机收益依赖实际负载'},{kind:'待解答问题',comment:'拒绝后为何不能直接从目标分布采？',now,id:'pending'}).state;
+  state=saveAnnotation(state,other,{section:'chapter-2',quote:'另一个专题的证据'},{now,id:'other'}).state;
+  return validateState(state);
+}
+test('The topic context derives exact records and current attempts without mutating state or counting foreign notes',()=>{
+  const state=fixture(),before=structuredClone(state),c=learningContext(state,unit,{now});
+  assert.equal(c.notes.length,2);assert.equal(c.questions.length,1);assert.equal(c.annotations.length,1);
+  assert.equal(c.practice.answered,1);assert.equal(c.practice.total,2);assert.ok(c.experiment);
+  assert.equal(c.stage.id,'checking');assert.deepEqual(state,before);
+  assert.deepEqual(learningContext(mergeBackupStates(defaultState(),JSON.parse(JSON.stringify(state))).state,unit,{now}),c);
+  const fresh=beginRecall(recordReview(state.studyProgress[0],'hard',10,now),now);
+  const recall=learningContext({...state,studyProgress:[fresh]},unit,{now});
+  assert.equal(recall.practice.answered,0);assert.equal(recall.practice.reflection,false);assert.equal(recall.stage.id,'recalling');
+  assert.equal(recall.notes.length,c.notes.length);assert.ok(recall.experiment);
+});
+test('Continuations finish active attempts first and recommendation handoffs open the actual pending question',()=>{
+  const state=fixture(),p=state.studyProgress[0],question=state.notes.find(n=>n.kind==='待解答问题');
+  assert.match(learningAction(unit,p,{state,now}).url,/#study-practice$/);
+  const ranked=learningRecommendations(state,units);
+  assert.equal(ranked[0].question.id,question.id);
+  const action=learningAction(unit,p,{state,now,preferredQuestion:ranked[0].question.id});
+  assert.equal(new URL(action.url,'https://suguilin.github.io').searchParams.get('id'),question.id);
+  assert.match(action.url,/journal/);assert.equal(action.label,'回看未解疑问');
+  const reading={...state,studyProgress:[{...p,answers:[],reflection:''}]};
+  assert.equal(learningAction(unit,reading.studyProgress[0],{state:reading,now}).question.id,question.id);
+  const reviewed=recordReview(p,'hard',10,now),recall=beginRecall(reviewed,now);
+  assert.match(learningAction(unit,recall,{state,now}).url,/mode=recall/);
+  assert.match(learningAction(unit,reviewed,{state,now:new Date('2026-10-15T04:00:00Z')}).url,/mode=recall/);
+  assert.ok(!learningAction(other,undefined,{state,now,preferredQuestion:question.id}).question);
+  const solved=structuredClone(reading);solved.notes.find(n=>n.id===question.id).kind='已解决问题';
+  assert.equal(learningContext(solved,unit,{now}).questions.length,0);
+  assert.match(learningAction(unit,solved.studyProgress[0],{state:solved,now}).url,/study/);
+  assert.equal(solved.notes.length,state.notes.length);
+});
+test('Home recommendations, daily plan, reader and filtered journal share the same question and record identities',()=>{
+  const state=fixture();state.studyProgress[0].answers=[];
+  const context={getState:()=>state,getData:()=>({resources:[],questions:[]}),units:()=>units};
+  for(const name of ['actionFor','handledQueueKeys','contextMarkup','contextLinks','card'])context[name]=StudyWorkspace.prototype[name];
+  const queue=dailyLearningQueue(state,units,now),question=state.notes.find(n=>n.kind==='待解答问题');
+  const item=queue.find(q=>q.unit.id===unit.id);assert.ok(item);
+  const action=context.actionFor(unit,item.progress,{review:item.review,now});
+  assert.equal(action.question.id,question.id);
+  assert.ok(context.handledQueueKeys(queue).includes(question.id));
+  assert.ok(context.card(unit,'',question.id).includes(action.url.replaceAll('&','&amp;')));
+  const markup=context.contextMarkup(unit);assert.match(markup,/2 篇记录/);assert.match(markup,/1 个未解疑问/);assert.match(markup,/实验记录/);
+  const exact=new URL(action.url,'https://suguilin.github.io');assert.equal(exact.searchParams.get('unit'),unit.id);
+});

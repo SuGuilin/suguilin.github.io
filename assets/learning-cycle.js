@@ -1,6 +1,18 @@
-import {dayKey,dailyQueue} from './study-model.js';
+import {dayKey,dailyQueue,currentAttempt} from './study-model.js';
 import {noteUnitId,readAnnotation} from './learning-signals.js';
-import {journalTitle} from './journal-model.js';
+import {journalTitle,journalReadingBody} from './journal-model.js';
+
+// One derived view of a topic's private records. Never persist these projections:
+// the original notes and attempts remain the source of truth for sync/backup.
+export function learningContext(state,unit,{now=new Date()}={}){
+  const progress=state.studyProgress.find(p=>p.id===unit.id),attempt=progress&&currentAttempt(progress);
+  const notes=state.notes.filter(n=>noteUnitId(n)===unit.id).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)||a.id.localeCompare(b.id));
+  const questions=notes.filter(n=>n.kind==='待解答问题'),annotations=notes.filter(n=>readAnnotation(n));
+  const experiment=notes.find(n=>n.kind==='实验记录'||['学习笔记','学习复盘'].includes(n.kind)&&/^## 代码实践[ ·]/m.test(journalReadingBody(n)));
+  const answered=unit.exercises.filter(e=>attempt?.answers.some(a=>a.id===e.id&&a.text.trim())).length;
+  return {unitId:unit.id,progress,stage:learningStage(progress,now),notes,questions,annotations,experiment,
+    practice:{answered,total:unit.exercises.length,reflection:!!attempt?.reflection.trim(),experimentDraft:!!attempt&&/^## 代码实践[ ·]/m.test(attempt.reflection)}};
+}
 
 // These are observable records, never a mastery score or an inferred ability.
 export function learningStage(progress, now=new Date()) {
@@ -14,11 +26,17 @@ export function learningStage(progress, now=new Date()) {
 export function learningURL(unit, progress, {review=false,section=''}={}) {
   return '/study/?id='+encodeURIComponent(unit.id)+(review||progress?.recall?'&mode=recall':'')+(section?'#'+section:'');
 }
-export function learningAction(unit,progress,{review=false,now=new Date()}={}){
+export function learningAction(unit,progress,{review=false,now=new Date(),state=null,preferredQuestion=''}={}){
   const stage=learningStage(progress,now);
+  const questions=state?learningContext(state,unit,{now}).questions:[],preferred=questions.find(n=>n.id===preferredQuestion);
+  const questionAction=question=>({url:'/journal/?'+new URLSearchParams({id:question.id,unit:unit.id}),label:'回看未解疑问',stage,question});
+  // Recommendations can explicitly select a question; ordinary continuations
+  // still finish an active recall, due review or unassessed answer first.
+  if(preferred)return questionAction(preferred);
   if(stage.id==='recalling')return {url:learningURL(unit,progress,{section:'study-practice'}),label:'继续复习',stage};
   if(review||stage.id==='due')return {url:learningURL(unit,progress,{review:true,section:'study-practice'}),label:'开始复习',stage};
   if(stage.id==='checking')return {url:learningURL(unit,progress,{section:'study-practice'}),label:'继续自检',stage};
+  if(questions.length)return questionAction(questions[0]);
   return {url:learningURL(unit,progress,{section:progress?.readingSection||''}),label:progress?'继续阅读':'开始学习',stage};
 }
 export function dailyLearningQueue(state,units,now=new Date(),resources=[]){
