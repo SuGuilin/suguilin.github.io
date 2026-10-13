@@ -194,5 +194,113 @@
       "digest-verl",
       "lesson-model-foundations"
     ]
+  },
+  "prerequisites": {
+    "lesson-model-foundations": [],
+    "lesson-llm-contract": [
+      "lesson-model-foundations"
+    ],
+    "lesson-retrieval-rag": [
+      "lesson-model-foundations",
+      "lesson-evaluation-statistics"
+    ],
+    "digest-paper-react": [
+      "lesson-llm-contract",
+      "lesson-tool-reliability"
+    ],
+    "digest-paper-dspy": [
+      "lesson-llm-contract",
+      "lesson-evaluation-statistics"
+    ],
+    "digest-jev": [
+      "lesson-llm-contract",
+      "lesson-evaluation-statistics"
+    ],
+    "digest-hello-agents": [
+      "lesson-llm-contract"
+    ],
+    "lesson-harness": [
+      "lesson-llm-contract",
+      "lesson-tool-reliability"
+    ],
+    "lesson-tool-reliability": [
+      "lesson-llm-contract"
+    ],
+    "digest-langgraph": [
+      "lesson-llm-contract",
+      "lesson-tool-reliability"
+    ],
+    "digest-deep-agents": [
+      "lesson-harness",
+      "lesson-context-engineering"
+    ],
+    "digest-mcp": [
+      "lesson-llm-contract",
+      "lesson-agent-security"
+    ],
+    "lesson-multi-agent": [
+      "lesson-harness",
+      "digest-langgraph"
+    ],
+    "lesson-context-engineering": [
+      "lesson-model-foundations",
+      "lesson-llm-contract"
+    ],
+    "lesson-long-term-memory": [
+      "lesson-retrieval-rag",
+      "lesson-context-engineering"
+    ],
+    "digest-mem0": [
+      "lesson-long-term-memory"
+    ],
+    "lesson-evaluation-statistics": [],
+    "digest-eval-gaia": [
+      "lesson-evaluation-statistics",
+      "lesson-retrieval-rag"
+    ],
+    "digest-eval-tau-family": [
+      "lesson-evaluation-statistics",
+      "lesson-tool-reliability"
+    ],
+    "digest-eval-terminalbench": [
+      "lesson-evaluation-statistics",
+      "lesson-agent-security"
+    ],
+    "lesson-finetuning-foundations": [
+      "lesson-model-foundations"
+    ],
+    "lesson-agent-rl": [
+      "lesson-finetuning-foundations",
+      "lesson-evaluation-statistics"
+    ],
+    "digest-verl": [
+      "lesson-agent-rl"
+    ],
+    "digest-agent-lightning": [
+      "lesson-agent-rl",
+      "lesson-harness"
+    ],
+    "digest-paper-ragen": [
+      "lesson-agent-rl"
+    ],
+    "digest-search-r1": [
+      "lesson-agent-rl",
+      "lesson-retrieval-rag"
+    ],
+    "digest-paper-deepseek-r1": [
+      "lesson-finetuning-foundations",
+      "lesson-agent-rl"
+    ],
+    "lesson-agent-security": [
+      "lesson-llm-contract"
+    ],
+    "lesson-inference-serving": [
+      "lesson-model-foundations"
+    ],
+    "lesson-production-system-design": [
+      "lesson-harness",
+      "lesson-agent-security",
+      "lesson-inference-serving"
+    ]
   }
 }

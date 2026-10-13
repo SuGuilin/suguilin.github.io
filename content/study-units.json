@@ -347,7 +347,7 @@
       "topic": "后训练",
       "summary": "区分 SFT、偏好与交互 RL，手算裁剪和组优势，检查奖励、mask、轨迹及独立评测。",
       "mode": "editorial",
-      "minutes": 45,
+      "minutes": 60,
       "prerequisites": [
         "PyTorch 自动求导",
         "PPO / 策略梯度基础",
@@ -406,7 +406,7 @@
           "id": "e3",
           "prompt": "训练奖励持续上涨，但 agent 反复调用工具刷中间奖励且任务成功率下降，该修哪里？",
           "hint": "区分代理指标、终态目标和执行约束。",
-          "answer": "先确认 grader 和环境，核对 reward 分项是否能在循环中累计。将真实终态、预算与无效重复行为分别记录，调整 shaping 以避免代理指标抵消任务失败，并保留固定独立评测。执行器强制工具预算与权限，不能仅靠训练惩罚。做无 shaping/有 shaping 等同预算消融，多 seed 看成功、成本和长度，避免只追训练 reward。",
+          "answer": "先确认 grader 和环境，核对 reward 分项是否能在循环中累计。将真实终态、预算与无效重复行为分别记录，调整 shaping 以避免代理指标抵消任务失败，并保留固定独立评测。执行器强制工具预算与权限，不能仅靠训练惩罚。做无 shaping/有 shaping 等同预算消融，多 seed 看成功、成本和长度，避免只追训练 reward。\n\n排查时手算分母：两回答长度2/4、每token代理项−1/+1，sequence mean再平均为0，token mean为1/3。检查记录中的loss_type、reward scaling、policy version和采样约束；全同reward组的相对优势为0。对同一动作d=logπ_ref−logπ_θ，KL示意exp(d)−d−1不等于current/old策略比率。",
           "rubric": [
             "定位奖励利用",
             "执行约束独立",
@@ -417,7 +417,7 @@
       "source": {
         "title": "PPO Original Paper",
         "url": "https://arxiv.org/abs/1707.06347",
-        "scope": "多来源机制解释与原创案例；最小代码及配套微实验已本机执行，完整系统实验未执行。",
+        "scope": "机制、原创算例与可运行标准库实验；不运行模型、GPU服务、数据库或真实策略训练。",
         "accessedAt": "2026-10-11T08:00:00.000Z",
         "excerpt": ""
       },
@@ -1888,7 +1888,7 @@
       "topic": "检索工程",
       "summary": "从数据入库到答案验真解释完整 RAG 链路，手算融合和召回指标，定位检索与生成各自的失败。",
       "mode": "editorial",
-      "minutes": 45,
+      "minutes": 60,
       "prerequisites": [
         "向量/相似度",
         "数据划分与评测",
@@ -1925,7 +1925,7 @@
           "id": "e1",
           "prompt": "两条排序 a/b/c 与 b/c/d 融合后 b/c/a/d，相关文档为 b/d，Recall@2 是多少？为何重排 b/c 不能解决缺失？",
           "hint": "区分候选和最终排序。",
-          "answer": "Recall@2=1/2，因为 b 被召回而 d 不在前两名；只对 b/c 重排不能引入 d。扩大或改变候选召回、查询与融合后再测，同时避免读到越权资料。固定标签与参数，报告不同 k 的召回和端到端成本；列表算例不证明真实 embedding 模型质量。\n\n把相关证据干预分两次：只重排 b/c 时上限仍是一个相关文档；让候选包含 d 后，再观察它能否进前两位。若 d 已在上下文但生成引用 c，则是生成/证据整合问题。表格同时记候选 Recall、上下文证据与答案支持，避免将一次召回统计解释为端到端正确。",
+          "answer": "Recall@2=1/2，因为 b 被召回而 d 不在前两名；只对 b/c 重排不能引入 d。扩大或改变候选召回、查询与融合后再测，同时避免读到越权资料。固定标签与参数，报告不同 k 的召回和端到端成本；列表算例不证明真实 embedding 模型质量。\n\n把相关证据干预分两次：只重排 b/c 时上限仍是一个相关文档；让候选包含 d 后，再观察它能否进前两位。若 d 已在上下文但生成引用 c，则是生成/证据整合问题。表格同时记候选 Recall、上下文证据与答案支持，避免将一次召回统计解释为端到端正确。\n\nexact=[a,b]、approx=[a,c]时ANN Recall@2=0.5；唯一相关gold={c}时相关性Recall却为1。再对相关度a=3/b=1/c=0计算[b,a,c]：MRR=1，指数gain的nDCG约0.7098。三个口径回答不同问题，不能混在同一“召回”列。",
           "rubric": [
             "手算 1/2 与候选上限",
             "候选/上下文/答案三层分别定位",
@@ -1947,7 +1947,7 @@
       "source": {
         "title": "RAG 原论文",
         "url": "https://arxiv.org/abs/2005.11401",
-        "scope": "已读机制与原创教材；标准库 fixture 已执行，无模型、远端或 GPU 服务调用。",
+        "scope": "机制、原创算例与可运行标准库实验；不运行模型、GPU服务、数据库或真实策略训练。",
         "accessedAt": "2026-10-12T17:32:39.000Z",
         "excerpt": ""
       },
@@ -2168,7 +2168,7 @@
       "topic": "推理工程",
       "summary": "解释推理服务的时间和内存分解，计算 KV 基线与每成功任务成本，用指标定位瓶颈。",
       "mode": "editorial",
-      "minutes": 45,
+      "minutes": 60,
       "prerequisites": [
         "Transformer attention / KV",
         "推理调用",
@@ -2205,7 +2205,7 @@
           "id": "e1",
           "prompt": "32 层、8 KV heads、head_dim=128、4096 tokens、FP16 的教学 KV baseline 是多少？为何不等于模型总显存？",
           "hint": "把 K/V 两份与每元素 2 字节乘入。",
-          "answer": "2×32×8×128×4096×2=536870912 字节，即 512 MiB。它仅是该简化架构的一条序列 K/V；权重、激活/workspace、批次、分配碎片、共享与量化或特殊状态都未包含。attention heads 不能直接代替 kv_heads。实际测量固定模型、版本、长度和并发，不能据算例报特定模型显存。",
+          "answer": "2×32×8×128×4096×2=536870912 字节，即 512 MiB。它仅是该简化架构的一条序列 K/V；权重、激活/workspace、批次、分配碎片、共享与量化或特殊状态都未包含。attention heads 不能直接代替 kv_heads。实际测量固定模型、版本、长度和并发，不能据算例报特定模型显存。\n\n块大小16、序列17/31：分配64个token槽，实际48，浪费16。增长/共享/写时复制会改变分配；KV原始算式和分配显存分开。Notebook进一步核对top-p阈值边界、投机接受与拒绝残差、int8夹值，任何优化都还需要真实质量与负载实验。",
           "rubric": [
             "正确计算",
             "区分 kv_heads",
@@ -2216,7 +2216,7 @@
           "id": "e2",
           "prompt": "缓存命中后首 token 更快，但长回答仍慢，为什么？如何判断不是检索或排队？",
           "hint": "看 prefill/decode 以及各段时间。",
-          "answer": "前缀缓存主要减少重复输入的 prefill，不替新 token 生成；长输出仍由 decode 步数和服务调度决定。分别记录 queue、retrieval/tool、prefill、TTFT、decode/TPOT 与总时延，固定输入输出长度和冷热缓存对照。若排队高则查并发与背压，若工具慢则查下游；缓存命中不是推理能力提高的证据。\n\n按示例 2+3+1+4=10 秒，缓存把 prefill 1 秒减为 0.2 后总 9.2 秒。若长回答的 decode 4 秒未变，总耗时改善很小。读取缓存命中 token、queue/prefill/decode 分段与产品 trace；若仅统计完成请求，会漏掉超时长尾，所以另报 timeout/cancel 比例。",
+          "answer": "前缀缓存主要减少重复输入的 prefill，不替新 token 生成；长输出仍由 decode 步数和服务调度决定。分别记录 queue、retrieval/tool、prefill、TTFT、decode/TPOT 与总时延，固定输入输出长度和冷热缓存对照。若排队高则查并发与背压，若工具慢则查下游；缓存命中不是推理能力提高的证据。\n\n按示例 2+3+1+4=10 秒，缓存把 prefill 1 秒减为 0.2 后总 9.2 秒。若长回答的 decode 4 秒未变，总耗时改善很小。读取缓存命中 token、queue/prefill/decode 分段与产品 trace；若仅统计完成请求，会漏掉超时长尾，所以另报 timeout/cancel 比例。\n\n投机解码还需逐轮测接受产出和完整耗时：4草稿、接受率0.6时独立假设下期望2.3056个token，若完整一轮1.7ms则约1.36倍基线速度；接受率0.1降到约0.65倍。不能用接受率或裸decode吞吐替代用户端总时延。",
           "rubric": [
             "10→9.2 的局部收益",
             "服务/产品 TTFT 口径分开",
@@ -2227,7 +2227,7 @@
       "source": {
         "title": "vLLM metrics",
         "url": "https://docs.vllm.ai/en/latest/usage/metrics/",
-        "scope": "已读机制与原创教材；标准库 fixture 已执行，无模型、远端或 GPU 服务调用。",
+        "scope": "机制、原创算例与可运行标准库实验；不运行模型、GPU服务、数据库或真实策略训练。",
         "accessedAt": "2026-10-12T17:32:39.000Z",
         "excerpt": ""
       },
