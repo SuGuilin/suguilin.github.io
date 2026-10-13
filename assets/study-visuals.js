@@ -19,7 +19,7 @@ export const learningNotebooks={
  'lesson-multi-agent':[['multi-agent.ipynb','子任务证据、冲突与总预算','本地归并 fixture · 15 分钟']],
  'lesson-inference-serving':[['inference-serving.ipynb','KV baseline、成本与尾部指标','离线算例 · 15 分钟']],
  'digest-deep-agents':[['context-engineering.ipynb','上下文装配与保留条件','基础合同 · 不运行 Deep Agents'],['multi-agent.ipynb','委派结果与冲突','基础合同 · 不调用模型']],
- 'digest-mcp':[['agent-security.ipynb','身份、scope 与对象归属','应用合同 · 不是 MCP transport']],
+ 'digest-mcp':[['mcp-tool-contract.ipynb','MCP 发现、调用与错误返回','真实 SDK 2.3.0 · 内存 + stdio'],['agent-security.ipynb','身份、scope 与对象归属','应用合同 · 不是 HTTP OAuth']],
  'digest-paper-react':[['agent-research-checks.ipynb','有限循环、无信息观察与停止','第 6 节 · 固定决策']],
  'digest-paper-dspy':[['agent-research-checks.ipynb','评分器负例与来源划分','第 5 节 · 不运行优化器']],
  'digest-eval-gaia':[['agent-research-checks.ipynb','附件 join 与金额 grader','第 4 节 · 原创任务']],

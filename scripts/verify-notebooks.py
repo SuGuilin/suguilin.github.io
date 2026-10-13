@@ -14,6 +14,8 @@ foundations=['llm-contract','retrieval-rag','context-engineering','agent-securit
 names.extend([name+'.ipynb' for name in foundations]+['agent-research-checks.ipynb'])
 if '--sdk' in sys.argv:
     names.extend(['langgraph-interrupts.ipynb', 'langgraph-durable-workflow.ipynb','langgraph-control-flow.ipynb'])
+if '--mcp' in sys.argv:
+    names.append('mcp-tool-contract.ipynb')
 for name in names:
     notebook = json.loads((root / 'notebooks' / name).read_text())
     assert notebook['nbformat'] == 4
@@ -28,7 +30,7 @@ for name in names:
                 for cell in notebook['cells']:
                     if cell['cell_type'] == 'code':
                         assert cell['outputs'] == [] and cell['execution_count'] is None
-                        if name.startswith('langgraph-') and 'subprocess.check_call' in ''.join(cell['source']):
+                        if (name.startswith('langgraph-') or name=='mcp-tool-contract.ipynb') and 'subprocess.check_call' in ''.join(cell['source']):
                             # Verification uses an already installed isolated environment.
                             os.environ['LANGSMITH_TRACING'] = 'false'
                             os.environ['LANGCHAIN_TRACING_V2'] = 'false'
@@ -73,6 +75,11 @@ for name in names:
                 assert report['version']=='1.2.14' and report['model_called'] is False
                 assert len(report['checks'])==9 and all(report['checks'].values())
                 assert namespace['calls']=={'good':1,'bad':2} and namespace['batch']['total']==29
+            elif name=='mcp-tool-contract.ipynb':
+                report=json.loads(Path('mechanism_report.json').read_text())
+                assert report['version']=='2.3.0' and report['protocol']=='2026-07-28'
+                assert report['model_called'] is False and all(report['checks'].values())
+                assert [r['independent_process'] for r in namespace['results']]==[False,True]
             elif name.removesuffix('.ipynb') in foundations or name=='agent-research-checks.ipynb':
                 report=json.loads(Path('mechanism_report.json').read_text())
                 assert report['scope']=='stdlib fixtures; no model/service' and all(report['checks'].values())
@@ -90,6 +97,26 @@ for name in foundations:
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(blocks[0],lesson['id'],'exec'),{})
 print('Six foundation reading snippets: exact page code and negative paths passed')
+
+# Other readable Python blocks are runnable too; architecture pseudocode is
+# visibly labelled in the page and intentionally excluded from execution.
+other_count=0
+for item in lesson_data+json.loads((root/'content/topic-readings.json').read_text())['readings']:
+    if item['id'] in {'lesson-'+n for n in foundations} or item['id']=='digest-langgraph': continue
+    if item['id']=='lesson-harness' and '--sdk' not in sys.argv: continue
+    snippets=re.findall(r'(?:```|~~~)python\n(.*?)\n(?:```|~~~)',item['content'],re.S)
+    namespace={}
+    with contextlib.redirect_stdout(io.StringIO()):
+        for snippet in snippets:
+            exec(compile(snippet,item['id'],'exec'),namespace)
+            other_count+=1
+    if item['id']=='lesson-long-term-memory':
+        assert namespace['retrieve']('unseen','2026-10-13') is None
+    if item['id']=='digest-mcp':
+        try: namespace['read_order']({'order_id':'o1'},'bob',{'o1':'alice'})
+        except PermissionError: pass
+        else: raise AssertionError('MCP application snippet leaked across users')
+print(f'{other_count} other exact reading snippets passed; labelled pseudocode excluded')
 
 if '--sdk' in sys.argv:
     # Execute the exact Python snippets shown in the reading page, including imports.

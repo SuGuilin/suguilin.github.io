@@ -34,6 +34,7 @@ test('Every authored topic has one knowledge home, connected explanations, pract
 test('Mechanism reports preserve failure, explanation and provenance across learning questions and journals',()=>{
   for(const [experiment,spec] of Object.entries(mechanismChecks)){
     const report={experiment,scope:'stdlib fixtures; no model/service',model_called:false,version:'1.2.14',checks:Object.fromEntries(Object.keys(spec).map((k,i)=>[k,i!==0])),my_explanation:'我修改一个边界，观察到失败而非掩盖它。'};
+    if(experiment==='mcp-tool-contract')Object.assign(report,{scope:'official SDK; memory and stdio; no HTTP/auth',version:'2.3.0',protocol:'2026-07-28'});
     const imported=appendPracticeReport('原来的预测',JSON.stringify(report),experiment);assert.match(imported.text,/未通过/);assert.ok(imported.text.startsWith('原来的预测'));assert.match(imported.text,/不认证/);
     const unit=units.find(u=>u.id===experiment)||units.find(u=>u.id==='digest-langgraph'),p={...newProgress(unit),reflection:imported.text,answers:[{id:'e1',text:'我的独立解释'}]};
     assert.match(studyQuestion(unit,p),/未通过/);assert.match(validateState(saveStudySnapshot({...defaultState(),studyProgress:[p]},unit,p,{id:'qa'}).state).notes[0].body,/修改一个边界/);
