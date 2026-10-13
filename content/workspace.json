@@ -4551,7 +4551,9 @@
       ],
       "answer": "**核心思路**\n\n控制权决定边界：workflow 的下一步由显式流程确定，agent 在授权动作空间里根据观察选择。已知事务流程用固定状态机，开放检索才引入有限循环；两者可组合。\n\n**反例与边界**\n\n取消订单被画成自由循环，模型不断重复写操作，并不会比固定校验/审批/提交更好。\n\n**怎样验证**\n\n同任务、模型、工具与总预算比较流程和循环，分别记录任务正确、证据、重复动作、耗时与成本。",
       "studyUnits": [
-        "lesson-harness"
+        "lesson-harness",
+        "digest-deep-agents",
+        "digest-jev"
       ],
       "reviewedAt": "2026-10-13"
     },
@@ -4566,7 +4568,8 @@
       ],
       "answer": "**核心思路**\n\n状态保存目标、消息、观察、待确认操作、预算和终止理由。循环是模型动作建议→结构/业务/权限校验→执行→观察→独立完成验真。合法 JSON 不代表业务正确。\n\n**反例与边界**\n\n工具 timeout 后把它当“未提交”并换 ID 重试，可能产生重复副作用。\n\n**怎样验证**\n\n正常、未知工具、非法参数、空观察、截断、权限拒绝、超时和无限重复建立固定 fixture；先验协议，再接模型。",
       "studyUnits": [
-        "lesson-llm-contract"
+        "lesson-llm-contract",
+        "digest-hello-agents"
       ],
       "reviewedAt": "2026-10-13"
     },
@@ -4611,7 +4614,8 @@
       ],
       "answer": "**核心思路**\n\n把原始证据、抽取事实和当前有效视图分开，保留用户、有效时间和版本。写入、冲突、索引、检索、撤回与删除是整条管线。\n\n**反例与边界**\n\n较旧后台抽取晚写入，若按写入时间覆盖当前偏好，会恢复成过时事实。\n\n**怎样验证**\n\n测 A/B 用户隔离、迟到、冲突、有效期、撤回和备份恢复；删除后检查原记录、索引、缓存和摘要。",
       "studyUnits": [
-        "lesson-long-term-memory"
+        "lesson-long-term-memory",
+        "digest-mem0"
       ],
       "reviewedAt": "2026-10-13"
     },
@@ -4671,7 +4675,11 @@
       ],
       "answer": "**核心思路**\n\nSFT 学示范的合法动作与分布，RL 用环境奖励改变策略；必须有可信 grader 与可复现环境。不同初始化、数据预算和交互次数不能随意比较。\n\n**反例与边界**\n\n格式奖励上涨但 agent 刷工具次数，终态成功下降；奖励优化不替代工具权限。\n\n**怎样验证**\n\n相同基座/工具/测试/预算比较 SFT、RL 与组合，核对 mask、reward hacking、独立任务、多个 seed 及成本。\n\n**目标追问**\n\n两回答长度2/4、每token代理项−1/+1，sequence等权平均为0，token等权平均为1/3，再由loss负号转成最小化目标。current/old重要性比率与current/reference KL是不同项，保存rollout策略版本、mask、采样配置和分母。",
       "studyUnits": [
-        "lesson-agent-rl"
+        "lesson-agent-rl",
+        "digest-verl",
+        "digest-agent-lightning",
+        "digest-paper-ragen",
+        "digest-search-r1"
       ],
       "reviewedAt": "2026-10-13"
     },
@@ -4835,7 +4843,9 @@
       ],
       "answer": "**核心思路**\n\ngrader 从需求独立判断业务行为、终态、证据和约束；规则与模型 judge 各有盲点，版本化。信任边界防 agent 改评分器。\n\n**反例与边界**\n\nexit 0、含关键词、写 reward=1 都可在任务错误时出现；正确答案错引用也要识别。\n\n**怎样验证**\n\n用正确等价、相近错误、错对象、缺确认、空结果和恶意产物负例验评分，再运行模型与完整 benchmark。",
       "studyUnits": [
-        "lesson-evaluation-statistics"
+        "lesson-evaluation-statistics",
+        "digest-eval-gaia",
+        "digest-eval-terminalbench"
       ],
       "reviewedAt": "2026-10-13"
     },
@@ -5127,7 +5137,8 @@
         "最终任务及回归"
       ],
       "studyUnits": [
-        "lesson-finetuning-foundations"
+        "lesson-finetuning-foundations",
+        "digest-paper-deepseek-r1"
       ],
       "reviewedAt": "2026-10-13"
     },

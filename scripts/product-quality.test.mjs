@@ -20,6 +20,7 @@ test('A reader can open actual prerequisite lessons and interview followups with
     const markup=StudyWorkspace.prototype.prerequisitesMarkup.call(context,unit);
     for(const id of prerequisiteTopics(unit.id))assert.ok(markup.includes('/study/?id='+id));
     const questions=topicInterviewQuestions(unit.id,data.questions);
+    assert.ok(questions.length>0,'Editorial topic lacks an explicit interview followup: '+unit.id);
     const interview=StudyWorkspace.prototype.interviewMarkup.call(context,unit);
     for(const q of questions)assert.ok(interview.includes('/interview/?question='+q.id));
   }
