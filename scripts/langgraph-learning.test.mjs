@@ -60,8 +60,8 @@ test('Leaving an arrangement keeps the original progress if export or persistenc
 });
 test('Recall labels use the learner local day across the UTC midnight boundary',()=>{
   const previous=process.env.TZ,initial=newProgress(unit);initial.answers=[{id:'e1',text:'检查点保存线程内执行状态'}];const p=recordReview(initial,'hard',15,new Date('2026-10-12T16:30:00Z'));
-  try{process.env.TZ='Asia/Shanghai';assert.match(StudyWorkspace.prototype.recallReader.call({fontSize:18},unit,p),/上次学习 2026-10-13/);
-    process.env.TZ='America/Los_Angeles';assert.match(StudyWorkspace.prototype.recallReader.call({fontSize:18},unit,p),/上次学习 2026-10-12/);
+  try{process.env.TZ='Asia/Shanghai';assert.match(StudyWorkspace.prototype.recallReader.call({contextMarkup:()=>'',fontSize:18},unit,p),/上次学习 2026-10-13/);
+    process.env.TZ='America/Los_Angeles';assert.match(StudyWorkspace.prototype.recallReader.call({fontSize:18,contextMarkup:()=>''},unit,p),/上次学习 2026-10-12/);
   }finally{if(previous===undefined)delete process.env.TZ;else process.env.TZ=previous;}
 });
 test('Topic exports retain their prior journals and discussions while excluding other subjects',()=>{
