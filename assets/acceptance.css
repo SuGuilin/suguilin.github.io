@@ -17,6 +17,10 @@
 .question-reference .markdown-body{font-size:15px;line-height:1.6}
 .question-reference .markdown-body p{margin:10px 0}
 .report-related{display:grid;gap:7px}.report-related a{font-size:13px;line-height:1.6}
+.report-list{gap:0}.report-card{border:0;border-top:1px solid var(--line);border-radius:0;padding:22px 0;box-shadow:none}
+.report-card h2{font-size:20px;line-height:1.5;margin:10px 0}.report-card p,.report-card li{line-height:1.6}
+.report-card .report-practice{background:transparent;border:0;border-left:1px solid var(--line);border-radius:0;padding:0 0 0 22px}
+.report-card .report-content{gap:26px;margin:18px 0}.report-card footer{padding-top:14px}
 .source-verification{margin-top:8px;font-size:12px;color:var(--muted)}
 .source-verification small{display:block;margin-top:8px;line-height:1.6}
 .catalog-source-control select{max-width:145px;min-height:36px;border:1px solid var(--control-border);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 9px;font:inherit;font-size:12px}
@@ -34,4 +38,5 @@
  .question-list .question>summary .tag{font-size:10px;padding:3px 5px;white-space:nowrap}
  .catalog-source-control{margin-right:auto}.catalog-source-control select{min-height:40px}
  .resource-catalog .toolbar{grid-template-columns:minmax(0,1fr) auto}.resource-catalog .search-field{grid-column:1/-1;width:100%}.resource-catalog .view-switch{grid-column:2;grid-row:3}
+ .report-card h2{font-size:18px}.report-card .report-practice{border-left:0;border-top:1px solid var(--line);padding:15px 0 0}.report-card .report-content{gap:14px}
 }
