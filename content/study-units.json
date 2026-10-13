@@ -2232,6 +2232,170 @@
         "excerpt": ""
       },
       "updatedAt": "2026-10-13T01:23:29Z"
+    },
+    {
+      "id": "lesson-model-foundations",
+      "title": "模型机制：Attention、RoPE、GQA 与缓存",
+      "topic": "模型基础",
+      "summary": "沿着张量形状、因果性和缓存解释 Transformer，用逐元素实验检验 attention、位置与 KV 的机制。",
+      "mode": "editorial",
+      "minutes": 55,
+      "prerequisites": [
+        "Python",
+        "线性代数与概率",
+        "基本梯度概念"
+      ],
+      "takeaways": [
+        {
+          "point": "从 tokenizer、移位标签和因果 mask 解释自回归预测；对话模板改变实际输入。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "Q/K 决定匹配、V 决定聚合；缩放、归一化轴和禁止位置必须写清。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "attention mask 和 loss mask 解决不同问题，工具观察是条件。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "RoPE 用旋转表达相对位移；GQA 降 KV 头数，特殊架构另算。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "缓存复用依赖历史因果不变；FlashAttention、量化和 MoE 优化的对象不同。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        }
+      ],
+      "pitfalls": [
+        "本篇运行的是标准库数学和梯度实验；未下载权重、未运行 GPU kernel 或真实大模型训练。",
+        "真实训练/性能测试需要固定模型、依赖、数据划分、长度与硬件；开发分支文档不是已验证的安装配方。"
+      ],
+      "exercises": [
+        {
+          "id": "e1",
+          "prompt": "对 [2,0,−2]、d_k=4 计算 attention 权重。第三个位置被因果 mask 禁止后，前两个权重应如何变化？",
+          "hint": "先缩放，再只在允许的位置归一化。",
+          "answer": "缩放得到 [1,0,−1]，完整概率约 [0.6652,0.2447,0.0900]。屏蔽第三个位置后，softmax([1,0])≈[0.7311,0.2689]，禁止位置为 0。不能保留原来的前两个概率，否则总和约 0.9099。解释 Q/K 决定分数，V 仍要按新权重加权；修改未来 V 不应影响当前输出。",
+          "rubric": [
+            "缩放分母正确",
+            "重新归一化",
+            "解释未来不可见"
+          ]
+        },
+        {
+          "id": "e2",
+          "prompt": "为什么增量 KV 缓存能与完整因果 attention 一致？列出三种会破坏一致性的实现错误。",
+          "hint": "从历史位置是否依赖未来、位置和 mask 开始。",
+          "answer": "固定权重、相同前缀与位置处理下，历史位置不受未来影响，其每层 K/V 可复用，新 Q 关注过去及当前 K/V。错位的 position/RoPE、mask 只覆盖新 token、遗漏当前 KV 都可能破坏一致性；若模型是非因果或架构不同，还要重新判断缓存前提。notebook 比较同一单层计算的所有输出并展示遗漏当前 KV 的反例，不据此推断完整模型速度。",
+          "rubric": [
+            "说出因果前提",
+            "说明每层缓存与当前 KV",
+            "给出具体错误"
+          ]
+        },
+        {
+          "id": "e3",
+          "prompt": "32 层、32 query heads、8 KV heads、4096 tokens、head_dim=128、FP16 的一条序列缓存多大？改成 MHA 与 MLA 时怎样调整解释？",
+          "hint": "先数 K/V 两份，再区分 KV heads 与 query heads。",
+          "answer": "普通 GQA KV 基线为 2×32×1×4096×8×128×2=536870912 bytes，即 512 MiB。同条件 MHA 若有 32 KV heads，得到 2048 MiB。MLA 的压缩 latent 与位置分支不符合这套布局，须读取具体架构并另算。两者都未计权重、allocator、workspace 与共享；缓存缩小不证明端到端时延同比下降。",
+          "rubric": [
+            "正确计算 512/2048 MiB",
+            "区分 query/KV",
+            "特殊架构不套公式"
+          ]
+        }
+      ],
+      "source": {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "scope": "已读取所列机制；原创数学与梯度 notebook 本地运行，无模型、GPU 或服务。",
+        "accessedAt": "2026-10-13T05:00:00Z",
+        "excerpt": ""
+      },
+      "updatedAt": "2026-10-13T05:00:00Z"
+    },
+    {
+      "id": "lesson-finetuning-foundations",
+      "title": "微调与偏好优化：SFT、LoRA、DPO 与数据边界",
+      "topic": "后训练算法",
+      "summary": "从监督目标、矩阵梯度和 reference 概率理解后训练，识别数据泄漏、错误偏好与指标捷径。",
+      "mode": "editorial",
+      "minutes": 55,
+      "prerequisites": [
+        "Python",
+        "线性代数与概率",
+        "基本梯度概念"
+      ],
+      "takeaways": [
+        {
+          "point": "先定位知识、格式行为、偏好或交互策略错误，再选择检索、SFT、偏好优化或 RL。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "SFT 要核对移位标签、监督 mask、模板支持和 loss 分母。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "LoRA 学习低秩更新；冻结权重不消除权重读取、激活和所有训练成本。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "DPO 比较 policy 相对 reference 的 chosen/rejected 序列 log-ratio。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        },
+        {
+          "point": "按来源或任务族划分，保留通用回归和冻结测试，曲线改善不等于最终任务成功。",
+          "evidence": "正文机制、一手来源与原创逐元素实验"
+        }
+      ],
+      "pitfalls": [
+        "本篇运行的是标准库数学和梯度实验；未下载权重、未运行 GPU kernel 或真实大模型训练。",
+        "真实训练/性能测试需要固定模型、依赖、数据划分、长度与硬件；开发分支文档不是已验证的安装配方。"
+      ],
+      "exercises": [
+        {
+          "id": "e1",
+          "prompt": "四个 log probability 为 [−2,−0.2,−0.4,−3]，只监督中间两个 token。写出 loss，并解释为何工具观察不算 loss 仍能影响决策。",
+          "hint": "分清条件可见性与预测目标。",
+          "answer": "监督 loss 为 −(−0.2−0.4)/2=0.3；全 token 平均为 1.4，目标不同。工具观察可作为后续 assistant token 的条件，attention 仍可看见；仅监督 assistant 目标不训练模型复述工具返回。全零 mask 应显式跳过或报错；packing 和标签移位要检查样本边界，不能因数值合法就忽略泄漏。",
+          "rubric": [
+            "计算及分母正确",
+            "区分两种 mask",
+            "处理零目标与边界"
+          ]
+        },
+        {
+          "id": "e2",
+          "prompt": "W 为 4096×4096，LoRA rank=8；计算 adapter 参数。若随机 A、零 B，第一步 A/B 梯度怎样？",
+          "hint": "先写 BA 的维度，再按链式法则观察零矩阵。",
+          "answer": "A 为 8×4096，B 为 4096×8，共 65536 个参数；W 有 16777216，单矩阵可训练参数比为 256。ΔW=(α/r)BA，B=0 使初始 ΔW=0；A 梯度含 B 因而首步为 0，B 梯度仍可非零。更新 B 后 A 才有梯度。基础权重及激活仍占内存，不能报告整个模型显存下降 256 倍。notebook 用有限差分独立核对梯度。",
+          "rubric": [
+            "维度和数量正确",
+            "解释初始化梯度",
+            "区分参数与显存"
+          ]
+        },
+        {
+          "id": "e3",
+          "prompt": "policy 的 chosen/rejected log probability 为 −2/−4，reference 为 −3/−4，β=0.1。算 DPO margin 与 loss；交换偏好标签会怎样？",
+          "hint": "比较两个分布的相对差，使用稳定 softplus。",
+          "answer": "policy 差为 2，reference 差为 1，margin z=0.1×(2−1)=0.1，L=log(1+exp(−0.1))≈0.6444。两侧 chosen/rejected 交换后 z=−0.1，loss≈0.7444；policy 与 reference 差相同则 log2≈0.6931。序列 log probability 应排除 prompt/padding；改为平均会改变原目标。该算例只检验公式和方向，不证明偏好数据正确或模型更可靠。",
+          "rubric": [
+            "reference 差计算正确",
+            "方向和 log2 基线",
+            "说明数据及目标边界"
+          ]
+        }
+      ],
+      "source": {
+        "title": "LoRA 原论文",
+        "url": "https://arxiv.org/abs/2106.09685",
+        "scope": "已读取所列机制；原创数学与梯度 notebook 本地运行，无模型、GPU 或服务。",
+        "accessedAt": "2026-10-13T05:00:00Z",
+        "excerpt": ""
+      },
+      "updatedAt": "2026-10-13T05:00:00Z"
     }
   ]
 }

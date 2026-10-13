@@ -3794,6 +3794,148 @@
       "verification": "实际读取公开文章中的行为评测与局限；未执行其 SDK 示例。",
       "verifiedAt": "2026-10-12",
       "priority": "frontier"
+    },
+    {
+      "id": "model-attention-paper",
+      "title": "Transformer：Attention 原论文",
+      "url": "https://arxiv.org/abs/1706.03762",
+      "source": "Vaswani 等 · 原论文",
+      "description": "从 Q/K/V 的形状、缩放与因果边界进入模型机制；配套本地实验逐元素对照。",
+      "category": "paper",
+      "level": "深化",
+      "tags": [
+        "Attention",
+        "Transformer"
+      ],
+      "whenToLearn": "从 Q/K/V 的形状、缩放与因果边界进入模型机制；配套本地实验逐元素对照。",
+      "verification": "已读相关机制，原论文指标未复现。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-model-foundations"
+      ]
+    },
+    {
+      "id": "training-lora-paper",
+      "title": "LoRA：低秩适配原论文",
+      "url": "https://arxiv.org/abs/2106.09685",
+      "source": "Hu 等 · 原论文",
+      "description": "从矩阵形状与初始化梯度理解低秩更新，区分可训练参数与总显存。",
+      "category": "paper",
+      "level": "深化",
+      "tags": [
+        "LoRA",
+        "微调"
+      ],
+      "whenToLearn": "从矩阵形状与初始化梯度理解低秩更新，区分可训练参数与总显存。",
+      "verification": "已读相关机制；本站小矩阵梯度实验与原模型实验分开。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-finetuning-foundations"
+      ]
+    },
+    {
+      "id": "training-dpo-paper",
+      "title": "DPO：偏好优化原论文",
+      "url": "https://arxiv.org/html/2305.18290v2",
+      "source": "Rafailov 等 · 原论文",
+      "description": "用 reference log-ratio 解释 chosen/rejected 的更新方向，手算并验证稳定损失。",
+      "category": "paper",
+      "level": "深化",
+      "tags": [
+        "DPO",
+        "偏好优化"
+      ],
+      "whenToLearn": "用 reference log-ratio 解释 chosen/rejected 的更新方向，手算并验证稳定损失。",
+      "verification": "已读 §3–4 与目标；未运行原论文模型训练。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-finetuning-foundations"
+      ]
+    },
+    {
+      "id": "harness-effects-2026",
+      "title": "Beyond the Model：Harness 组件影响",
+      "url": "https://arxiv.org/html/2609.32459v1",
+      "source": "Hu 等 · 2026-09-26 v1",
+      "description": "比较 Harness 与模型、任务之间的交互；用组件消融识别压缩和通用子 Agent 的负收益。",
+      "category": "paper",
+      "level": "深化",
+      "tags": [
+        "Harness",
+        "消融",
+        "Coding Agent"
+      ],
+      "whenToLearn": "比较 Harness 与模型、任务之间的交互；用组件消融识别压缩和通用子 Agent 的负收益。",
+      "verification": "已读摘要与实验设计、组件结论；作者 benchmark 未复现。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-harness",
+        "lesson-evaluation-statistics"
+      ]
+    },
+    {
+      "id": "zero2agent-course",
+      "title": "Zero2Agent：从实现过程学 Harness",
+      "url": "https://github.com/alienzhou/zero2agent",
+      "source": "alienzhou · 作者仓库",
+      "description": "源码、设计决策与小步跟练一起读；适合研究代码搜索、执行循环和宿主能力。",
+      "category": "course",
+      "level": "深化",
+      "tags": [
+        "GitHub",
+        "中文课程",
+        "Harness"
+      ],
+      "whenToLearn": "源码、设计决策与小步跟练一起读；适合研究代码搜索、执行循环和宿主能力。",
+      "verification": "已读 README 和公开目录，未安装或运行仓库；作者生产经验为自述。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-harness",
+        "lesson-context-engineering"
+      ]
+    },
+    {
+      "id": "microsoft-agent-course",
+      "title": "Microsoft：AI Agents for Beginners",
+      "url": "https://github.com/microsoft/ai-agents-for-beginners",
+      "source": "Microsoft · 官方课程仓库",
+      "description": "按设计模式、协议、上下文、生产和安全查漏；运行样例先检查 Microsoft Foundry 与账号要求。",
+      "category": "course",
+      "level": "深化",
+      "tags": [
+        "GitHub",
+        "课程",
+        "Microsoft"
+      ],
+      "whenToLearn": "按设计模式、协议、上下文、生产和安全查漏；运行样例先检查 Microsoft Foundry 与账号要求。",
+      "verification": "已读课程总览；未运行 Azure/Foundry 样例，不承诺免费额度。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-harness",
+        "lesson-multi-agent",
+        "lesson-agent-security"
+      ]
+    },
+    {
+      "id": "hugo-runtime-blog",
+      "title": "Hugo Zhu：企业 Agent Runtime 分层",
+      "url": "https://hugozhu.site/post/2026/143-enterprise-agent-runtime-five-layer-architecture/",
+      "source": "Hugo Zhu · 作者博客",
+      "description": "以作者分层视角检查编排、能力、工作区和权限；对“必须多 Agent”等断言提出反例。",
+      "category": "discovery",
+      "level": "深化",
+      "tags": [
+        "技术博客",
+        "架构观点",
+        "中文"
+      ],
+      "whenToLearn": "以作者分层视角检查编排、能力、工作区和权限；对“必须多 Agent”等断言提出反例。",
+      "verification": "已读公开正文；作者架构观点，不是通用规范。Skill 必然确定、MCP 唯一入口等判断不能普遍成立。",
+      "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-production-system-design",
+        "lesson-multi-agent"
+      ]
     }
   ],
   "curriculum": [
@@ -3827,6 +3969,7 @@
       "deliverable": "一份最小实现 + 执行轨迹 + 架构取舍笔记",
       "project": "research",
       "studyUnits": [
+        "lesson-model-foundations",
         "lesson-llm-contract",
         "digest-paper-react",
         "lesson-harness"
@@ -4131,6 +4274,7 @@
       "deliverable": "专题复现报告 + 代码 + 适用边界",
       "project": "evalops",
       "studyUnits": [
+        "lesson-finetuning-foundations",
         "lesson-agent-rl",
         "digest-verl",
         "digest-agent-lightning",
@@ -4810,6 +4954,186 @@
       "answer": "**核心思路**\n\n优先验证对当前结论影响最大的未知或失败根因，定义能区分两种解释的最小实验；一次改一个变量并给可观察结果。\n\n**反例与边界**\n\n同时换模型、提示、检索和工具，分数提高仍无法归因，也浪费预算。\n\n**怎样验证**\n\n写假设、输入/版本、变量、指标、失败条件和停止预算；运行后保留预测与观察，下次独立复习说明理解变化。",
       "studyUnits": [
         "lesson-evaluation-statistics"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q31",
+      "category": "模型基础",
+      "title": "写出 causal attention 的形状、缩放与 mask。",
+      "answer": "**核心思路**\n\nQ/K 为 T×d_k，V 为 T×d_v；沿 key 维度做 softmax(QK^T/√d_k+M)，输出 T×d_v。禁止未来位置后，要对允许位置重新归一化。缩放针对点积随维度变大的方差，真实训练的独立性假设不一定完全成立。\n\n**反例与边界**\n\n分数 [2,0,−2]、d_k=4，完整权重约 [0.6652,0.2447,0.0900]；禁止最后一项后前两项变为 [0.7311,0.2689]。去掉 causal mask 会泄漏未来目标。\n\n**怎样验证**\n\n用配套实验改未来向量，要求历史输出不变，再比较完整与缓存前向。",
+      "rubric": [
+        "张量与归一化轴",
+        "正确屏蔽与缩放",
+        "未来改动反例"
+      ],
+      "studyUnits": [
+        "lesson-model-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q32",
+      "category": "模型基础",
+      "title": "RoPE 为什么能表达相对位置？长上下文为何仍需测试？",
+      "answer": "**核心思路**\n\n二维旋转满足 (R(mθ)q)^T(R(nθ)k)=q^T R((n−m)θ)k，范数保持，点积依赖相对位移。多维使用不同频率，具体架构可能只旋转部分维度。\n\n**反例与边界**\n\n同时把 (3,7) 改成 (8,12)，位移不变，点积应一致。公式能计算更大位置不能证明超出训练长度的复杂推理正确。\n\n**怎样验证**\n\n先跑旋转等式，再在真实模型上按长度桶测检索、跨轮约束与首尾证据，记录 scaling 和 position 配置。",
+      "rubric": [
+        "旋转等式",
+        "同时平移反例",
+        "外推不能只看窗口上限"
+      ],
+      "studyUnits": [
+        "lesson-model-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q33",
+      "category": "模型基础",
+      "title": "MHA、MQA、GQA 的缓存差异怎样计算？",
+      "answer": "**核心思路**\n\nMHA 每个 query head 对应自己的 KV，MQA 共用一个 KV，GQA 分组共享。普通 KV bytes=2×L×B×T×H_kv×D×dtype bytes。32 层、8 KV heads、4096 tokens、D=128、FP16 得 512 MiB；32 KV heads 得 2048 MiB。\n\n**反例与边界**\n\nquery heads 不能代替 KV heads，权重、workspace、allocator 未计入。MLA、滑动窗口或混合层需按实际布局另算。\n\n**怎样验证**\n\n读 config 和缓存实际 shape，改变并发与长度，分别记录分配量和请求时延。",
+      "rubric": [
+        "query/KV 区别",
+        "512/2048 MiB 算例",
+        "特殊架构与总显存"
+      ],
+      "studyUnits": [
+        "lesson-model-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q34",
+      "category": "模型基础",
+      "title": "KV cache、FlashAttention、PagedAttention 分别解决什么问题？",
+      "answer": "**核心思路**\n\nKV cache 复用历史每层 K/V 投影，FlashAttention 通过分块与在线 softmax 减少巨大注意力矩阵的 IO，PagedAttention 管理 KV 的分块存储和共享。它们分别涉及重算、计算 IO、内存管理，不能互相代替。\n\n**反例与边界**\n\n缓存后新 Q 仍需读取历史 KV；FlashAttention 并不自动把全注意力理论算术复杂度改为线性。\n\n**怎样验证**\n\n固定模型、长度、batch、dtype、硬件与版本，拆开 prefill/decode、吞吐、TTFT 和峰值内存；不要从一种优化名称直接宣称端到端收益。",
+      "rubric": [
+        "三项优化对象不同",
+        "计算复杂度边界",
+        "固定 workload 分解指标"
+      ],
+      "studyUnits": [
+        "lesson-model-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q35",
+      "category": "后训练",
+      "title": "SFT 的 assistant-only loss 与 attention mask 有什么区别？",
+      "answer": "**核心思路**\n\nloss mask 选择被监督预测的位置；attention mask 选择可见条件。工具观察通常不参与 assistant 生成 loss，却必须可见以支持后续决策。四个 log probability [−2,−0.2,−0.4,−3] 仅监督中间两项，平均 NLL 为 0.3。\n\n**反例与边界**\n\n零监督要显式跳过/报错，标签移位、padding 和 packing 的跨样本可见性都要检查；模板不支持 assistant 范围时，单独设置名字不能保证正确。\n\n**怎样验证**\n\n打印真实 tokenized batch 的角色、labels、位置与 mask。",
+      "rubric": [
+        "条件与目标区别",
+        "正确分母与零监督",
+        "模板和 packing 边界"
+      ],
+      "studyUnits": [
+        "lesson-finetuning-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q36",
+      "category": "后训练",
+      "title": "LoRA 首步梯度为何可能只更新 B？如何估算参数？",
+      "answer": "**核心思路**\n\nΔW=(α/r)BA，A 是 r×d_in，B 是 d_out×r。随机 A、零 B 的初始化保持 ΔW=0；A 的首步梯度含 B 因而为零，B 仍可有非零梯度，随后 A 才开始更新。\n\n**反例与边界**\n\n4096×4096、r=8，一个矩阵 adapter 65536 参数，基础矩阵 16777216。冻结基础权重不消除基础权重读取和激活，因此不能把参数比当总显存比。\n\n**怎样验证**\n\n配套 notebook 用有限差分对照解析梯度，确认 W 不变，再做小矩阵下降。",
+      "rubric": [
+        "形状与初始化",
+        "链式梯度",
+        "参数不是总显存"
+      ],
+      "studyUnits": [
+        "lesson-finetuning-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q37",
+      "category": "后训练",
+      "title": "DPO 为什么需要 reference？手算一个偏好对。",
+      "answer": "**核心思路**\n\n标准 sigmoid DPO 的 margin 是 β[(logπθ(w)−logπθ(l))−(logπref(w)−logπref(l))]。reference 限定相对偏离，目标并非单独提高 chosen 概率。policy −2/−4、reference −3/−4、β=.1 得 z=.1，loss≈.6444；交换偏好后约 .7444，同差时 log2。\n\n**反例与边界**\n\n回答序列 log probability 排除 prompt/padding；改成平均会改变原目标。reference 应固定，PEFT 复用与 adapter 切换仍要核对实际分布。\n\n**怎样验证**\n\n稳定 softplus、交换标签和数值梯度一起检查。",
+      "rubric": [
+        "reference log-ratio",
+        "数值与标签方向",
+        "序列目标边界"
+      ],
+      "studyUnits": [
+        "lesson-finetuning-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q38",
+      "category": "后训练",
+      "title": "什么时候用 RAG、SFT、DPO 或在线 RL？",
+      "answer": "**核心思路**\n\n先定位失败。缺失/变化的知识优先改检索；稳定领域行为或格式偏差可用 SFT；两个候选的偏好用 DPO 等离线目标；环境反馈与长期路径选择重要时评估在线 RL。\n\n**反例与边界**\n\n文档版本过时，用微调不能保证实时正确；SFT 成功轨迹错误会固化幻觉；DPO 标注偏好偏爱长答案也可能降低任务正确；错误 grader 会诱导奖励捷径。\n\n**怎样验证**\n\n冻结任务与分层指标，比较基础、SFT、偏好阶段及通用回归。权限和幂等仍由运行时保证。",
+      "rubric": [
+        "失败归因后选择",
+        "监督信号与局限",
+        "最终任务及回归"
+      ],
+      "studyUnits": [
+        "lesson-finetuning-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q39",
+      "category": "后训练",
+      "title": "同一文档的 chunk 为什么不能随机拆到 train/test？",
+      "answer": "**核心思路**\n\n共享来源、相邻 chunk 或题目改写容易泄漏内容及答案，随机打散会低估泛化难度。按文档、任务族、会话或仓库分组后划分，再做近重复检测；时间敏感任务增加未来时间测试。\n\n**反例与边界**\n\n同一问题的三种措辞进入训练，第四种进测试，模型可能记住答案而非掌握机制。\n\n**怎样验证**\n\n记录 group ID、去重规则和标注来源，禁止测试答案进入 prompt、检索索引、编译或训练；开发集调参，独立测试仅作最终评估。",
+      "rubric": [
+        "来源/任务族拆分",
+        "近重复与时间",
+        "检索和 prompt 也可泄漏"
+      ],
+      "studyUnits": [
+        "lesson-finetuning-foundations"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q40",
+      "category": "工程",
+      "title": "动态批处理和长输出为何影响 p95？",
+      "answer": "**核心思路**\n\nbatching 改善吞吐，却可能增加等待和串行步骤；长输入 prefill 与长输出 decode 对瓶颈影响不同。TTFT、每 token 时间、吞吐与端到端 p95 是不同指标。\n\n**反例与边界**\n\n拆开排队、prefill、decode、工具和传输；流式首 token 快不等于任务很快完成，取消后也要确认计算和费用是否继续。\n\n**怎样验证**\n\n固定负载分布、并发与冷/热缓存，记录成功率、失败成本及分位数，检验背压与公平性，不只跑单请求平均数。",
+      "rubric": [
+        "请求阶段分解",
+        "吞吐/尾部取舍",
+        "固定负载与成功成本"
+      ],
+      "studyUnits": [
+        "lesson-inference-serving"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q41",
+      "category": "系统设计",
+      "title": "多 Agent 怎样证明价值，而不只是增加角色？",
+      "answer": "**核心思路**\n\n先做单 Agent 或固定流程基线，再用相同任务、模型和总预算比较专用委派、通用委派和串行/并行安排。按子任务依赖、证据冲突、失败与聚合成本判断价值。\n\n**反例与边界**\n\n独立研究可并行，后续写入仍要等待依赖；角色更多但上下文重复、证据丢失或预算超支可能降低效果。近期 Harness 组件研究的结果也依赖模型和任务，不能推出必须委派的规则。\n\n**怎样验证**\n\n报告任务族配对结果、来源证据、总调用与故障，保留不同意见而非只多数投票。",
+      "rubric": [
+        "单系统基线",
+        "依赖及总预算",
+        "配对组件消融"
+      ],
+      "studyUnits": [
+        "lesson-multi-agent"
+      ],
+      "reviewedAt": "2026-10-13"
+    },
+    {
+      "id": "q42",
+      "category": "项目复盘",
+      "title": "训练曲线更好，为什么线上 Agent 仍可能更差？",
+      "answer": "**核心思路**\n\nloss 或偏好胜率优化的是训练代理目标，线上任务还受数据分布、工具、环境、停止条件和权限影响。可能出现背诵、长度捷径、通用能力回退或错误 reward。\n\n**反例与边界**\n\n用一条真实失败 trace 指出训练目标和用户结果分歧，并把基础模型、SFT、偏好阶段放在同一冻结任务上比较。\n\n**怎样验证**\n\n按任务族、长度、困难负例分层测最终产物、引用、恢复、成本和延迟，保留通用回归、置信区间与失败样本，不拿单次演示归因。",
+      "rubric": [
+        "代理目标与任务区别",
+        "真实失败与基线",
+        "分层及通用回归"
+      ],
+      "studyUnits": [
+        "lesson-finetuning-foundations"
       ],
       "reviewedAt": "2026-10-13"
     }
@@ -6122,6 +6446,12 @@
       "cadence": "学习者每周手动查看主线依赖的官方更新；每次做实验前记录实际package、model checkpoint、dataset、harness、评测协议与日期。未创建定时任务。",
       "promotionRule": "新条目先保存发现来源与访问状态，打开主源后再加入推荐阅读；原文不可读时只列线索。",
       "rssStatus": "本轮核验的是官方更新/发布网页，未宣称验证任何RSS或Atom订阅端点。"
+    },
+    "2026-10-13-product-audit": {
+      "date": "2026-10-13",
+      "scope": "模型算法、GitHub 课程、Harness 新研究与中文社区观点；逐来源区分正文/摘要/目录/受限入口。",
+      "addedResources": 7,
+      "notes": "微信公众号与小红书原帖直接访问未取得正文；未升级为已读材料。全站资料日期保持逐来源核验，不把本轮日期覆盖旧来源。"
     }
   },
   "learningProductResearch": {
@@ -6516,6 +6846,67 @@
         "q8",
         "q25"
       ]
+    },
+    {
+      "id": "kuaishou-training-apr",
+      "title": "对话状态、Agentic Training 与 observation mask",
+      "company": "快手",
+      "author": "Code_Agent",
+      "dateText": "页面 04-22 16:40；未显示年份",
+      "url": "https://www.nowcoder.com/discuss/876505573997432832",
+      "platform": "牛客",
+      "evidence": "作者自述面经 · 免费可见部分",
+      "verifiedAt": "2026-10-13",
+      "verification": "已读免费部分至第 6 题；余下 60% 为付费区域，未读取。经历、公司及答案由作者陈述；其中对 next-token prediction 的表述需回到本站机制解释核验。",
+      "topics": [
+        "对话状态",
+        "SFT",
+        "Agentic Training",
+        "Loss mask"
+      ],
+      "questions": [
+        "多轮上下文怎样压缩并保留有效状态？",
+        "Agentic Training 怎样组织 action 与 observation？",
+        "工具观察为什么可见但不参与生成 loss？"
+      ],
+      "practice": "在 SFT 机制实验中打印目标 mask；解释 loss 置零和 attention 不可见的区别，再用过期状态构造反例。",
+      "questionRefs": [
+        "q4",
+        "q35",
+        "q9",
+        "q39"
+      ]
+    },
+    {
+      "id": "meituan-api-statistics-mar",
+      "title": "流式调用合同与 A/B 实验追问",
+      "company": "美团（汇编作者标注）",
+      "author": "林小白zii",
+      "dateText": "页面 09-10 02:04；可见汇编自述面试 2026-03-21 / 03-19",
+      "url": "https://www.nowcoder.com/discuss/927381887545245696",
+      "platform": "牛客",
+      "evidence": "作者汇编 · 免费可见部分",
+      "verifiedAt": "2026-10-13",
+      "verification": "已读可见面经 01–03，包括 API/流式和 A/B 部分；余下 60% 为付费区域，未读取。并非企业确认题库，也未独立证实汇编经历。",
+      "topics": [
+        "API合同",
+        "流式",
+        "Trace",
+        "A/B"
+      ],
+      "questions": [
+        "请求、错误和流式事件如何保持同一个调用身份？",
+        "随机分流、样本量和实验污染如何影响 A/B 判断？",
+        "怎样用具体工程案例解释 AI Coding 的验证过程？"
+      ],
+      "practice": "画出一个流式调用的正常、拒答、截断和取消路径；再设计配对离线评测与随机线上实验，明确两者的实验单位。",
+      "questionRefs": [
+        "q2",
+        "q16",
+        "q21",
+        "q27",
+        "q40"
+      ]
     }
   ],
   "interviewPracticeSources": [
@@ -6553,6 +6944,13 @@
       "url": "https://www.bilibili.com/video/BV1eRbr6mEJE/",
       "scope": "RAG、Agent、微调与场景题的发现入口",
       "verification": "仅搜索索引可见；页面直接访问失败，未观看视频或核实题目。"
+    },
+    {
+      "title": "LLM 算法与 Agent 面试主题索引",
+      "platform": "GitHub",
+      "url": "https://github.com/DolbyUUU/Awesome-LLM-Interview-Questions-and-Answers",
+      "scope": "基础、Attention、RL、RAG、训练与压缩的查漏索引；答案需要一手资料复核。",
+      "verification": "已读 README/目录；维护者明确答案多由 Gemini/GPT 生成，部分参考知乎。未逐条读取外部 Poe 对话或验证公司题源。"
     }
   ],
   "interviewDiscovery": [
@@ -6809,7 +7207,28 @@
       "dateLabel": "限制文档更新 2026-10-02 · 独立评测 v1 2026-09-29",
       "question": "把语义判断交给小模型，计算和执行仍由程序负责。先学概率与回退，再比较官方限制、独立评测和作者实践。",
       "scope": "已读官方相关文档与独立评测摘要；未进行 Jev API 实测。",
-      "query": "Jev"
+      "query": "Jev",
+      "verifiedAt": "2026-10-11"
+    },
+    {
+      "resourceId": "harness-effects-2026",
+      "unitId": "lesson-harness",
+      "title": "Harness 不一定越复杂越好：模型、任务与组件一起测",
+      "dateLabel": "论文 2026-09-26 v1 · 阅读范围核对 2026-10-13",
+      "question": "专用委派、通用委派和压缩的效果可能相反。用固定预算的配对实验解释差异。",
+      "scope": "已读实验设计与组件结论；未复现论文 benchmark。",
+      "query": "agent harness ablation",
+      "verifiedAt": "2026-10-13"
+    },
+    {
+      "resourceId": "training-dpo-paper",
+      "unitId": "lesson-finetuning-foundations",
+      "title": "SFT、LoRA 与 DPO：把后训练公式跑明白",
+      "dateLabel": "机制深化 · 官方实现文档核对 2026-10-13",
+      "question": "从 loss mask、初始化梯度和 reference log-ratio 开始，避免用方法名替代机制理解。",
+      "scope": "标准库梯度与损失实验；未进行大模型训练。",
+      "query": "LLM post training DPO GRPO",
+      "verifiedAt": "2026-10-13"
     }
   ]
 }

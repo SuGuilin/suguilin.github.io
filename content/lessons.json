@@ -66,9 +66,23 @@
           "supports": "2026-09 研究：创建/演化、冻结版本、运行模型与保留集的比较边界",
           "verifiedAt": "2026-10-13",
           "verification": "已读相关方法段落，未运行 benchmark、模型或 harness 生成实验。"
+        },
+        {
+          "title": "Beyond the Model · v1",
+          "url": "https://arxiv.org/html/2609.32459v1",
+          "supports": "模型×任务×Harness 与组件消融结论；未复现分数",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "Hugo Zhu 的 Runtime 分层",
+          "url": "https://hugozhu.site/post/2026/143-enterprise-agent-runtime-five-layer-architecture/",
+          "supports": "作者观点与本站反例讨论；不是协议规范",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
         }
       ],
-      "content": "## 案例：审批恢复为什么把节点执行了两次？\n\n\n草稿已经生成，下一步等待用户审批。希望暂停后从原处继续，就在节点里调用 `interrupt()`。下面是 LangGraph 1.2.14 的节点代码；完整图构建与断言在配套 Colab 中，不需要调用模型。\n\n运行后第一次计数为 `before_interrupt=1`；同一线程恢复后变为 `before_interrupt=2, after_interrupt=1`。因此审批前面的代码会重跑：如果那里直接提交订单或扣费，可能重复产生副作用。检查点保存图状态，并不自动替外部服务去重。\n\n~~~python\nfrom collections import Counter\nfrom langgraph.types import interrupt\n\ncalls = Counter()\ndef approve_draft(state):\n    calls['before_interrupt'] += 1\n    approved = interrupt({'draft': state['draft'], 'question': '是否继续？'})\n    calls['after_interrupt'] += 1\n    return {'approved': bool(approved)}\n~~~\n\n完整笔记本的实际输出：\n\n~~~text\n暂停：before_interrupt=1；待恢复节点 approve\n恢复：before_interrupt=2，after_interrupt=1；approved=True\n~~~\n\n`Command(resume=True)` 是本例传入的审批值。`thread_id` 必须与暂停时一致。这里的 `InMemorySaver` 只在内存里保存；更换 saver 或重启进程就没有旧记录。打开下方 Colab 可以继续验证拒绝分支、线程隔离和新 saver 的空状态。\n\n## 从闭环到运行时契约\n\n假设任务是“读三篇论文，比较方法并生成笔记”。模型负责提出下一步；Harness 负责保存任务、构造上下文、调度工具和检查结果。[Deep Agents 官方说明](https://docs.langchain.com/oss/python/deepagents/overview)将这些能力组织为执行环境、上下文管理、委派和引导。采用这个划分，可以更换模型而保留执行约束。\n\n把状态定义为目标、约束、证据引用、产物、待执行动作和剩余预算。状态机至少区分运行、等待审批、结果待确认、成功与失败。“模型说完成”只触发验证，文件存在、引用可追溯、要求满足才允许进入成功状态。工具返回的文本属于观察，不能直接改变权限。审批应绑定具体动作与参数摘要，修改参数后重新判断。\n\n事件记录保存决策、动作标识、输入摘要、结果引用和预算变化；检查点保存可恢复快照。两者用途不同。模型调用可以重做，外部写入可能已经生效；检查点无法消除这段不确定窗口。[LangGraph 中断文档](https://docs.langchain.com/oss/python/langgraph/interrupts)也提醒恢复可能重跑节点，因此副作用仍需下一课的幂等协议。\n\n## 核心伪代码\n\n~~~伪代码 · 配套 notebook 提供可运行实验\nstate = load_checkpoint(task_id)\nwhile state.status == RUNNING:\n    ensure_budget(state)\n    context = select_context(state, token_budget)\n    decision = model(context)\n    validate_schema_and_policy(decision, state)\n    persist_intent(decision.action_id, decision.args)\n    if needs_approval(decision):\n        checkpoint_and_pause(state, decision)\n        break\n    result = execute_or_reconcile(decision)\n    state = reduce_event(state, result)\n    state.status = verify_outcome_or_continue(state)\n    save_checkpoint(state)\n~~~\n\n这里 execute_or_reconcile 同时处理新动作与未确认旧动作；reduce_event 是确定性的状态转换。不要让模型自行生成可信租户身份或递增预算。为每个终止原因给出明确结果，例如预算耗尽、用户取消、不可恢复错误，防止失败被包装成成功。\n\n## 上下文选择实验\n\n固定模型与任务集，对比全量历史、滚动摘要、摘要加按需证据三种策略。摘要保留任务目的、已确定事实、未解决冲突和下一步，长工具结果保存为带版本的产物引用。用同一引用重新加载，避免恢复后读到已变化的网页却仍把它当原证据。[上下文工程文章](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)提供压缩与按需加载思路，本课的字段设计则需自己验证。\n\n准备二十个跨文档任务，分别在工具调用前、返回后和检查点提交前注入崩溃，再恢复。记录目标遗失、证据误归因、重复写入、调用数、总耗时及 token。保留正常路径作为对照，不只测崩溃案例。\n\n## 验收标准\n\n每次恢复都能重建目标与待确认动作；所有完成声明有产物验证证据；取消和预算耗尽能停止新增调用。每个故障位置重复三次，出现重复写入必须先修复；不能用更高平均成功率抵消这一缺陷。报告三种上下文策略的质量与成本，允许结果显示某种“高级”策略没有收益。\n\n## 面试追问\n\n模型换强后为什么仍会重复提交？摘要删掉了一个约束如何定位？子 Agent 返回“已审批”为什么不能直接执行？回答应落到状态来源、动作身份、恢复窗口和可检查的不变量。\n\n\n## 执行合同、预算与终止理由\n\nHarness 的输入是任务目标、可信权限、工具集合和预算；输出是产物、证据与终止理由。模型决定下一动作，执行器先校验结构、语义、对象权限和预算，再调用工具。观察更新状态后，独立 verifier 检查任务完成条件。完成、失败、取消、等待审批、预算耗尽应是明确状态，不能从最后一句自然语言推断。\n\n预算至少包括工具次数、模型 token、墙钟时间和并发；它们不能用单一步数替代。超时通过取消传播阻止新增动作，已提交副作用仍需查询或对账。检查点保存待确认操作身份，审批绑定产物版本，取消与恢复都要保留这个关联。\n\n**预算必须在动作发生前预留，并在返回后结算。** 例如总预算 1000 token，已用 600，下一调用最多输出 250、预计还需 200 输入，就不能仅因“当前只用了 600”而放行。并发两次各检查剩余 400 也会透支；在可信计数器中原子预留，结束后按实际 usage 释放差额。墙钟截止时间传给每个子调用，用 monotonic 时钟计算剩余时间，不能被系统时钟调整延长。\n\n状态转换的关键是 `running → verifying → succeeded`：模型的 finish 只申请验收。若产物缺引用，进入 task_failure 或在剩余预算内返回修订；若远端写入仍 unknown，进入待确认，不能宣布成功或自动重做。可取消的新动作与已在途动作分别跟踪，才能解释为什么停止运行不等于撤销业务。\n\n## Workflow、自由循环与多代理的选择\n\n已知流程使用确定 workflow；动态信息收集使用有限 agent loop；独立任务可按接口委派。复杂结构必须证明收益：在同模型、工具、任务与总预算下比较正确、证据、耗时和成本。多代理重复搜同一材料或协调丢信息时，系统更复杂但能力未必更强。\n\n上下文组装与业务状态分离。摘要允许压缩长观察，但不能改目标、权限、批准身份与未确认写入；数据和外部指令标为不可信材料。缓存按输入、模型、工具和数据版本建 key，不能复用其他用户私有结果。数据源更新后的旧结论需要重新核对。\n\n## 从机制测试到集成验收\n\n纯校验器测参数与预算；工具 adapter 测正常、拒绝、超时和结果未知；图测循环和分支；业务层测幂等与权限；真实任务测产物和证据。将模型选择 fixture 固定后再加入模型，失败才能定位。每个 trace 关联 task、thread、operation、policy/model version，日志不要保存凭证。\n\n本篇中断 notebook 验证节点重入，durable-agent 验证教学协议；新增 LangGraph 专题运行真正跨进程 SQLite 恢复与控制流。它们补足不同层的证据，不能据本机成功推断生产多副本或真实模型任务完成率。面试应解释不变量、状态转移和故障窗口，再讨论框架选型。\n\n## Harness 自进化怎样避免只适配开发集\n\n2026 年 9 月的 HarnessDev 把可运行 harness 本身作为研究对象，区分从弱基线创建与基于执行反馈迭代。论文 §3 区分创建模型、运行模型与评分者，并冻结版本后检查保留任务；换运行模型会改变比较含义。这里已读相关方法段落，未运行该 benchmark。\n\n本站的最小对照可先固定模型、工具、数据与 grader，每次只改上下文或停止机制，用开发任务选择候选，再在保留任务检查成功、回归和 token 成本。若只反复挑反馈集最高分，可能适配噪声；同时换模型会让 harness 收益难以归因。记录候选 commit、失败类别和预算，比“会自进化”的标签更能说明改变了什么。\n\n## 一手来源\n\n- [Deep Agents overview](https://docs.langchain.com/oss/python/deepagents/overview)\n- [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)\n- [LangGraph Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)\n- [Anthropic Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)",
+      "content": "## 案例：审批恢复为什么把节点执行了两次？\n\n\n草稿已经生成，下一步等待用户审批。希望暂停后从原处继续，就在节点里调用 `interrupt()`。下面是 LangGraph 1.2.14 的节点代码；完整图构建与断言在配套 Colab 中，不需要调用模型。\n\n运行后第一次计数为 `before_interrupt=1`；同一线程恢复后变为 `before_interrupt=2, after_interrupt=1`。因此审批前面的代码会重跑：如果那里直接提交订单或扣费，可能重复产生副作用。检查点保存图状态，并不自动替外部服务去重。\n\n~~~python\nfrom collections import Counter\nfrom langgraph.types import interrupt\n\ncalls = Counter()\ndef approve_draft(state):\n    calls['before_interrupt'] += 1\n    approved = interrupt({'draft': state['draft'], 'question': '是否继续？'})\n    calls['after_interrupt'] += 1\n    return {'approved': bool(approved)}\n~~~\n\n完整笔记本的实际输出：\n\n~~~text\n暂停：before_interrupt=1；待恢复节点 approve\n恢复：before_interrupt=2，after_interrupt=1；approved=True\n~~~\n\n`Command(resume=True)` 是本例传入的审批值。`thread_id` 必须与暂停时一致。这里的 `InMemorySaver` 只在内存里保存；更换 saver 或重启进程就没有旧记录。打开下方 Colab 可以继续验证拒绝分支、线程隔离和新 saver 的空状态。\n\n## 从闭环到运行时契约\n\n假设任务是“读三篇论文，比较方法并生成笔记”。模型负责提出下一步；Harness 负责保存任务、构造上下文、调度工具和检查结果。[Deep Agents 官方说明](https://docs.langchain.com/oss/python/deepagents/overview)将这些能力组织为执行环境、上下文管理、委派和引导。采用这个划分，可以更换模型而保留执行约束。\n\n把状态定义为目标、约束、证据引用、产物、待执行动作和剩余预算。状态机至少区分运行、等待审批、结果待确认、成功与失败。“模型说完成”只触发验证，文件存在、引用可追溯、要求满足才允许进入成功状态。工具返回的文本属于观察，不能直接改变权限。审批应绑定具体动作与参数摘要，修改参数后重新判断。\n\n事件记录保存决策、动作标识、输入摘要、结果引用和预算变化；检查点保存可恢复快照。两者用途不同。模型调用可以重做，外部写入可能已经生效；检查点无法消除这段不确定窗口。[LangGraph 中断文档](https://docs.langchain.com/oss/python/langgraph/interrupts)也提醒恢复可能重跑节点，因此副作用仍需下一课的幂等协议。\n\n## 核心伪代码\n\n~~~伪代码 · 配套 notebook 提供可运行实验\nstate = load_checkpoint(task_id)\nwhile state.status == RUNNING:\n    ensure_budget(state)\n    context = select_context(state, token_budget)\n    decision = model(context)\n    validate_schema_and_policy(decision, state)\n    persist_intent(decision.action_id, decision.args)\n    if needs_approval(decision):\n        checkpoint_and_pause(state, decision)\n        break\n    result = execute_or_reconcile(decision)\n    state = reduce_event(state, result)\n    state.status = verify_outcome_or_continue(state)\n    save_checkpoint(state)\n~~~\n\n这里 execute_or_reconcile 同时处理新动作与未确认旧动作；reduce_event 是确定性的状态转换。不要让模型自行生成可信租户身份或递增预算。为每个终止原因给出明确结果，例如预算耗尽、用户取消、不可恢复错误，防止失败被包装成成功。\n\n## 上下文选择实验\n\n固定模型与任务集，对比全量历史、滚动摘要、摘要加按需证据三种策略。摘要保留任务目的、已确定事实、未解决冲突和下一步，长工具结果保存为带版本的产物引用。用同一引用重新加载，避免恢复后读到已变化的网页却仍把它当原证据。[上下文工程文章](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)提供压缩与按需加载思路，本课的字段设计则需自己验证。\n\n准备二十个跨文档任务，分别在工具调用前、返回后和检查点提交前注入崩溃，再恢复。记录目标遗失、证据误归因、重复写入、调用数、总耗时及 token。保留正常路径作为对照，不只测崩溃案例。\n\n## 验收标准\n\n每次恢复都能重建目标与待确认动作；所有完成声明有产物验证证据；取消和预算耗尽能停止新增调用。每个故障位置重复三次，出现重复写入必须先修复；不能用更高平均成功率抵消这一缺陷。报告三种上下文策略的质量与成本，允许结果显示某种“高级”策略没有收益。\n\n## 面试追问\n\n模型换强后为什么仍会重复提交？摘要删掉了一个约束如何定位？子 Agent 返回“已审批”为什么不能直接执行？回答应落到状态来源、动作身份、恢复窗口和可检查的不变量。\n\n\n## 执行合同、预算与终止理由\n\nHarness 的输入是任务目标、可信权限、工具集合和预算；输出是产物、证据与终止理由。模型决定下一动作，执行器先校验结构、语义、对象权限和预算，再调用工具。观察更新状态后，独立 verifier 检查任务完成条件。完成、失败、取消、等待审批、预算耗尽应是明确状态，不能从最后一句自然语言推断。\n\n预算至少包括工具次数、模型 token、墙钟时间和并发；它们不能用单一步数替代。超时通过取消传播阻止新增动作，已提交副作用仍需查询或对账。检查点保存待确认操作身份，审批绑定产物版本，取消与恢复都要保留这个关联。\n\n**预算必须在动作发生前预留，并在返回后结算。** 例如总预算 1000 token，已用 600，下一调用最多输出 250、预计还需 200 输入，就不能仅因“当前只用了 600”而放行。并发两次各检查剩余 400 也会透支；在可信计数器中原子预留，结束后按实际 usage 释放差额。墙钟截止时间传给每个子调用，用 monotonic 时钟计算剩余时间，不能被系统时钟调整延长。\n\n状态转换的关键是 `running → verifying → succeeded`：模型的 finish 只申请验收。若产物缺引用，进入 task_failure 或在剩余预算内返回修订；若远端写入仍 unknown，进入待确认，不能宣布成功或自动重做。可取消的新动作与已在途动作分别跟踪，才能解释为什么停止运行不等于撤销业务。\n\n## Workflow、自由循环与多代理的选择\n\n已知流程使用确定 workflow；动态信息收集使用有限 agent loop；独立任务可按接口委派。复杂结构必须证明收益：在同模型、工具、任务与总预算下比较正确、证据、耗时和成本。多代理重复搜同一材料或协调丢信息时，系统更复杂但能力未必更强。\n\n上下文组装与业务状态分离。摘要允许压缩长观察，但不能改目标、权限、批准身份与未确认写入；数据和外部指令标为不可信材料。缓存按输入、模型、工具和数据版本建 key，不能复用其他用户私有结果。数据源更新后的旧结论需要重新核对。\n\n## 从机制测试到集成验收\n\n纯校验器测参数与预算；工具 adapter 测正常、拒绝、超时和结果未知；图测循环和分支；业务层测幂等与权限；真实任务测产物和证据。将模型选择 fixture 固定后再加入模型，失败才能定位。每个 trace 关联 task、thread、operation、policy/model version，日志不要保存凭证。\n\n本篇中断 notebook 验证节点重入，durable-agent 验证教学协议；新增 LangGraph 专题运行真正跨进程 SQLite 恢复与控制流。它们补足不同层的证据，不能据本机成功推断生产多副本或真实模型任务完成率。面试应解释不变量、状态转移和故障窗口，再讨论框架选型。\n\n## Harness 自进化怎样避免只适配开发集\n\n2026 年 9 月的 HarnessDev 把可运行 harness 本身作为研究对象，区分从弱基线创建与基于执行反馈迭代。论文 §3 区分创建模型、运行模型与评分者，并冻结版本后检查保留任务；换运行模型会改变比较含义。这里已读相关方法段落，未运行该 benchmark。\n\n本站的最小对照可先固定模型、工具、数据与 grader，每次只改上下文或停止机制，用开发任务选择候选，再在保留任务检查成功、回归和 token 成本。若只反复挑反馈集最高分，可能适配噪声；同时换模型会让 harness 收益难以归因。记录候选 commit、失败类别和预算，比“会自进化”的标签更能说明改变了什么。\n\n## 一手来源\n\n- [Deep Agents overview](https://docs.langchain.com/oss/python/deepagents/overview)\n- [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)\n- [LangGraph Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts)\n- [Anthropic Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)\n\n**近期研究如何修正工程直觉（2026-09-26 v1）：**[Beyond the Model](https://arxiv.org/html/2609.32459v1) 比较模型、任务与 Harness，组件研究区分专用与通用子 Agent。所读结论报告压缩和通用子 Agent 在部分仓库生成任务中可能降低表现；不能推出“所有复杂任务必须拆分”。把自己的实验设计成任务族×组件的配对表：固定模型和总预算，分别测单循环、专用委派和通用委派；记录失败、成本与证据丢失。论文分数属于作者，本工作台未复现该 benchmark。\n\n**读技术博客时的练习：**[Hugo Zhu 的分层方案](https://hugozhu.site/post/2026/143-enterprise-agent-runtime-five-layer-architecture/) 给出组织运行时的视角，但分层不是协议标准。Skill 可以包含自然语言和不确定的模型过程；普通文件夹也不会自动记录全部审计事件。提出一个单 Agent + 明确 API 权限与审计也能完成的任务，解释为何它不需要强制 MCP 或多个子 Agent。\n",
       "chineseCharacterCount": 4182,
       "contentStatus": "核心机制、反例与原创练习；实验范围分别标明",
       "verifiedAt": "2026-10-13",
@@ -717,6 +731,145 @@
       "contentStatus": "核心机制、反例与原创练习；实验范围分别标明",
       "verifiedAt": "2026-10-13",
       "chineseCharacterCount": 2313,
+      "accent": "blue"
+    },
+    {
+      "id": "lesson-model-foundations",
+      "title": "模型机制：Attention、RoPE、GQA 与缓存",
+      "topic": "模型基础",
+      "goal": "沿着张量形状、因果性和缓存解释 Transformer，用逐元素实验检验 attention、位置与 KV 的机制。",
+      "summary": "沿着张量形状、因果性和缓存解释 Transformer，用逐元素实验检验 attention、位置与 KV 的机制。",
+      "number": 13,
+      "content": "## 从 token 到 logits：模型到底计算什么\n\n自回归语言模型学习的是条件分布 p(x_t | x_<t)。Tokenizer 把文本变成整数序列，embedding 把整数映射到向量，堆叠的 decoder block 更新表示，最后的线性投影产生词表上的 logits。softmax 后才是概率；温度、采样和停止条件属于生成策略。把一句话编码成几个 token，取决于 tokenizer；字符数、单词数、token 数不能互换。\n\n训练时通常把同一序列移位一位：输入 [a,b,c] 对应标签 [b,c,d]。因果 mask 防止第一个位置看到未来的 b；并行计算所有位置不等于允许看未来。推理时拿最后一个有效位置的 logits 预测下一 token，再继续计算。padding、EOS 和对话角色分隔符要按模型的 chat template 处理；重复添加 BOS 或把用户文字拼成系统角色会改变真正输入。\n\n**需要抓住的重点：**模型预测和 Agent 执行之间有契约边界。一个高概率工具名称只是生成结果，仍须做参数、身份、权限与业务校验。基础模型与对话模型可共享自回归目标，但后训练和模板使它们的行为不同；不能说对话模型不再做 next-token prediction。\n\n## Q、K、V 与缩放：为什么注意力不是查字典\n\n对一层单头教学模型，X 为 T×d_model，Q=XW_Q、K=XW_K、V=XW_V，Q/K 为 T×d_k，V 为 T×d_v。注意力输出为 softmax(QK^T/√d_k + M)V，softmax 沿 key 维度进行，M 的禁止位置为负无穷。每行权重和为 1，输出是 V 的加权组合；Q/K 决定匹配，V 决定被聚合的内容。\n\n若 Q/K 各分量独立、零均值、方差为 1，点积方差随 d_k 增长，除以 √d_k 使尺度稳定。这是缩放的动机，真实训练后的分量不必完全满足假设。大 logits 容易让 softmax 饱和；数值实现先减去本行最大值避免 exp 溢出。\n\n原创建模例子：一个 query 对三个 key 的未缩放相似度为 [2,0,−2]，d_k=4，缩放后为 [1,0,−1]，概率约 [0.6652,0.2447,0.0900]。若第三个 key 是未来位置，应直接屏蔽，再对前两个重新归一化，而不是把第三个概率设 0 却保留其余原值。\n\n注意力权重可以帮助排查机制，但单独一张热力图不能证明最终输出的因果解释。需要改动输入、干预边界或做消融，看输出和任务结果怎样变化。\n\n## 两种 mask：不让看到，与不要求预测\n\nattention mask 决定谁可以作为条件；loss mask 决定哪些目标位置计算训练损失。工具观察要参与下一步决策的 attention，但通常不作为 assistant 行为的监督目标。仅把 tool token 的 loss 置零，不能让模型“看不见”观察；遮住全部观察则无法学会依据工具结果行动。\n\npadding mask 与 causal mask 要合并。packing 多条样本时，是否允许跨样本 attention、位置是否重置、标签是否跨边界移位，都必须核对具体 collator 和 attention backend。把两条互不相关的客户会话直接拼接并训练，会制造本不应存在的上下文联系。\n\n验证时不要只看 loss 数值：打印一个真实批次的 token、role、position、attention 可见性和 labels，确认第一个回答 token 有正确上下文、padding 不贡献 loss、工具观察不被要求生成、样本边界不泄漏。\n\n## 一个 decoder block：残差、归一化与 FFN\n\n常见 pre-norm decoder 的教学顺序是 h←h+Attention(Norm(h))，再 h←h+FFN(Norm(h))。残差让每层在原表示上学习变化；归一化稳定尺度；FFN 逐 token 变换通道，不负责直接连接不同位置。具体模型可能使用 RMSNorm、SwiGLU、并行残差或其他结构，不能把一种顺序套到所有模型。\n\nLayerNorm 去均值并按方差缩放；RMSNorm 按均方根缩放，通常不做去均值。Gated FFN 可以用一支投影产生门，另一支产生值，再逐元素相乘；维度与激活取决于架构。推理参数、KV 状态和训练激活是三类不同内存，不能因为 attention 得到优化就忽略 FFN 或输出投影。\n\n读模型源码时先定位 embedding、一个 decoder layer、attention、MLP、norm、LM head，再用 config 核对层数、query heads、KV heads 和中间维度。不要从模型名称猜这些数字。\n\n## RoPE：绝对位置旋转，点积表达相对位移\n\nRoPE 将 Q/K 的成对维度按位置旋转。二维情况下 R(mθ)q 与 R(nθ)k 的点积等于 q^T R((n−m)θ)k。旋转保持向量范数，但相对角度改变匹配；多维用不同频率的二维对。这里讨论原始机制，具体模型可能只旋转部分维度或使用不同长上下文扩展。\n\n原创建模检验：q=(1,0)、k=(0,1)，θ=0.2；同时把两个位置从 (3,7) 移到 (8,12)，相对距离仍为 4，点积应一致。只移动一个位置则通常改变点积。配套 notebook 直接计算这个等式。\n\n“公式能算更长位置”不能证明模型在训练长度之外仍准确。扩展位置范围后，要检查长文检索、多轮约束、首尾证据、不同长度桶，以及实际使用的 RoPE scaling 配置；不能把单一 needle 任务的结果扩展成复杂推理保证。\n\n## MHA、MQA、GQA 与 MLA：看存储对象再算显存\n\nMHA 的每个 query head 有自己的 K/V head；MQA 共享一个 K/V head；GQA 让一组 query heads 共享 K/V。query head 数保持不变时，减少 KV heads 可降低缓存量与读取带宽，但训练/转换方式和质量取舍要用具体模型检验。它们不是简单地把 query heads 删掉。\n\n普通全注意力的教学 KV 基线：bytes=2×layers×batch×tokens×kv_heads×head_dim×bytes_per_element。32 层、32 query heads、8 KV heads、head_dim=128、4096 tokens、FP16、batch=1 得到 512 MiB；若用 32 KV heads 则为 2048 MiB。这个比较假设其余条件相同，未包含权重、分配、workspace 或缓存共享。\n\nMLA 使用压缩的潜在表示和特定位置分支，不能机械套上述 KV-head 算式。混合滑动窗口、状态空间或其他特殊层也需要按实际存储布局计算。读 DeepSeek-V3 的 MLA/MoE 介绍是认识架构差异的例子，不把历史模型称为当前最新模型。\n\n## Prefill 与增量 Decode：缓存为什么成立\n\n因果模型中，历史位置不依赖未来 token。在固定权重、相同前缀、相同位置处理下，已计算的每层历史 K/V 可以复用；新一步只计算新 token 的 Q/K/V，再让新 Q 关注历史与当前 K/V。prefill 处理完整输入，decode 随生成追加缓存。KV cache 保存中间表示，不是数据库记忆或检索结果。\n\n教学 full attention 会形成 T×T 分数矩阵；缓存后单个新 token 的 attention 分数是 1×T。过去的 K/V 投影不再重算，但长历史仍要参与读取；不能说缓存后每 token 的所有计算都与长度无关。多层依赖、批次、padding 和位置必须保持一致，错误的 position 或 mask 会让缓存版与完整前向不一致。\n\n配套 notebook 使用固定投影和单层向量，逐位置比较完整因果 attention 与增量缓存，要求输出逐元素一致；再修改未来 token，检查历史输出不变。它检验数学机制，不代表完整 Transformer、GPU kernel 或具体模型速度。\n\n## FlashAttention、量化与 MoE：优化了哪一项\n\nFlashAttention 的核心是以分块和在线 softmax 避免在高带宽内存中完整读写巨大的 attention 矩阵，得到精确 attention（仍有浮点误差），主要改变 IO 与中间存储。它没有把普通全注意力的理论算术复杂度自动变成线性。比较性能要固定硬件、dtype、形状、因果选项和实现版本。\n\n量化降低部分权重或缓存的存储，但比例不能只算“位宽变小几倍”：还包含 scale、zero-point、未量化层、kernel 和反量化开销。MoE 用路由选择部分专家，活跃计算参数可以小于总参数；专家权重仍需存放，跨设备通信、负载不均衡和容量策略可能主导时延。没有总参数、活跃参数和部署拓扑，单独报告“模型大小”不够。\n\n实践顺序是先分解内存与时间，确定权重、KV、attention IO、FFN 或通信中的瓶颈，再选优化。没有性能测量时，可以解释机制和预期，不应声称已获得某个百分比加速。\n\n下面先跑一个单层因果对照；完整的旋转、KV 算式和负例在 notebook 中。\n\n```python\nimport math\n\ndef attention(q, keys, values):\n    if not q or not keys or len(keys) != len(values):\n        raise ValueError('matching nonempty Q/K/V required')\n    if any(len(k) != len(q) for k in keys):\n        raise ValueError('key dimensions must match query')\n    if not all(math.isfinite(v) for row in [q] + keys + values for v in row):\n        raise ValueError('finite vectors required')\n    if not values[0] or any(len(v) != len(values[0]) for v in values):\n        raise ValueError('value dimensions must match')\n    logits = [sum(a*b for a,b in zip(q,k))/math.sqrt(len(q)) for k in keys]\n    weights = [math.exp(v-max(logits)) for v in logits]\n    weights = [v/sum(weights) for v in weights]\n    return [sum(w*v[j] for w,v in zip(weights,values)) for j in range(len(values[0]))]\n\nx = [[1.,0.], [0.,1.], [1.,1.]]\nfull = [attention(q,x[:i+1],x[:i+1]) for i,q in enumerate(x)]\ncache=[]; incremental=[]\nfor token in x:\n    cache.append(token)\n    incremental.append(attention(token,cache,cache))\nassert full == incremental\nassert attention(x[0],x[:1],x[:1]) != attention(x[0],x,x)\nprint(full)\n```\n\n## 面试与实验：把名词变成能检验的推理\n\n解释 attention 时写清形状、softmax 轴和禁止位置；解释缓存时指出历史不变的因果前提；解释 GQA 时算 KV 缓存；解释 RoPE 时演示相对位移等式。再说反例：去掉 causal mask、错位 position、跨样本泄漏或特殊架构会怎样破坏结论。\n\n本篇 notebook 无模型下载、无 GPU、无 API，含负例和输出断言。跑通以后修改 head 数、一个未来向量或位置差，在笔记中写下预测与观察，再导入 mechanism_report.json。需要验证真实模型时，另行固定模型 revision、tokenizer、库版本、batch 和长度；不能把本篇的算例当成完整模型性能。\n\n继续阅读“模型调用”理解输出契约，阅读“推理服务”把内存和时延放入请求生命周期，再到面试页练习 attention、GQA、RoPE 与缓存追问。\n",
+      "sources": [
+        {
+          "title": "Attention Is All You Need",
+          "url": "https://arxiv.org/abs/1706.03762",
+          "supports": "原论文的 scaled dot-product attention、残差与 FFN",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "RoFormer",
+          "url": "https://arxiv.org/html/2104.09864v5",
+          "supports": "§3 二维旋转与相对位置机制",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "GQA 原论文",
+          "url": "https://arxiv.org/abs/2305.13245",
+          "supports": "grouped-query attention 的共享 KV 设计",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "Transformers cache explanation",
+          "url": "https://huggingface.co/docs/transformers/en/cache_explanation",
+          "supports": "因果缓存、每层存储和增量 attention mask",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "FlashAttention 原论文",
+          "url": "https://arxiv.org/abs/2205.14135",
+          "supports": "精确注意力的 IO 与中间存储优化",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "DeepSeek-V3 作者仓库",
+          "url": "https://github.com/deepseek-ai/DeepSeek-V3",
+          "supports": "历史架构案例：MLA 与 MoE；不是最新版声明",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        }
+      ],
+      "objectives": [
+        "从 tokenizer、移位标签和因果 mask 解释自回归预测；对话模板改变实际输入。",
+        "Q/K 决定匹配、V 决定聚合；缩放、归一化轴和禁止位置必须写清。",
+        "attention mask 和 loss mask 解决不同问题，工具观察是条件。",
+        "RoPE 用旋转表达相对位移；GQA 降 KV 头数，特殊架构另算。",
+        "缓存复用依赖历史因果不变；FlashAttention、量化和 MoE 优化的对象不同。"
+      ],
+      "prerequisites": [
+        "Python",
+        "线性代数与概率",
+        "基本梯度概念"
+      ],
+      "readingMinutes": 30,
+      "labMinutes": 25,
+      "reviewedAt": "2026-10-13",
+      "verifiedAt": "2026-10-13",
+      "level": "机制与深化",
+      "contentStatus": "机制、原创算例、负例与可运行标准库实验",
+      "chineseCharacterCount": 2177,
+      "accent": "blue"
+    },
+    {
+      "id": "lesson-finetuning-foundations",
+      "title": "微调与偏好优化：SFT、LoRA、DPO 与数据边界",
+      "topic": "后训练算法",
+      "goal": "从监督目标、矩阵梯度和 reference 概率理解后训练，识别数据泄漏、错误偏好与指标捷径。",
+      "summary": "从监督目标、矩阵梯度和 reference 概率理解后训练，识别数据泄漏、错误偏好与指标捷径。",
+      "number": 14,
+      "content": "## 先分清四个问题：知识、行为、偏好与探索\n\n预训练学习文本的统计规律；SFT 用示范教模型怎样按指令和格式行动；偏好优化用更好/更差的候选对调整行为；在线 RL 让策略与环境交互并依据奖励更新。它们可以组合，不能用一个排行榜数字证明每阶段必然有益。\n\n若错误来自文档缺失或已过时，先改检索和数据；若来自稳定输出格式或领域行为，考虑 SFT；若需要在两个合格答案中取舍，考虑偏好数据；若路径选择、工具反馈和长期奖励很重要，再评估交互式 RL。不要把微调当作更新实时知识的唯一方式，也不要把权限校验交给参数学习。\n\n训练前先冻结一组真实任务：工具参数、引用正确、拒答、澄清和失败恢复。把产品结果与 token loss 分开；低 loss 可以来自背诵、格式捷径或样本泄漏。\n\n## SFT 的损失：移位、选择目标、确定分母\n\n因果 SFT 的教学目标是 L=−Σ_t m_t log pθ(y_t|x,y_<t) / Σ_t m_t。m_t 标记监督位置；全为零的样本需要显式跳过或报错，不能默默除零。常见 assistant-only 或 completion-only 训练不要求模型复述用户输入、检索文本和工具观察，但这些内容仍作为条件参与计算。\n\n原创建模例子：四个目标位置的 log probability 为 [−2,−0.2,−0.4,−3]，只有中间两个 assistant 位置参与 loss，平均损失为 0.3。把全部四个位置平均得到 1.4，优化的问题已经改变。批次中长短回答的 token 平均与逐序列平均也不同；要明确每个样本怎样加权。\n\nHugging Face TRL 的 SFT 配置与 chat template 支持有关；assistant_only_loss 依赖能标出 assistant 范围的模板。工具调用数据还要核对 schema 和角色布局。读取一个实际 tokenized batch，比只写下配置名称更有价值。这里未运行 TRL 大模型训练。\n\n## 训练数据：任务族划分比随机打散更重要\n\n同一文档的相邻 chunk、同一会话的多个 turn、同一题目的改写和同一仓库的近重复问题不能随意横跨 train/dev/test。先以来源或任务族分组，再去重并划分；时间变化显著的任务增加未来时间测试。训练与验证可以共享通用术语，但不能共享答案、隐藏 grader 或完全相同的实例。\n\n工具轨迹至少保留 task_id、turn_id、工具 schema 版本、执行观察、结束原因和评判来源。成功轨迹要确认成功真有证据；失败轨迹用于诊断或特定恢复训练时，需要明确监督目标。复制不可靠的“成功答案”会把幻觉固化进模型。\n\n偏好标注要控制长度、格式和无关措辞的捷径，区分正确、部分正确、不可回答与工具执行失败。将标注规则交给另一人复核一批分歧样本；不把模型评委产生的候选偏好直接当作事实。\n\n## LoRA 的矩阵、缩放与初始化\n\n对冻结矩阵 W∈R^(d_out×d_in)，LoRA 学习 ΔW=(α/r)BA，A∈R^(r×d_in)、B∈R^(d_out×r)。前向为 Wx+(α/r)B(Ax)，可训练参数 r(d_in+d_out)，而全量矩阵有 d_in d_out 个参数。r=8、d_in=d_out=4096 时，一个矩阵的 adapter 参数为 65536，全量为 16777216；这是单矩阵比较，不能代表整个模型显存下降同一比例。\n\n常见初始化用随机 A、零 B，使初始 ΔW=0。最初 B 的梯度可非零，而 A 的梯度因 B=0 暂为零；后续 B 更新后 A 才开始获得梯度。PEFT 还有其他初始化和 scaling 选项，实验要写出实际配置；不要把所有 LoRA 都当作同一公式变体。\n\ntarget_modules、rank、α、dropout、训练 dtype 和是否更新 embedding/LM head 都影响行为。rank 越大并不必然更泛化。adapter 应绑定 base model revision、tokenizer 和训练配置；将它加到另一个同名但不同 revision 的模型，不能视为同一实验。\n\n## LoRA 真正节省什么：权重、梯度与优化器状态\n\n冻结基础权重减少其梯度和优化器状态，却仍需读取权重并进行前向/部分反向，训练激活仍占内存。QLoRA 将量化基础权重与低秩更新结合；计算 dtype、量化 scale、optimizer 和 activation checkpointing 都需要分别核算。\n\n合并 adapter 到基础矩阵可以减少额外支路，但量化权重、多个 adapter 或动态切换使合并策略更复杂。验证合并前后输出时，要允许数值误差，并用相同输入和 dtype；“参数可以相加”不等于部署接口已支持安全热切换。\n\n本篇 notebook 用小矩阵实现 LoRA，并将解析梯度与中心有限差分对照，实际做数步梯度下降。它证明实现中的方向、形状和初始化，不下载权重，不展示虚构微调收益，也不估计真实显存。\n\n## DPO 从偏好对到 log-ratio\n\n给定同一 prompt x 的优选 y_w 和非优选 y_l，标准 sigmoid DPO 使用 z=β[(logπθ(y_w|x)−logπθ(y_l|x))−(logπref(y_w|x)−logπref(y_l|x))]，L=−logσ(z)。它比较策略相对 reference 的序列 log-ratio；不是简单最大化 chosen 的概率，也不是对两个回答做词表 softmax。\n\n序列 log probability 通常是回答目标 token 的 log probability 之和，排除 prompt 和 padding。长度影响累加值；改为平均会改变目标，不能仍称与原式完全相同。reference 通常冻结，具体 PEFT 实现可能复用基础权重或不同 adapter，仍要确认哪个分布承担 reference。\n\n当 policy 与 reference 的 chosen/rejected 相对差一样，z=0，loss=log2≈0.6931。原创例子：policy 差为 2，reference 差为 1，β=0.1，z=0.1，loss≈0.6444；把偏好标签交换后 z=−0.1，loss≈0.7444。β 影响相对偏离和梯度尺度，不能孤立地说“越大越强”或“越小越好”。\n\n## DPO、PPO、GRPO：训练闭环中的位置不同\n\n标准离线 DPO 在固定偏好对上训练，不要求每次更新都在线采样或训练单独 reward model；偏好仍依赖数据覆盖和标注质量。PPO 通常包括 rollout、reward、value/advantage 估计和裁剪更新；GRPO 以同 prompt 的多个结果构造相对优势，通常不需要独立 critic。具体实现的 KL、归一化、mask 与重要性校正要回到代码，不能只认方法名称。\n\n给工具 Agent 做在线 RL 时，工具观察是条件，action token 是策略学习对象；环境超时、工具版本和停止策略可能改变奖励分布。每个 rollout 保留 policy 版本和任务身份，避免把训练中的环境变化误认成模型能力提高。\n\n选择方法时问：有什么监督信号、谁生成候选、是否能可靠判定成功、环境是否可重放、预算够不够。离线偏好优化不天然解决长期信用分配，也不能代替运行时的审批和幂等。\n\n## 训练稳定性与效率：先看有效批次和数据路径\n\n教学有效批量常写为 per-device batch × data-parallel replicas × gradient accumulation；张量并行分片数不等于数据副本数。变长 token、packing 和按 token 归一化使“样本数相同”也可能有不同权重。学习率、warmup、梯度裁剪和精度溢出需要与 loss、梯度范数和实际 token 数一起记录。\n\n全量训练显存分为权重、梯度、优化器状态和激活，分片与 checkpointing 针对不同对象。activation checkpointing 用重算换内存；ZeRO、FSDP、tensor/pipeline parallel 的通信和约束不同。没有硬件拓扑与序列长度，不能根据一个参数量给出可靠训练时间。\n\n最小排查次序：打印批次与 labels → 检查可训练参数 → 用一个小批次过拟合验证梯度路径 → 比较开发集与独立测试 → 才扩大规模。小批次过拟合只验证训练管道，不证明泛化。\n\n下面可直接核对 DPO 的方向；LoRA 梯度和分组划分在 notebook 中。\n\n```python\nimport math\n\ndef dpo_loss(policy_chosen, policy_rejected, ref_chosen, ref_rejected, beta=.1):\n    if beta <= 0 or not all(math.isfinite(v) for v in\n                           [policy_chosen,policy_rejected,ref_chosen,ref_rejected,beta]):\n        raise ValueError('finite values and positive beta required')\n    z=beta*((policy_chosen-policy_rejected)-(ref_chosen-ref_rejected))\n    return max(-z,0)+math.log1p(math.exp(-abs(z)))\n\nassert math.isclose(dpo_loss(-2,-4,-2,-4),math.log(2))\nassert math.isclose(dpo_loss(-2,-4,-3,-4),.6443966600735709)\nassert dpo_loss(-4,-2,-4,-3) > math.log(2)\ntry:\n    dpo_loss(-2,-4,-3,-4,float('nan'))\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError('nonfinite beta accepted')\nprint('reference, direction and finite-value checks passed')\n```\n\n## 评估、回归与面试解释\n\n至少保留基础模型、SFT、偏好优化三个检查点，在冻结任务上比较正确、引用、工具调用、拒答和恢复；按领域、长度、困难负例分层，同时测 token、时延和成本。加入未训练的通用任务，观察灾难性遗忘。训练曲线与偏好胜率的提升，均不能自动替代最终任务成功。\n\n面试解释按“目标 → 数据 → 损失 → 更新对象 → 评估”展开。遇到追问能写出 LoRA 形状与初始化梯度，手算 DPO 一个偏好对，解释为何工具 observation 不参与生成 loss 却必须可见；再给出数据泄漏和错误奖励的反例。\n\n本篇提供无 GPU 的数学与梯度实验，含错误输入和数据划分断言。导入结果后，在笔记里解释你改了哪个变量、预期什么、观察什么，再安排复习。真实训练时另行核对稳定版本、模型许可、数据授权与硬件预算，本篇不会把开发分支文档写成已验证的训练配置。\n",
+      "sources": [
+        {
+          "title": "LoRA 原论文",
+          "url": "https://arxiv.org/abs/2106.09685",
+          "supports": "冻结基础权重与低秩更新",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "PEFT LoRA reference · main",
+          "url": "https://huggingface.co/docs/peft/main/package_reference/lora",
+          "supports": "rank、target modules、初始化；开发分支，未运行训练框架",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "DPO 原论文",
+          "url": "https://arxiv.org/html/2305.18290v2",
+          "supports": "§3–4 preference 模型、reference log-ratio 与 sigmoid 目标",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "TRL SFT Trainer",
+          "url": "https://huggingface.co/docs/trl/en/sft_trainer",
+          "supports": "assistant/completion loss 与 chat template 前提",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        },
+        {
+          "title": "TRL DPO Trainer · main",
+          "url": "https://huggingface.co/docs/trl/main/en/dpo_trainer",
+          "supports": "偏好数据、reference 与不同损失选项；开发分支不是固定训练版本",
+          "verifiedAt": "2026-10-13",
+          "verification": "已读取所列范围；本站数学与梯度实验不代表大模型训练或性能复现。"
+        }
+      ],
+      "objectives": [
+        "先定位知识、格式行为、偏好或交互策略错误，再选择检索、SFT、偏好优化或 RL。",
+        "SFT 要核对移位标签、监督 mask、模板支持和 loss 分母。",
+        "LoRA 学习低秩更新；冻结权重不消除权重读取、激活和所有训练成本。",
+        "DPO 比较 policy 相对 reference 的 chosen/rejected 序列 log-ratio。",
+        "按来源或任务族划分，保留通用回归和冻结测试，曲线改善不等于最终任务成功。"
+      ],
+      "prerequisites": [
+        "Python",
+        "线性代数与概率",
+        "基本梯度概念"
+      ],
+      "readingMinutes": 30,
+      "labMinutes": 25,
+      "reviewedAt": "2026-10-13",
+      "verifiedAt": "2026-10-13",
+      "level": "机制与深化",
+      "contentStatus": "机制、原创算例、负例与可运行标准库实验",
+      "chineseCharacterCount": 2129,
       "accent": "blue"
     }
   ],

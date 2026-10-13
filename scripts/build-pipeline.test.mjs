@@ -17,7 +17,7 @@ test('A content-only rebuild replaces a stale embedded reading and updates all s
     const script=(await readFile('scripts/build.mjs','utf8')).replace("from 'esbuild'",`from '${pathToFileURL(require.resolve('esbuild')).href}'`);
     await writeFile(path.join(root,'scripts/build.mjs'),script);
     await writeFile(path.join(root,'src/shell.html'),'<html data-content-version="{{assetVersion}}">{{title}}{{navigation}}{{explorationNavigation}}</html>');
-    for(const name of ['workspace','product','experience','reader','workflow'])await writeFile(path.join(root,'assets',name+'.css'),'');
+    for(const name of ['workspace','product','experience','reader','workflow','acceptance'])await writeFile(path.join(root,'assets',name+'.css'),'');
     await writeFile(path.join(root,'assets/app.js'),'stale bundle');
     await writeFile(path.join(root,'assets/workspace.js'),"import data from '../content/topic-readings.json' with {type:'json'}; export const reading = data.readings;");
     for(const [name,data] of Object.entries({workspace:{resources:[],guides:[]},lessons:{lessons:[]},'study-units':{units:[]},'study-curriculum':{groups:[]},'topic-readings':{readings:[{scope:'memory-only-v1'}]}}))await writeFile(path.join(root,'content',name+'.json'),JSON.stringify(data));
