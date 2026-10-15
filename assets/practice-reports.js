@@ -38,6 +38,7 @@ export function calibrationReportNote(text){
   return body;
 }
 export const notebookReports={
+  'rag-sqlite-retrieval.ipynb':{experiment:'rag-sqlite-retrieval',filename:'rag_retrieval_report.json'},
   'mcp-tool-contract.ipynb':{experiment:'mcp-tool-contract',filename:'mechanism_report.json'},
   'langgraph-control-flow.ipynb':{experiment:'langgraph-control-flow',filename:'langgraph_flow_report.json'},
   'agent-research-checks.ipynb':{experiment:'agent-research-checks',filename:'mechanism_report.json'},
@@ -49,9 +50,12 @@ export const notebookReports={
 export function appendPracticeReport(reflection,text,expectedExperiment='durable-agent'){
   const note=Object.hasOwn(mechanismChecks,expectedExperiment)?mechanismReportNote(text,expectedExperiment):expectedExperiment==='langgraph-durable-workflow'?langgraphReportNote(text):expectedExperiment==='decision-calibration'?calibrationReportNote(text):expectedExperiment==='durable-agent'?recoveryReportNote(text):null;
   if(!note)throw new Error('本篇暂不支持此实验记录');
-  if(reflection.includes(note))return {text:reflection,duplicate:true};const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
+  const heading=note.split('\n',1)[0],latest=reflection.lastIndexOf(heading+'\n');
+  if(latest>=0&&reflection.slice(latest,latest+note.length)===note)return {text:reflection,duplicate:true};
+  const combined=[reflection.trim(),note].filter(Boolean).join('\n\n');if(combined.length>6000)throw new Error('笔记超过 6000 字，请先将现有内容存入日志，再导入');return {text:combined,duplicate:false};
 }
 export const mechanismChecks={
+  'rag-sqlite-retrieval':{fts_ranking:'真实 FTS5 排序',filter_before_limit:'过滤先于候选截断',query_contract:'查询与身份边界',update_visibility:'更新进入索引',delete_visibility:'删除移出索引',citation_version:'引用版本校验',evaluation_protocol:'固定标签评测',empty_evidence:'空证据状态',sqlite_reopen:'索引重开恢复'},
   'lesson-model-foundations':{stable_softmax:'稳定 softmax',causal_mask:'因果可见性',cache_equivalence:'缓存逐元素等价',rope_relative:'RoPE 相对位移',kv_heads:'KV 头数与内存',negative_inputs:'非法输入拒绝'},
   'lesson-finetuning-foundations':{loss_mask:'监督位置与分母',lora_gradient:'LoRA 有限差分梯度',frozen_base:'冻结基础矩阵',dpo_reference:'DPO reference 与标签方向',group_split:'来源分组划分',negative_inputs:'非法输入拒绝'},
   'mcp-tool-contract':{discovery:'真实工具发现',structured_result:'结构化结果',invalid_input_rejected:'非法类型拒绝',business_error_retained:'业务错误保留',unknown_tool_rejected:'未知工具拒绝',subprocess_boundary:'stdio 子进程边界'},
@@ -82,7 +86,7 @@ export function mechanismReportNote(text,expected){
   const labels=expanded?{...spec,...extension}:spec;
   if(!r.checks||typeof r.checks!=='object'||Array.isArray(r.checks)||!(legacy||expanded)||!Object.keys(labels).every(k=>typeof r.checks[k]==='boolean'))throw new Error('实验检查项不完整');
   if(r.my_explanation!==undefined&&typeof r.my_explanation!=='string')throw new Error('实验解释须为文本');
-  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':mcp?'真实 MCP SDK '+r.version+'，协议 '+r.protocol+'；内存与 stdio，无模型、HTTP/OAuth 或私有数据':expected==='lesson-finetuning-foundations'?'标准库数学与小矩阵梯度下降；未运行真实大模型、远端服务或完整 benchmark':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(labels).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}${legacy&&extraKeys.length?'\n\n旧版报告未包含扩展实验检查。':''}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
+  return `## 代码实践 · ${expected}\n\n范围：${sdk?'真实 LangGraph '+r.version+'；固定决策、无模型和远端服务':mcp?'真实 MCP SDK '+r.version+'，协议 '+r.protocol+'；内存与 stdio，无模型、HTTP/OAuth 或私有数据':expected==='rag-sqlite-retrieval'?'本地 SQLite FTS5 实际检索与教学语料；无 embedding、重排模型、LLM 或服务压测':expected==='lesson-finetuning-foundations'?'标准库数学与小矩阵梯度下降；未运行真实大模型、远端服务或完整 benchmark':'标准库教学 fixture；无模型、服务、训练或 benchmark 运行'}。\n\n${Object.entries(labels).map(([k,label])=>'- '+label+'：'+(r.checks[k]?'通过':'未通过')).join('\n')}${legacy&&extraKeys.length?'\n\n旧版报告未包含扩展实验检查。':''}\n\n导入只核验格式，不认证来源或真实系统效果。${r.my_explanation?.trim()?'\n\n我的解释：\n'+r.my_explanation.trim().slice(0,2500):''}`;
 }
 export function langgraphReportNote(text){
   if(typeof text!=='string'||text.length>50000)throw new Error('请选择不超过 50 KB 的 langgraph_report.json');

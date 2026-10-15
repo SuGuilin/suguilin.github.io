@@ -11,7 +11,7 @@ import re
 root = Path(__file__).resolve().parent.parent
 names = ['durable-agent.ipynb', 'paired-agent-evaluation.ipynb', 'agent-mechanism-checks.ipynb', 'decision-calibration.ipynb']
 foundations=['llm-contract','retrieval-rag','context-engineering','agent-security','multi-agent','inference-serving','model-foundations','finetuning-foundations']
-names.extend([name+'.ipynb' for name in foundations]+['agent-research-checks.ipynb'])
+names.extend([name+'.ipynb' for name in foundations]+['agent-research-checks.ipynb','rag-sqlite-retrieval.ipynb'])
 if '--sdk' in sys.argv:
     names.extend(['langgraph-interrupts.ipynb', 'langgraph-durable-workflow.ipynb','langgraph-control-flow.ipynb'])
 if '--mcp' in sys.argv:
@@ -70,6 +70,11 @@ for name in names:
                 assert abs(namespace['brier'](namespace['labels'], namespace['probabilities']) - 0.1671875) < 1e-12
                 accepted = namespace['selective'](namespace['changed'], namespace['probabilities'], 0.9)
                 assert accepted['coverage'] == 0.25 and accepted['accepted_error'] == 0.5
+            elif name=='rag-sqlite-retrieval.ipynb':
+                report=json.loads(Path('rag_retrieval_report.json').read_text())
+                assert len(report['checks'])==9 and all(report['checks'].values())
+                assert report['observations'][0]['recall']==1 and report['observations'][2]['recall'] is None
+                assert namespace['bad']==[] and len(namespace['safe'])==1
             elif name=='langgraph-control-flow.ipynb':
                 report=json.loads(Path('langgraph_flow_report.json').read_text())
                 assert report['version']=='1.2.15' and report['model_called'] is False

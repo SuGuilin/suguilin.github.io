@@ -46,8 +46,8 @@ export function renderMarkdown(text, options={}) {
         continue;
       }
     }
-    const heading = /^(#{1,3})\s+(.+)$/.exec(line);
-    if (heading) {flush();const level = heading[1].length+1;const id=options.headingPrefix?` id="${esc(options.headingPrefix)}-${headingIndex}"`:'';headingIndex++;out.push(`<h${level}${id}>${inline(heading[2])}</h${level}>`);continue;}
+    const heading = /^(#{1,6})\s+(.+)$/.exec(line);
+    if (heading) {flush();const level = Math.min(6,heading[1].length+(options.headingOffset===0?0:1));const id=options.headingPrefix?` id="${esc(options.headingPrefix)}-${headingIndex}"`:'';headingIndex++;out.push(`<h${level}${id}>${inline(heading[2])}</h${level}>`);continue;}
     const bullet = /^\s*([-*]|\d+\.)\s+(.+)$/.exec(line);
     if (bullet) {
       const type = /\d/.test(bullet[1])?'ol':'ul';
