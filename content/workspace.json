@@ -3523,9 +3523,9 @@
           "observed": "已读固定/递归/语义等分块策略、段落合并与代码示例；原文示例chunk_size=200而注释写100，旧导入接口需要按依赖版本核对，不直接作为本站运行配方。"
         }
       ],
-      "verifiedAt": "2026-10-13",
+      "verifiedAt": "2026-10-15",
       "access": "readable",
-      "verification": "本轮已读README目录与分块章节正文；分块示例的注释/接口仍需按版本检查。未运行全部仓库案例，不把课程覆盖等同于本站实现。",
+      "verification": "2026-10-15 重读 README 的前置/目录与分块相关正文；chunk_size=200/注释100的差异仍存在。未运行整库；本站另提供已执行的本地词项索引教学实验。",
       "priority": "explore",
       "relatedUrls": [],
       "studyUnits": [
@@ -3986,6 +3986,49 @@
       "whenToLearn": "同文档池比较dense、改写、融合、重排、tool-call与late interaction；同时审查合成query和judge限制。",
       "verification": "已读v1方法、结果和限制；judge看不到检索原文，ColBERT同时换编码器。未复现成绩，不推出所有任务通用的最优管线。",
       "verifiedAt": "2026-10-13",
+      "studyUnits": [
+        "lesson-retrieval-rag",
+        "lesson-evaluation-statistics"
+      ]
+    },
+    {
+      "id": "sqlite-fts5-practical",
+      "title": "SQLite FTS5：可实跑的词项检索与索引一致性",
+      "url": "https://www.sqlite.org/fts5.html",
+      "source": "SQLite 官方文档",
+      "description": "真实 MATCH/BM25、过滤顺序、tokenizer 与更新删除；配合本站 SQLite notebook 比较失败和修正版本。",
+      "category": "framework",
+      "level": "深化",
+      "tags": [
+        "RAG",
+        "检索",
+        "官方文档",
+        "SQLite"
+      ],
+      "whenToLearn": "已理解候选与排序后，先做一个无模型检索基线，再引入 embedding。",
+      "verification": "2026-10-15 已读 bm25、Unicode61 和外部内容表一致性章节。本站独立小语料实验已跑；未运行向量库或生产压测。",
+      "verifiedAt": "2026-10-15",
+      "studyUnits": [
+        "lesson-retrieval-rag"
+      ]
+    },
+    {
+      "id": "zone7-rag-retrieval-reflection",
+      "title": "中文实践观点：混合检索的分数和收益怎样验证",
+      "url": "https://www.cnblogs.com/zone7/p/19729698",
+      "source": "博客园 · zone7 原作者技术分享",
+      "description": "作者比较词项、向量与混合检索，并给出加权示例。学习时应核查分数量纲、归一化、候选池和评测数据，不能把固定权重或“最优”视为普遍结论。",
+      "category": "community",
+      "level": "深化",
+      "tags": [
+        "中文社区",
+        "RAG",
+        "作者观点",
+        "批判性阅读"
+      ],
+      "whenToLearn": "对照 RAG 正文与真实索引实验，解释为什么未经校准的 BM25 与余弦分数不能直接外推。",
+      "verification": "2026-10-15 读作者正文的向量/混合策略与代码段；未运行其仓库。其效果排序与权重为作者示例，不作本站实测结论。",
+      "verifiedAt": "2026-10-15",
       "studyUnits": [
         "lesson-retrieval-rag",
         "lesson-evaluation-statistics"
@@ -4643,7 +4686,7 @@
         "对比关键词、向量、混合和重排。",
         "同时分析召回、排序、延迟与成本。"
       ],
-      "answer": "**核心思路**\n\n固定语料、切块、ACL、标签与预算；对照词项、稠密、rank 融合和候选重排。RRF 用排序而非直接相加不同比例分数。\n\n**反例与边界**\n\n重排 top-2 中没有正确文档，不能靠重排找回未召回候选；向量相似也不是真实性。\n\n**怎样验证**\n\n逐 k 测 Recall/MRR/nDCG，再测答案与引用支持、拒答和 p95 成本；人工证据作为生成对照。\n\n**计算追问**\n\nexact=[a,b]、approx=[a,c]、人工相关={c}：ANN Recall@2=0.5，相关证据Recall@2=1。MRR只看首相关；相关度a=3/b=1，排序[b,a]的MRR=1，但指数gain nDCG约0.7098。报告过滤、去重、gain与无答案口径。",
+      "answer": "**核心思路**\n\n固定语料、切块、ACL、标签与预算；对照词项、稠密、rank 融合和候选重排。RRF 用排序而非直接相加不同比例分数。\n\n**反例与边界**\n\n重排 top-2 中没有正确文档，不能靠重排找回未召回候选；向量相似也不是真实性。\n\n**怎样验证**\n\n逐 k 测 Recall/MRR/nDCG，再测答案与引用支持、拒答和 p95 成本；人工证据作为生成对照。\n\n**计算追问**\n\nexact=[a,b]、approx=[a,c]、人工相关={c}：ANN Recall@2=0.5，相关证据Recall@2=1。MRR只看首相关；相关度a=3/b=1，排序[b,a]的MRR=1，但指数gain nDCG约0.7098。报告过滤、去重、gain与无答案口径。\n\n可运行追问：在本站 RAG 的 SQLite 实验中，Bob 的片段排全局第一，Alice 的 gold={a1,a2}。先取 top-2 再过滤得到一条，Recall=0.5；先约束候选再截断得到两条，Recall=1。固定数据、标签、k 与排序，只改过滤位置。这个结果说明候选覆盖机制，不能外推为真实向量库或混合检索的通用收益。",
       "studyUnits": [
         "lesson-retrieval-rag"
       ],
@@ -4658,7 +4701,7 @@
         "再检查答案是否忠实使用证据。",
         "给出引用、拒答和端到端指标。"
       ],
-      "answer": "**核心思路**\n\n先用人工 query 测检索，再把人工相关证据给同一生成器；查看错误发生在召回、解析、重排、上下文还是答案整合。\n\n**反例与边界**\n\n答案碰巧正确但引用不支持，不等于 RAG 成功；模型记忆可掩盖检索缺失。\n\n**怎样验证**\n\n保存 query、候选、最终证据和 claim 引用，加入无答案、冲突、精确版本及越权文档，固定模型与评分器。",
+      "answer": "**核心思路**\n\n先用人工 query 测检索，再把人工相关证据给同一生成器；查看错误发生在召回、解析、重排、上下文还是答案整合。\n\n**反例与边界**\n\n答案碰巧正确但引用不支持，不等于 RAG 成功；模型记忆可掩盖检索缺失。\n\n**怎样验证**\n\n保存 query、候选、最终证据和 claim 引用，加入无答案、冲突、精确版本及越权文档，固定模型与评分器。\n\n验证题：chunk ID 相同但版本已更新，链接仍可打开，不代表旧结论有依据。分别验证引用身份/版本、逐 claim 语义支持；前者通过不保证后者。本站 SQLite 代码实际检查旧词退出、新词进入、删除与重开持久性；未运行 LLM，不把空证据状态误称为已经测过生成拒答质量。",
       "studyUnits": [
         "lesson-retrieval-rag"
       ],

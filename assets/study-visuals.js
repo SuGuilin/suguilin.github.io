@@ -1,3 +1,5 @@
+import {learningNotebooks} from './practice-catalog.js';
+export {learningNotebooks} from './practice-catalog.js';
 import {escapeHTML as esc} from './state.js';
 import {renderMarkdown} from './markdown.js';
 import {notebookReports} from './practice-reports.js';
@@ -10,43 +12,12 @@ export const mechanismDiagrams={
  'lesson-production-system-design':{title:'过期 Worker 怎样被阻止提交状态？',steps:[['排队','任务生命周期','把 queued、running、waiting_approval 和终止状态定义清楚，再连接队列、worker 和模型。'],['持久化','状态、租约与预算','保存检查点、稳定操作身份、心跳或租约和预算，使 worker 崩溃后仍能识别未确认工作。'],['协作','审批与权限边界','审批绑定具体动作与参数；取消停止新动作，已提交的远端副作用仍需查询和对账。'],['取舍','用基线解释架构','同任务比较单 Agent 与多 Agent 的成功率、成本和时延，证明拆分收益足以覆盖协调与一致性成本。']],question:'任务被取消，是否意味着远端已提交的写入也被撤销？',choices:['是，取消会自动回滚所有系统','不是，已提交动作仍需查询或补偿','取决于模型是否回答“已撤销”'],correct:1,explanation:'取消可以停止新的动作，但不能自动撤回其他系统已经提交的副作用。需要明确的状态查询、补偿或对账流程。'}
 };
 export function questionTitle(unit){return unit.title;}
-export const learningNotebooks={
- 'lesson-model-foundations':[['model-foundations.ipynb','Attention、RoPE 与缓存的逐元素对照','标准库数学 · 25 分钟']],
- 'lesson-finetuning-foundations':[['finetuning-foundations.ipynb','SFT mask、LoRA 梯度与 DPO log-ratio','标准库梯度 · 25 分钟']],
- 'digest-langgraph':[['langgraph-control-flow.ipynb','路由、工具、并行、子图、流式与故障','真实 SDK · 25 分钟'],['langgraph-durable-workflow.ipynb','状态合并、跨进程恢复与审批边界','真实 SDK + SQLite · 25–35 分钟']],
- 'lesson-llm-contract':[['llm-contract.ipynb','结构、日期和金额的拒绝路径','标准库合同 · 15 分钟']],
- 'lesson-retrieval-rag':[['retrieval-rag.ipynb','RRF、ANN / 相关性召回、nDCG 与 MaxSim','离线排序与矩阵 · 30 分钟']],
- 'lesson-context-engineering':[['context-engineering.ipynb','预算与必要状态保留','成本单位 fixture · 15 分钟']],
- 'lesson-agent-security':[['agent-security.ipynb','可信身份、scope 与越权拒绝','本地合同 · 15 分钟']],
- 'lesson-multi-agent':[['multi-agent.ipynb','子任务证据、冲突与总预算','本地归并 fixture · 15 分钟']],
- 'lesson-inference-serving':[['inference-serving.ipynb','采样、投机残差、KV 块分配与量化','标准库概率与内存 · 30 分钟']],
- 'digest-deep-agents':[['context-engineering.ipynb','上下文装配与保留条件','基础合同 · 不运行 Deep Agents'],['multi-agent.ipynb','委派结果与冲突','基础合同 · 不调用模型']],
- 'digest-mcp':[['mcp-tool-contract.ipynb','MCP 发现、调用与错误返回','真实 SDK 2.3.0 · 内存 + stdio'],['agent-security.ipynb','身份、scope 与对象归属','应用合同 · 不是 HTTP OAuth']],
- 'digest-paper-react':[['agent-research-checks.ipynb','有限循环、无信息观察与停止','第 6 节 · 固定决策']],
- 'digest-paper-dspy':[['agent-research-checks.ipynb','评分器负例与来源划分','第 5 节 · 不运行优化器']],
- 'digest-eval-gaia':[['agent-research-checks.ipynb','附件 join 与金额 grader','第 4 节 · 原创任务']],
- 'digest-eval-tau-family':[['agent-research-checks.ipynb','pass@k / pass^k 组合估计','第 3 节 · 合成 trial']],
- 'digest-eval-terminalbench':[['agent-research-checks.ipynb','实际业务结果与 grader 负例','第 4、5 节 · 无容器']],
- 'digest-mem0':[['agent-mechanism-checks.ipynb','用户归属与有效时间','第 1 节 · 不运行 Mem0']],
- 'digest-verl':[['agent-research-checks.ipynb','PPO 裁剪、组优势与 mask','第 1、2 节 · 无 GPU 训练']],
- 'digest-agent-lightning':[['agent-research-checks.ipynb','rollout 身份与 token 边界','第 2 节 · 不运行 Gateway']],
- 'digest-paper-ragen':[['agent-research-checks.ipynb','组内零方差与动作合同','第 1、2 节 · 不运行 RAGEN']],
- 'digest-search-r1':[['agent-research-checks.ipynb','action mask 与观察条件','第 2 节 · 无检索服务']],
- 'digest-paper-deepseek-r1':[['agent-research-checks.ipynb','裁剪目标与评测可靠性','第 1、3 节 · 未加载权重']],
- 'digest-hello-agents':[['llm-contract.ipynb','模型接口与拒绝路径','基础合同 · 15 分钟'],['agent-research-checks.ipynb','有限循环的停止机制','第 6 节 · 固定决策']],
- 'digest-jev':[['decision-calibration.ipynb','概率、错误与回退阈值','合成数据 · 15 分钟']],
- 'lesson-harness':[['langgraph-interrupts.ipynb','LangGraph 审批暂停与恢复','真实 SDK · 15 分钟'],['durable-agent.ipynb','检查点与远端副作用','内存模拟 + SQLite · 25 分钟']],
- 'lesson-tool-reliability':[['durable-agent.ipynb','超时、幂等与查询恢复','内存模拟 + SQLite · 25 分钟']],
- 'lesson-evaluation-statistics':[['paired-agent-evaluation.ipynb','配对评测与伪重复','合成数据 · 20 分钟']],
- 'lesson-long-term-memory':[['agent-mechanism-checks.ipynb','有效时间与用户隔离','标准库 · 第 1 节']],
- 'lesson-agent-rl':[['agent-mechanism-checks.ipynb','动作位置与 loss mask','标准库 · 第 2 节'],['agent-research-checks.ipynb','裁剪、归一化与参考 KL','标准库 · 第 1、2、8 节']],
- 'lesson-production-system-design':[['agent-mechanism-checks.ipynb','过期 Worker 的版本检查','标准库 · 第 3 节']]
-};
+
 export function notebookPanel(unit){
  const notebooks=learningNotebooks[unit.id];if(!notebooks)return '';
  const version=typeof document!=='undefined'?document.documentElement?.dataset?.contentVersion:'',suffix=version?'?v='+encodeURIComponent(version):'';
  return `<section class="learning-notebook" aria-label="运行本篇代码"><h3>代码实践</h3>${notebooks.map(n=>{const report=notebookReports[n[0]],inputId='report-'+unit.id+'-'+report?.experiment;return `<div class="notebook-row"><div><strong>${n[1]}</strong><small>${n[2]} · CPU · 无需模型密钥</small></div><a class="text-link" href="https://colab.research.google.com/github/SuGuilin/suguilin.github.io/blob/main/notebooks/${n[0]}" target="_blank" rel="noopener noreferrer">Colab ↗</a><a class="text-link" href="/notebooks/${n[0]}${suffix}" download>下载代码</a>${report?`<button class="text-link" data-study="import-experiment" data-input="${inputId}">导入实验结果</button><input type="file" id="${inputId}" accept=".json,application/json" data-practice-report data-unit="${unit.id}" data-experiment="${report.experiment}" hidden><p class="notebook-import-help">运行最后一格，从 Colab 文件侧栏下载 ${report.filename}，导入本篇笔记。</p>`:''}</div>`;}).join('')}</section>`;
 }
 export function mechanismFigure(unit){const d=mechanismDiagrams[unit.id];if(!d)return '';return `<figure class="mechanism-figure" data-mechanism="${unit.id}"><figcaption><span class="eyebrow">MECHANISM MAP / 原创教学示意</span><h2>${d.title}</h2><p>点击一个环节，看看它承担什么责任。</p></figcaption><div class="mechanism-path" role="group" aria-label="探索机制环节">${d.steps.map((s,i)=>`<button data-mechanism-step="${i}" aria-pressed="${i===0}"><span>${String(i+1).padStart(2,'0')}</span><strong>${s[0]}</strong><small>${s[1]}</small></button>`).join('')}</div><div class="mechanism-detail" aria-live="polite"><span>01 / ${d.steps[0][1]}</span><p>${d.steps[0][2]}</p></div><div class="mechanism-check"><strong>停一下，先判断。</strong><p>${d.question}</p><div>${d.choices.map((c,i)=>`<button data-mechanism-choice="${i}">${c}</button>`).join('')}</div><p class="mechanism-feedback" aria-live="polite" hidden></p></div></figure>`;}
-export function lessonChapters(lesson,{opening=false,remaining=false}={}){const matches=[...lesson.content.matchAll(/^(#{2,3})\s+(.+)$/gm)];return matches.filter(m=>m[2]!=='一手来源').map((m,i)=>{if(opening&&i!==0||remaining&&i===0)return '';const end=matches.find(n=>n.index>m.index)?.index??lesson.content.length;const text=lesson.content.slice(m.index+m[0].length,end).trim();return `<section class="reading-chapter" id="chapter-${i}"><h2>${esc(m[2])}</h2><div class="markdown-body">${renderMarkdown(text,{headingPrefix:'chapter-'+i})}</div></section>`;}).join('');}
+export function lessonChapters(lesson,{opening=false,remaining=false}={}){const matches=[...lesson.content.matchAll(/^(#{2,3})\s+(.+)$/gm)];return matches.filter(m=>m[2]!=='一手来源').map((m,i)=>{if(opening&&i!==0||remaining&&i===0)return '';const end=matches.find(n=>n.index>m.index)?.index??lesson.content.length;const text=lesson.content.slice(m.index+m[0].length,end).trim();return `<section class="reading-chapter" id="chapter-${i}"><h2>${esc(m[2])}</h2><div class="markdown-body">${renderMarkdown(text,{headingPrefix:'chapter-'+i,headingOffset:0})}</div></section>`;}).join('');}
 export function bindMechanismExplorers(){for(const root of document.querySelectorAll('[data-mechanism]')){const d=mechanismDiagrams[root.dataset.mechanism];if(!d)continue;root.addEventListener('click',e=>{const step=e.target.closest('[data-mechanism-step]'),choice=e.target.closest('[data-mechanism-choice]');if(step){const i=Number(step.dataset.mechanismStep);for(const b of root.querySelectorAll('[data-mechanism-step]'))b.setAttribute('aria-pressed',String(b===step));root.querySelector('.mechanism-detail').innerHTML='<span>'+String(i+1).padStart(2,'0')+' / '+esc(d.steps[i][1])+'</span><p>'+esc(d.steps[i][2])+'</p>';}if(choice){const correct=Number(choice.dataset.mechanismChoice)===d.correct;for(const b of root.querySelectorAll('[data-mechanism-choice]'))b.classList.toggle('chosen',b===choice);const feedback=root.querySelector('.mechanism-feedback');feedback.hidden=false;feedback.textContent=(correct?'这个判断抓住了关键。':'再检查一下这个边界。')+' '+d.explanation;}});}}

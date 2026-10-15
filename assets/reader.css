@@ -187,3 +187,12 @@ body.reader-focus .reading-toolbar{top:0}body.reader-focus .study-reader-aside{t
 .study-reader-aside>.text-link{display:block}
 @media(max-width:700px){.annotation-row>div{gap:6px 16px}}
 @media(max-width:560px){.reading-toolbar{top:58px}}
+.practice-feedback{margin:0 0 18px;padding:12px 14px;border-left:2px solid var(--accent);background:var(--surface-soft,var(--bg));font-size:14px;line-height:1.6}
+.practice-feedback strong{font-size:14px;font-weight:600}
+.practice-feedback p{margin:6px 0;color:var(--text-secondary,var(--muted))}
+.practice-feedback-actions{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.practice-feedback-actions .text-link{font-size:13px}
+.study-prose .markdown-body h4,.study-prose .markdown-body h5,.study-prose .markdown-body h6{font-size:var(--reading-size,16px);font-weight:600;line-height:1.55;margin:20px 0 9px;letter-spacing:0;color:var(--ink)}
+.journal-practice-result{margin:12px 0;border-block:1px solid var(--line);padding:9px 0;font-size:14px;line-height:1.6}
+.journal-practice-result summary{font-size:14px;color:var(--muted);cursor:pointer}
+.journal-practice-result>div{padding-top:8px}
